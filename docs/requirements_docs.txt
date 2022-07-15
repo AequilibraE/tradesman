@@ -1,0 +1,15 @@
+numpy
+pyaml
+PyQt5>=5.10.1
+enum34>=1.1.6
+Sphinx>=1.7.5
+pydata-sphinx-theme
+sphinx_autodoc_annotation
+nbsphinx
+pillow
+matplotlib
+folium
+requests
+sphinx-gallery
+nbsphinx
+ipython_genutils
