@@ -2,7 +2,7 @@ import logging
 import sys
 
 import geopandas as gpd
-from aequilibrae import logger, Project
+from aequilibrae import Project
 
 from tradesman.data_retrieval import subdivisions
 from tradesman.data_retrieval.trigger_import_amenities import trigger_import_amenities
@@ -50,7 +50,7 @@ class Model:
 
         trigger_network(self._project, self.__folder, self.__model_place)
 
-    def import_subdivisions(self, subdivisions=2, overwrite=False):
+    def import_subdivisions(self, subdivision_levels=2, overwrite=False):
         """Imports political subdivisions.
 
         Args:
@@ -58,7 +58,7 @@ class Model:
                *overwrite* (:obj:`bool`): Deletes pre-existing subdivisions. Defaults to False
 
         """
-        add_subdivisions_to_model(self._project, self.__model_place, subdivisions, overwrite)
+        add_subdivisions_to_model(self._project, self.__model_place, subdivision_levels, overwrite)
 
     def import_population(self, overwrite=False):
         """
@@ -68,7 +68,7 @@ class Model:
                 *overwrite* (:obj:`bool`): Deletes pre-existing population_source_import. Defaults to False
         """
 
-        trigger_population(self._project, self.__model_place, self.__population_source, overwrite=False)
+        trigger_population(self._project, self.__model_place, self.__population_source, overwrite=overwrite)
 
     def build_zoning(self, hexbin_size=200, max_zone_pop=10000, min_zone_pop=500, save_hexbins=True):
         """Creates hexagonal bins, and then clusters it regarding the political subdivision.
@@ -124,10 +124,12 @@ class Model:
 
     @property
     def place(self):
+        """ Returns the name of the place for which this model was made"""
         return self.__model_place
 
     @staticmethod
     def __starts_logging():
+        logger = logging.getLogger("tradesman")
         stdout_handler = logging.StreamHandler(sys.stdout)
         formatter = logging.Formatter("%(asctime)s;%(name)s;%(message)s")
         stdout_handler.setFormatter(formatter)
