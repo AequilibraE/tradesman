@@ -3,6 +3,18 @@ line-length = 120
 target-version = ['py37', 'py38', 'py39', 'py310']
 include = '\.pyi?$'
 
+[tool.poetry]
+name = "tradesman"
+version = "0.1"
+description = "Python dependency management and packaging made easy."
+authors = [
+    "Renata Akemii",
+     "Pedro Camargo <c@margo.co>",
+]
+maintainers = ["Pedro Camargo <c@margo.co>",]
+license = "MIT"
+
+
 [tool.poetry.dependencies]
 python = "^3.7"
 openmatrix = "*"
