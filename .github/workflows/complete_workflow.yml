@@ -32,9 +32,8 @@ jobs:
 
     - name: Builds documentation
       run: |
-        poetry shell
         cd docs
-        sphinx-build -b html source build
+        poetry run sphinx-build -b html source build
 
     - name: Keeps documentation on GitHub
       uses: actions/upload-artifact@v2
