@@ -32,6 +32,7 @@ jobs:
 
     - name: Builds documentation
       run: |
+        poetry shell
         cd docs
         sphinx-build -b html source build
 
