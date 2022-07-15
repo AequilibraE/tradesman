@@ -24,10 +24,11 @@ jobs:
         sudo apt-get install -y pandoc
         python -m pip install setuptools --upgrade
         python -m pip install sphinx-gallery --user
-        python -m pip install wheel spatialite
+        python -m pip install wheel spatialite poetry
         sudo apt-get install libsqlite3-mod-spatialite
         sudo apt-get install -y libspatialite-dev
         sudo ln -s /usr/lib/x86_64-linux-gnu/mod_spatialite.so /usr/lib/x86_64-linux-gnu/mod_spatialite
+        poetry install
 
     - name: Builds documentation
       run: |
