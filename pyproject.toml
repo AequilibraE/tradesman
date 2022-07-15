@@ -3,10 +3,6 @@ line-length = 120
 target-version = ['py37', 'py38', 'py39', 'py310']
 include = '\.pyi?$'
 
-[build-system]
-requires = ["aequilibrae=0.7.2", "", "", "", "", "", ""]
-
-
 [tool.poetry.dependencies]
 python = "^3.7"
 openmatrix = "*"
