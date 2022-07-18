@@ -7,7 +7,7 @@ def get_borders_online(country_name: str):
     country_code = pycountry.countries.search_fuzzy(country_name)[0].alpha_3
 
     r = requests.get(f"https://www.geoboundaries.org/gbRequest.html?ISO={country_code}&ADM=ADM0")
-    dlPath = r.json()[0]['gjDownloadURL']
+    dlPath = r.json()[0]["gjDownloadURL"]
     geoBoundary = requests.get(dlPath).json()
     if not geoBoundary["features"]:
         return MultiPolygon([0])
