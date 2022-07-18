@@ -4,8 +4,7 @@ from shapely.geometry import Polygon, MultiPolygon
 
 
 def get_borders_online(country_name: str):
-    country = pycountry.countries.search_fuzzy(country_name)[0]  # type: pycountry.countries
-    country_code = country.alpha_3
+    country_code = pycountry.countries.search_fuzzy(country_name)[0].alpha_3
 
     r = requests.get(f"https://www.geoboundaries.org/gbRequest.html?ISO={country_code}&ADM=ADM0")
     dlPath = r.json()[0]['gjDownloadURL']
