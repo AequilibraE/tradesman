@@ -1,18 +1,16 @@
-import pandas as pd
-import geopandas as gpd
-import rasterio
-import sqlite3
-from os.path import join, isfile
 import urllib.request
+from os.path import join, isfile
 from tempfile import gettempdir
+
 import numpy as np
+import pandas as pd
+import rasterio
 from scipy.sparse import coo_matrix
 
 from tradesman.data_retrieval.country_main_area import get_main_area
 
 
 def population_raster(data_link, field_name, project):
-
     url = data_link
 
     dest_path = join(gettempdir(), f"pop_{field_name}.tif")
@@ -27,11 +25,7 @@ def population_raster(data_link, field_name, project):
     width = dataset.width
     height = dataset.height
     x_min = dataset.bounds.left
-    x_max = dataset.bounds.right
-    y_min = dataset.bounds.bottom
     y_max = dataset.bounds.top
-    dx = x_max - x_min
-    dy = y_max - y_min
     x_size, y_size = dataset.res
 
     # Computes the  X and Y indices for the XY grid that will represent our raster

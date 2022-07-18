@@ -64,7 +64,7 @@ def import_osm_data(tag: str, model_place: str, osm_data: dict, project: Project
     else:
         table_name = "osm_amenities"
         geom_type = "POINT"
-        qry = f"INSERT into osm_amenities(type, id, amenity, zone_id, geometry) VALUES(?, ?, ?, ?, CastToPoint(GeomFromWKB(?, 4326)));"
+        qry = "INSERT into osm_amenities(type, id, amenity, zone_id, geometry) VALUES(?, ?, ?, ?, CastToPoint(GeomFromWKB(?, 4326)));"
         list_of_tuples = list(
             tag_by_zone[["type", "id", "amenity", "zone_id", "geom"]].fillna(0).itertuples(index=False, name=None)
         )

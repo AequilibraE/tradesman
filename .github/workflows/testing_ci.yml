@@ -1,4 +1,4 @@
-name: Build documentation
+name: Testing Workflow
 
 on:
   pull_request:
@@ -9,10 +9,32 @@ on:
 
 jobs:
 
-  build:
+  linting:
     runs-on: ubuntu-latest
-    strategy:
-      max-parallel: 1
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set Python environment
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.9
+          architecture: x64
+
+      - name: Install dependencies
+        run: |
+          python -m pip install setuptools --upgrade
+          python -m pip install poetry black
+          poetry install
+
+      - name: Lint with flake8
+        run: poetry run flake8
+
+      - name: Check code format with Black
+        run: poetry run black --check .
+
+
+  build_documentation:
+    needs: linting
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.9
@@ -48,3 +70,14 @@ jobs:
 #      with:
 #        branch: gh-pages # The branch the action should deploy to.
 #        folder: docs/build # The folder the action should deploy.
+
+    - name: Builds package
+      run: poetry build
+
+    - name: Stores artifacts along with the workflow result
+      uses: actions/upload-artifact@v2
+      with:
+        name: library
+        path: dist/*.whl
+        if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn`
+

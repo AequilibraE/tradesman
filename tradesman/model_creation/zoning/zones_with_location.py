@@ -33,7 +33,6 @@ def zones_with_location(hexb, all_subdivisions):
     dindex = states.sindex
     empties = data_complete.division_name_x.isna()
     for idx, record in data_complete[empties].iterrows():
-        i -= 1
         geo = record.geometry
         dscrt = [x for x in dindex.nearest(geo.bounds, 10)]
         dist = [states.loc[d, "geometry"].distance(geo) for d in dscrt]

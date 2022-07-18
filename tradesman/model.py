@@ -15,7 +15,7 @@ from tradesman.model_creation.trigger_population import trigger_population
 from tradesman.model_creation.zoning.zone_building import zone_builder
 
 
-class Model:
+class Tradesman:
     def __init__(self, network_path: str, model_place: str = None):
         # If the model exists, you would only tell where it is (network_path), and the software
         # would check and populate the model place.  Needs to be implemented
