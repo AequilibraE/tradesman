@@ -22,14 +22,13 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install setuptools --upgrade
-          python -m pip install poetry black
-          poetry install
+          python -m pip install flake8 black
 
       - name: Lint with flake8
-        run: poetry run flake8
+        run: flake8
 
       - name: Check code format with Black
-        run: poetry run black --check .
+        run: black --check .
 
 
   build_documentation:
