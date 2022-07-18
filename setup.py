@@ -1,8 +1,8 @@
 import os
 import sys
 
-from aequilibrae.paths.__version__ import release_version
 from setuptools import setup, find_packages
+from .__version__ import version
 
 sys.dont_write_bytecode = True
 
@@ -11,14 +11,13 @@ here = os.path.dirname(os.path.realpath(__file__))
 pkgs = [pkg for pkg in find_packages()]
 
 pkg_data = {"tradesman.data": ["population/*.csv"]}
-loose_modules = []
+loose_modules = ["__version__"]
 
 if __name__ == "__main__":
     setup(
         name="aequilibrae",
-        version=release_version,
-        # TODO: Fix the requirements and optional requirements to bring directly from the requirements file
-        install_requires=["pysal", "openmatrix", "rasterio", "matplotlib", "aequilibrae", "pyarrow"],
+        version=version,
+        install_requires=["pysal", "openmatrix", "rasterio", "matplotlib", "aequilibrae"],
         packages=pkgs,
         package_dir={"": "."},
         py_modules=loose_modules,

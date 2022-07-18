@@ -70,6 +70,22 @@ jobs:
 #        branch: gh-pages # The branch the action should deploy to.
 #        folder: docs/build # The folder the action should deploy.
 
+  builds_package:
+    needs: build_documentation
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.9
+    - name: Install dependencies
+      run: |
+        sudo apt-get install -y pandoc
+        python -m pip install setuptools --upgrade
+        python -m pip install wheel poetry
+        poetry install
+
     - name: Builds package
       run: poetry build
 
@@ -80,3 +96,11 @@ jobs:
         path: dist/*.whl
         if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn`
 
+    - name: Publish wheels to PyPI
+      if: ${{ github.event_name == 'release'}}
+      env:
+        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      run: |
+        python -m pip install twine
+        twine upload dist/*.whl
