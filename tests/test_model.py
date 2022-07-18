@@ -1,20 +1,26 @@
 import uuid
+
 from os.path import join
+
 from tempfile import gettempdir
+
 from unittest import TestCase
 
-from tradesman.model import Model
+from tradesman.model import Tradesman
 
 
 class TestModel(TestCase):
     def setUp(self) -> None:
         dir = join(gettempdir(), uuid.uuid4().hex)
-        self.proj = Model(dir, "Andorra")
+
+        self.proj = Tradesman(dir, "Andorra")
 
     #
+
     # def test_create(self):
     #     self.fail()
     #
+
     # def test_set_population_source(self):
     #     self.fail()
 
@@ -27,8 +33,10 @@ class TestModel(TestCase):
     # def test_import_population(self):
     #     self.fail()
     #
+
     # def test_build_zoning(self):
     #     self.fail()
     #
+
     # def test_place(self):
     #     self.fail()

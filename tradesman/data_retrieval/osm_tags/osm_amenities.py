@@ -9,8 +9,8 @@ def amenities(osm_data: dict, model_place: str, tile_size=25):
         *tile_size* (:obj:`float`): The size of the tile we want to split our area in. Defaults to 25km side
     """
     queries = [
-        f'[out:json][timeout:180];(node["amenity"]["area"!~"yes"]' + "({});>;);out geom;",
-        f'[out:json][timeout:180];(way["amenity"]["area"!~"yes"]' + "({});>;);out geom;",
+        '[out:json][timeout:180];(node["amenity"]["area"!~"yes"]' + "({});>;);out geom;",
+        '[out:json][timeout:180];(way["amenity"]["area"!~"yes"]' + "({});>;);out geom;",
     ]
 
     load_osm_data(

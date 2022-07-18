@@ -28,8 +28,6 @@ def create_clusters(hexbins, max_zone_pop=10000, min_zone_pop=500):
         zone_sizes = t["population"].to_dict()
         zones_to_break = len(zone_sizes)
         counter = 0
-        threshold = 500
-        thrsh = 500
         if cnt % 25 == 0:
             print(f"Done {cnt}/{len(data_store)} states")
         while zones_to_break > 0:
