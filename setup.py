@@ -10,9 +10,7 @@ here = os.path.dirname(os.path.realpath(__file__))
 
 pkgs = [pkg for pkg in find_packages()]
 
-pkg_data = {
-    "tradesman.data": ["population/*.csv"]
-}
+pkg_data = {"tradesman.data": ["population/*.csv"]}
 loose_modules = []
 
 if __name__ == "__main__":

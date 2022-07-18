@@ -124,7 +124,7 @@ class Tradesman:
 
     @property
     def place(self):
-        """ Returns the name of the place for which this model was made"""
+        """Returns the name of the place for which this model was made"""
         return self.__model_place
 
     @staticmethod

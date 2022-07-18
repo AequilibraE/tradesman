@@ -10,7 +10,6 @@ from tradesman.model import Tradesman
 
 
 class TestModel(TestCase):
-
     def setUp(self) -> None:
         dir = join(gettempdir(), uuid.uuid4().hex)
 
