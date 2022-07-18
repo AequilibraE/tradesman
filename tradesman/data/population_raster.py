@@ -7,7 +7,7 @@ import pandas as pd
 import rasterio
 from scipy.sparse import coo_matrix
 
-from tradesman.data_retrieval.country_main_area import get_main_area
+from tradesman.data_retrieval.country_main_area import country_border_from_model
 
 
 def population_raster(data_link, field_name, project):
@@ -17,7 +17,7 @@ def population_raster(data_link, field_name, project):
     if not isfile(dest_path):
         urllib.request.urlretrieve(url, dest_path)
 
-    main_area = get_main_area(project)
+    main_area = country_border_from_model(project)
 
     dataset = rasterio.open(dest_path)
 

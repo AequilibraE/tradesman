@@ -1,5 +1,6 @@
 import logging
 import sys
+from os.path import isdir
 
 import geopandas as gpd
 from aequilibrae import Project
@@ -7,10 +8,10 @@ from aequilibrae import Project
 from tradesman.data_retrieval import subdivisions
 from tradesman.data_retrieval.trigger_import_amenities import trigger_import_amenities
 from tradesman.data_retrieval.trigger_import_building import trigger_building_import
+from tradesman.model_creation.import_network import import_network
 from tradesman.model_creation.population_pyramid import get_population_pyramid
 from tradesman.model_creation.set_source import set_source
 from tradesman.model_creation.subdivisions_to_model import add_subdivisions_to_model
-from tradesman.model_creation.trigger_network import trigger_network
 from tradesman.model_creation.trigger_population import trigger_population
 from tradesman.model_creation.zoning.zone_building import zone_builder
 
@@ -25,6 +26,9 @@ class Tradesman:
         self._project = Project()
         self.__osm_data = {}
         self.__starts_logging()
+
+        self.__initialize_model()
+        self._project.open(network_path)
 
     def create(self):
         """Creates the entire model"""
@@ -47,8 +51,9 @@ class Tradesman:
     def import_network(self):
         """Triggers the import of the network from OSM and adds subdivisions into the model.
         If the network already exists in the folder, it will be loaded, otherwise it will be created."""
-
-        trigger_network(self._project, self.__folder, self.__model_place)
+        if isdir(self.__folder):
+            return
+        import_network(self._project, self.__folder, self.__model_place)
 
     def import_subdivisions(self, subdivision_levels=2, overwrite=False):
         """Imports political subdivisions.
@@ -121,6 +126,12 @@ class Tradesman:
         """
 
         trigger_building_import(self.__model_place, self._project, self.__osm_data)
+
+    def __initialize_model(self):
+        if isdir(self.__folder):
+            return
+
+        self._project.new(self.__folder)
 
     @property
     def place(self):

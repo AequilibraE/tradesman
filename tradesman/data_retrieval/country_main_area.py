@@ -1,9 +1,11 @@
-from aequilibrae import Project
 import shapely
+from aequilibrae import Project
+from shapely.geometry import MultiPolygon
 
 
-def get_main_area(project: Project):
-
-    country_wkb = project.conn.execute("Select asBinary(geometry) from country_borders").fetchone()[0]
-    country_geo = shapely.wkb.loads(country_wkb)
+def country_border_from_model(project: Project):
+    country_wkb = project.conn.execute("Select asBinary(geometry) from country_borders").fetchone()
+    if not country_wkb:
+        return MultiPolygon([])
+    country_geo = shapely.wkb.loads(country_wkb[0])
     return country_geo

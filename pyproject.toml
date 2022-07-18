@@ -16,13 +16,14 @@ license = "MIT"
 
 
 [tool.poetry.dependencies]
-python = "~3.9.0"
+python = "~3.8.0"
 pysal = "*"
 openmatrix = "*"
 rasterio = "*"
 matplotlib = "*"
 aequilibrae = "0.7.2"
 pyarrow = "*"
+pycountry = "*"
 
 
 [tool.poetry.dev-dependencies]
