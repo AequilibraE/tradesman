@@ -16,7 +16,7 @@ loose_modules = ["__version__"]
 
 if __name__ == "__main__":
     setup(
-        name="aequilibrae",
+        name="tradesman",
         version=version,
         install_requires=["pysal", "openmatrix", "rasterio", "matplotlib", "aequilibrae"],
         packages=pkgs,
