@@ -21,14 +21,14 @@ class Tradesman:
         # If the model exists, you would only tell where it is (network_path), and the software
         # would check and populate the model place.  Needs to be implemented
         self.__model_place = model_place
-        #self.__population_source = "WorldPop"
+        self.__population_source = "WorldPop"
         self.__folder = network_path
         self._project = Project()
         self.__osm_data = {}
         self.__starts_logging()
 
         self.__initialize_model()
-        self._project.open(network_path)
+        #self._project.open(network_path)
 
     def create(self):
         """Creates the entire model"""
@@ -51,9 +51,9 @@ class Tradesman:
     def import_network(self):
         """Triggers the import of the network from OSM and adds subdivisions into the model.
         If the network already exists in the folder, it will be loaded, otherwise it will be created."""
-        if isdir(self.__folder):
-            pass
-        import_network(self._project, self.__folder, self.__model_place)
+        #if isdir(self.__folder):
+            #return
+        import_network(self._project, self.__model_place)
 
     def import_subdivisions(self, subdivision_levels=2, overwrite=False):
         """Imports political subdivisions.

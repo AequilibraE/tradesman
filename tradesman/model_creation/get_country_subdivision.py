@@ -4,7 +4,7 @@ from shapely.geometry import Polygon
 import geopandas as gpd
 import pandas as pd
 from shapely.ops import unary_union
-from shapely import wkt
+from shapely import wkb
 import pycountry
 from aequilibrae import Project
 import sqlite3
@@ -42,8 +42,8 @@ def get_subdivisions_online(model_place: str, level: int):
 
     for key, value in adm_level.items():
         if len(value) > 1:
-            adm_level[key] = unary_union(value).wkt
-        adm_level[key] = value[0].wkt
+            adm_level[key] = unary_union(value).wkb
+        adm_level[key] = value[0].wkb
 
     df = pd.DataFrame.from_dict(adm_level, orient="index", columns=["geom"])
 

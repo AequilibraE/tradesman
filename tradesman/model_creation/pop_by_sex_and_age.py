@@ -36,7 +36,7 @@ def get_pop_by_sex_age(project: Project, model_place: str):
 
             pop_per_zone.reset_index(inplace=True)
 
-            list_of_tuples = list(pop_per_zone[["population", "index"]].itertuples(index=False, name=None))
+            list_of_tuples = list(pop_per_zone[["population", "zone_id"]].itertuples(index=False, name=None))
 
             if age[a] < 80:
                 fields.add(field_name, f"{s} population {age[a]} to {age[a+1]} years old.", "INTEGER")
