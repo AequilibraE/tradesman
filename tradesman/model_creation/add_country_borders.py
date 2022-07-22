@@ -27,3 +27,5 @@ def add_country_borders_to_model(country_name: str, project):
     sql = "INSERT into country_borders(country_name, geometry) VALUES(?, CastToMulti(GeomFromWKB(?, 4326)));"
     project.conn.execute(sql, [country_name, geo.wkb])
     project.conn.commit()
+
+    return geo

@@ -1,6 +1,6 @@
 from aequilibrae import Project, Parameters
 
-from tradesman.data_retrieval.country_main_area import country_border_from_model
+from tradesman.model_creation.add_country_borders import add_country_borders_to_model
 from tradesman.model_creation.extra_data_fields import extra_fields
 
 
@@ -11,7 +11,7 @@ def import_network(project: Project, model_place: str):
 
     project.network.create_from_osm(place_name=model_place)
 
-    place_geo = country_border_from_model(project)
+    place_geo = add_country_borders_to_model(country_name=model_place)
     if place_geo.area == 0:
         raise Warning("No country borders were imported.")
     else:

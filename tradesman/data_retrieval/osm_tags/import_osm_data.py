@@ -4,8 +4,7 @@ import pandas as pd
 import geopandas as gpd
 from aequilibrae import Project
 from tradesman.data.load_zones import load_zones
-from tradesman.data_retrieval.osm_tags.osm_buildings import buildings
-from tradesman.data_retrieval.osm_tags.osm_amenities import amenities
+from tradesman.data_retrieval.osm_tags.generic_tag import generic_tag
 from tradesman.data_retrieval.osm_tags.osm_tag_values import (
     building_values,
     amenity_values,
@@ -16,10 +15,10 @@ from shapely import wkb
 def import_osm_data(tag: str, model_place: str, osm_data: dict, project: Project):
 
     if tag == "building":
-        df = pd.DataFrame.from_dict(buildings(osm_data, model_place))
+        df = pd.DataFrame.from_dict(generic_tag(tag, osm_data, model_place))
         tag_value = building_values
     elif tag == "amenity":
-        df = pd.DataFrame.from_dict(amenities(osm_data, model_place))
+        df = pd.DataFrame.from_dict(generic_tag(tag, osm_data, model_place))
         tag_value = amenity_values
     else:
         raise ValueError(f"No data with {tag} tag was imported.")

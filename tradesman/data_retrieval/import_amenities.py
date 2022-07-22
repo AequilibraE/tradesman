@@ -8,7 +8,7 @@ from tradesman.data_retrieval.osm_tags.import_osm_data import import_osm_data
 from tradesman.data_retrieval.osm_tags.query_writer import query_writer
 
 
-def trigger_import_amenities(model_place: str, project: Project, osm_data: dict):
+def import_amenities(model_place: str, project: Project, osm_data: dict):
 
     osm_amenities = import_osm_data(tag="amenity", model_place=model_place, osm_data=osm_data, project=project)
 

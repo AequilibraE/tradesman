@@ -6,13 +6,13 @@ import geopandas as gpd
 from aequilibrae import Project
 
 from tradesman.data_retrieval import subdivisions
-from tradesman.data_retrieval.trigger_import_amenities import trigger_import_amenities
-from tradesman.data_retrieval.trigger_import_building import trigger_building_import
+from tradesman.data_retrieval.import_amenities import import_amenities
+from tradesman.data_retrieval.import_building import building_import
+from tradesman.model_creation.get_country_subdivision import add_subdivisions_to_model
 from tradesman.model_creation.import_network import import_network
-from tradesman.model_creation.population_pyramid import get_population_pyramid
+from tradesman.model_creation.pop_by_sex_and_age import get_pop_by_sex_age
 from tradesman.model_creation.set_source import set_source
-from tradesman.model_creation.subdivisions_to_model import add_subdivisions_to_model
-from tradesman.model_creation.trigger_population import trigger_population
+from tradesman.model_creation.import_population import import_population
 from tradesman.model_creation.zoning.zone_building import zone_builder
 
 
@@ -21,7 +21,7 @@ class Tradesman:
         # If the model exists, you would only tell where it is (network_path), and the software
         # would check and populate the model place.  Needs to be implemented
         self.__model_place = model_place
-        self.__population_source = "WorldPop"
+        #self.__population_source = "WorldPop"
         self.__folder = network_path
         self._project = Project()
         self.__osm_data = {}
@@ -37,7 +37,7 @@ class Tradesman:
         self.import_subdivisions(2, True)
         self.import_population()
         self.build_zoning()
-        self.import_population_pyramid()
+        self.import_pop_by_sex_and_age()
         self.import_amenities()
         self.import_buildings()
 
@@ -52,7 +52,7 @@ class Tradesman:
         """Triggers the import of the network from OSM and adds subdivisions into the model.
         If the network already exists in the folder, it will be loaded, otherwise it will be created."""
         if isdir(self.__folder):
-            return
+            pass
         import_network(self._project, self.__folder, self.__model_place)
 
     def import_subdivisions(self, subdivision_levels=2, overwrite=False):
@@ -73,7 +73,7 @@ class Tradesman:
                 *overwrite* (:obj:`bool`): Deletes pre-existing population_source_import. Defaults to False
         """
 
-        trigger_population(self._project, self.__model_place, self.__population_source, overwrite=overwrite)
+        import_population(self._project, self.__model_place, self.__population_source, overwrite=overwrite)
 
     def build_zoning(self, hexbin_size=200, max_zone_pop=10000, min_zone_pop=500, save_hexbins=True):
         """Creates hexagonal bins, and then clusters it regarding the political subdivision.
@@ -105,11 +105,11 @@ class Tradesman:
         """
         self._project.close()
 
-    def import_population_pyramid(self):
+    def import_pop_by_sex_and_age(self):
         """
         Triggers the import of population pyramid from raster into the model.
         """
-        get_population_pyramid(self._project, self.__model_place)
+        get_pop_by_sex_age(self._project, self.__model_place)
 
     def import_amenities(self):
         """
@@ -117,7 +117,7 @@ class Tradesman:
         Data will be exported as columns in zones file and as a separate SQL file.
         """
 
-        trigger_import_amenities(self.__model_place, self._project, self.__osm_data)
+        import_amenities(self.__model_place, self._project, self.__osm_data)
 
     def import_buildings(self):
         """
@@ -125,7 +125,7 @@ class Tradesman:
         Data will be exported as columns in zones file and as a separate SQL file.
         """
 
-        trigger_building_import(self.__model_place, self._project, self.__osm_data)
+        building_import(self.__model_place, self._project, self.__osm_data)
 
     def __initialize_model(self):
         if isdir(self.__folder):

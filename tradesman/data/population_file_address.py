@@ -1,19 +1,23 @@
 from turtle import down
-import pandas as pd
+import pycountry
+
+from tradesman.data.meta_pop_url import url_reducer
 
 
 def link_source(model_place: str, source="WorldPop"):
 
-    pop_path = "/home/jovyan/workspace/road_analytics/tradesman/data/population/all_raster_pop_source.csv"
-    df = pd.read_csv(pop_path)
+    country_code = pycountry.countries.search_fuzzy(model_place)[0].alpha_3
 
-    if source == "WorldPop":
+    if source.lower() == "WorldPop".lower():
 
-        return df[df.Country.str.upper() == model_place.upper()].worldpop_link.values[0]
+        return (
+            "https://data.worldpop.org/GIS/Population/Global_2000_2020/2020/"
+            + f"{country_code}/{country_code.lower()}_ppp_2020.tif"
+        )
 
-    elif source == "Meta":
+    elif source.lower() == "Meta".lower():
 
-        return df[df.Country.str.upper() == model_place.upper()].meta_link.values[0]
+        return "https://cutt.ly/" + url_reducer[country_code]
 
     else:
         raise ValueError("No population source found.")
