@@ -31,7 +31,7 @@ def get_subdivisions_online(model_place: str, level: int):
         adm_name = boundary["properties"]["shapeName"]
         geo = boundary["geometry"]
 
-        if not adm_name in adm_level:
+        if adm_name not in adm_level:
             adm_level[adm_name] = []
 
         if boundary["geometry"]["type"] == "MultiPolygon":

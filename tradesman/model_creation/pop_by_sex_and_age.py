@@ -27,7 +27,7 @@ def get_pop_by_sex_age(project: Project, model_place: str):
 
             try:
                 df = population_raster(data_link, field_name, project)
-            except:
+            except ValueError:
                 continue
 
             gdf_pop = gpd.GeoDataFrame(df, geometry=gpd.points_from_xy(df.longitude, df.latitude), crs=4326)
