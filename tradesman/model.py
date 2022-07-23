@@ -6,20 +6,14 @@ import geopandas as gpd
 from aequilibrae import Project
 
 from tradesman.data_retrieval import subdivisions
-from tradesman.data_retrieval.trigger_import_amenities import trigger_import_amenities
-from tradesman.data_retrieval.trigger_import_building import trigger_building_import
-from tradesman.model_creation.add_country_borders import add_country_borders_to_model
-from tradesman.model_creation.import_network import import_network
-from tradesman.model_creation.population_pyramid import get_population_pyramid
 from tradesman.data_retrieval.import_amenities import import_amenities
 from tradesman.data_retrieval.import_building import building_import
+from tradesman.model_creation.add_country_borders import add_country_borders_to_model
 from tradesman.model_creation.get_country_subdivision import add_subdivisions_to_model
 from tradesman.model_creation.import_network import import_network
+from tradesman.model_creation.import_population import import_population
 from tradesman.model_creation.pop_by_sex_and_age import get_pop_by_sex_age
 from tradesman.model_creation.set_source import set_source
-from tradesman.model_creation.import_population import import_population
-from tradesman.model_creation.subdivisions_to_model import add_subdivisions_to_model
-from tradesman.model_creation.trigger_population import trigger_population
 from tradesman.model_creation.zoning.zone_building import zone_builder
 
 
@@ -125,7 +119,7 @@ class Tradesman:
 
     def import_amenities(self):
         """
-        Triggers the import of ammenities from OSM.
+        Triggers the import of amenities from OSM.
         Data will be exported as columns in zones file and as a separate SQL file.
         """
 
