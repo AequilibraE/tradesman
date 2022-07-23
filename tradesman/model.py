@@ -135,8 +135,9 @@ class Tradesman:
 
     def __initialize_model(self):
         if isdir(self.__folder):
-            return
-        self._project.new(self.__folder)
+            self._project.open(self.__folder)
+        else:
+            self._project.new(self.__folder)
 
     @property
     def place(self):
