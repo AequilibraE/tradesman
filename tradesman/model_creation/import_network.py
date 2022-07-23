@@ -5,6 +5,7 @@ from tradesman.model_creation.extra_data_fields import extra_fields
 
 
 def import_network(project: Project, model_place: str):
+    """Imports network from"""
     par = Parameters()
     par.parameters["network"]["links"]["fields"]["one-way"].extend(extra_fields)
     par.write_back()
