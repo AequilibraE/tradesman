@@ -3,7 +3,7 @@ import urllib.request
 from os.path import join, isfile
 from tempfile import gettempdir
 
-from tradesman.data_retrieval.country_main_area import get_main_area
+from tradesman.data_retrieval.country_main_area import country_border_from_model
 
 
 def select_urban_areas(project):
@@ -15,7 +15,7 @@ def select_urban_areas(project):
     if not isfile(dest_path):
         urllib.request.urlretrieve(url, dest_path)
 
-    country_borders = get_main_area(project)
+    country_borders = country_border_from_model(project)
 
     # gdf = gpd.GeoDataFrame(pd.DataFrame(country_borders, columns=['geometry']), geometry='geometry', crs=4326)
 

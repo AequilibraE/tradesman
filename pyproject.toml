@@ -23,6 +23,7 @@ rasterio = "*"
 matplotlib = "*"
 aequilibrae = "0.7.2"
 pyarrow = "*"
+pycountry = "*"
 
 
 [tool.poetry.dev-dependencies]
