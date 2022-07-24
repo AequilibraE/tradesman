@@ -38,8 +38,8 @@ def hex_builder(coverage_area, hex_height, epsg=3857):
             df.drop(["index_right"], axis=1, inplace=True)
         return df
 
-    half_height = (hex_height / 2)
-    vertex_diff = (xvertexhi - xvertexlo)
+    half_height = hex_height / 2
+    vertex_diff = xvertexhi - xvertexlo
     for column in range(0, int(floor(float(x_right - x_left) / x_spacing))):
         # (column + 1) and (row + 1) calculation is used to maintain
         # _topology between adjacent shapes and avoid overlaps/holes
