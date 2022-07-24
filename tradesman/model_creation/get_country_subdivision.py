@@ -9,52 +9,58 @@ import pycountry
 from aequilibrae import Project
 import sqlite3
 from os.path import join
+import warnings
 
 
 def get_subdivisions_online(model_place: str, level: int):
     country_code = pycountry.countries.search_fuzzy(model_place)[0].alpha_3
 
-    r = requests.get(f"https://www.geoboundaries.org/gbRequest.html?ISO={country_code}&ADM=ADM{level}")
+    all_data = []
+    for lev in range(1, level + 1):
+        r = requests.get(f"https://www.geoboundaries.org/gbRequest.html?ISO={country_code}&ADM=ADM{lev}")
 
-    if len(r.json()) == 0:
-        print(f"There is no administrative boundary level {level}. \nWill use administrative boundary level 1 instead.")
-        r = requests.get(f"https://www.geoboundaries.org/gbRequest.html?ISO={country_code}&ADM=ADM1")
-        level = 1
+        if len(r.json()) == 0:
+            warnings.warn(
+                f"There is no administrative boundary level {lev}. \nWill use administrative boundary level 1 instead."
+            )
+            continue
 
-    dlPath = r.json()[0]["gjDownloadURL"]
-    geoBoundary = requests.get(dlPath).json()
+        dlPath = r.json()[0]["gjDownloadURL"]
+        geoBoundary = requests.get(dlPath).json()
 
-    adm_level = {}
+        adm_level = {}
+        for boundary in geoBoundary["features"]:
 
-    for boundary in geoBoundary["features"]:
+            adm_name = boundary["properties"]["shapeName"]
+            geo = boundary["geometry"]
 
-        adm_name = boundary["properties"]["shapeName"]
-        geo = boundary["geometry"]
+            if adm_name not in adm_level:
+                adm_level[adm_name] = []
 
-        if adm_name not in adm_level:
-            adm_level[adm_name] = []
+            if boundary["geometry"]["type"] == "MultiPolygon":
+                for poly in geo["coordinates"]:
+                    adm_level[adm_name].append(Polygon(poly[0]))
+            else:
+                adm_level[adm_name].append(Polygon(geo["coordinates"][0]))
 
-        if boundary["geometry"]["type"] == "MultiPolygon":
-            for poly in geo["coordinates"]:
-                adm_level[adm_name].append(Polygon(poly[0]))
-        else:
-            adm_level[adm_name].append(Polygon(geo["coordinates"][0]))
+        for key, value in adm_level.items():
+            if len(value) > 1:
+                adm_level[key] = unary_union(value).wkb
+            adm_level[key] = value[0].wkb
 
-    for key, value in adm_level.items():
-        if len(value) > 1:
-            adm_level[key] = unary_union(value).wkb
-        adm_level[key] = value[0].wkb
+        df = pd.DataFrame.from_dict(adm_level, orient="index", columns=["geom"])
 
-    df = pd.DataFrame.from_dict(adm_level, orient="index", columns=["geom"])
+        df.reset_index(inplace=True)
 
-    df.reset_index(inplace=True)
+        df.rename(columns={"index": "division_name"}, inplace=True)
+        df = df.assign(country_name=model_place, level=lev)
 
-    df.rename(columns={"index": "division_name"}, inplace=True)
+        all_data.append(df)
 
-    df.insert(0, "country_name", model_place)
-    df.insert(2, "level", level)
-
-    return df
+    if len(all_data):
+        all_data = pd.concat(all_data)
+        all_data = all_data[["country_name", "division_name", "level", "geom"]]
+    return all_data
 
 
 def add_subdivisions_to_model(project: Project, model_place: str, levels_to_add=2, overwrite=False):

@@ -1,4 +1,4 @@
-def export_hex_population(project, zones_with_pop):
+def saves_hex_pop_to_file(project, zones_with_pop):
     zones_with_pop["geo"] = zones_with_pop.geometry.to_wkb()
     zones_with_pop = zones_with_pop.rename(columns={"division_name": "country_subdivision"})
 
@@ -10,6 +10,5 @@ def export_hex_population(project, zones_with_pop):
     project.conn.execute("SELECT CreateSpatialIndex('hex_pop' , 'geometry');")
 
     project.conn.execute("UPDATE hex_pop SET geometry=GeomFromWKB(geo, 4326);")
-
-    project.conn.execute("Alter table hex_pop DROP COLUMN geo;")
+    project.conn.execute("UPDATE hex_pop SET geo=NULL")
     project.conn.commit()

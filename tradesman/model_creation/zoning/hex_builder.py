@@ -38,26 +38,28 @@ def hex_builder(coverage_area, hex_height, epsg=3857):
             df.drop(["index_right"], axis=1, inplace=True)
         return df
 
+    half_height = (hex_height / 2)
+    vertex_diff = (xvertexhi - xvertexlo)
     for column in range(0, int(floor(float(x_right - x_left) / x_spacing))):
         # (column + 1) and (row + 1) calculation is used to maintain
         # _topology between adjacent shapes and avoid overlaps/holes
         # due to rounding errors
 
         x1 = x_left + (column * x_spacing)  # far _left
-        x2 = x1 + (xvertexhi - xvertexlo)  # _left
-        x3 = x_left + ((column + 1) * x_spacing)  # _right
-        x4 = x3 + (xvertexhi - xvertexlo)  # far _right
+        x2 = x1 + vertex_diff  # _left
+        x3 = x1 + x_spacing  # _right
+        x4 = x3 + vertex_diff  # far _right
         xm = (x2 + x3) / 2
 
         for row in range(0, int(floor(float(y_top - y_bottom) / hex_height))):
             if (column % 2) == 0:
-                y1 = y_bottom + (((row * 2) + 0) * (hex_height / 2))  # hi
-                y2 = y_bottom + (((row * 2) + 1) * (hex_height / 2))  # mid
-                y3 = y_bottom + (((row * 2) + 2) * (hex_height / 2))  # lo
+                y1 = y_bottom + (((row * 2) + 0) * half_height)  # hi
+                y2 = y_bottom + (((row * 2) + 1) * half_height)  # mid
+                y3 = y_bottom + (((row * 2) + 2) * half_height)  # lo
             else:
-                y1 = y_bottom + (((row * 2) + 1) * (hex_height / 2))  # hi
-                y2 = y_bottom + (((row * 2) + 2) * (hex_height / 2))  # mid
-                y3 = y_bottom + (((row * 2) + 3) * (hex_height / 2))  # lo
+                y1 = y_bottom + (((row * 2) + 1) * half_height)  # hi
+                y2 = y_bottom + (((row * 2) + 2) * half_height)  # mid
+                y3 = y_bottom + (((row * 2) + 3) * half_height)  # lo
 
             poly = Polygon([(x1, y2), (x2, y1), (x3, y1), (x4, y2), (x3, y3), (x2, y3), (x1, y2)])
             data.append([poly_id, xm, y2, poly])
