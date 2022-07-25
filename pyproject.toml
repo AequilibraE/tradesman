@@ -21,7 +21,7 @@ pysal = "*"
 openmatrix = "*"
 rasterio = "*"
 matplotlib = "*"
-aequilibrae = "0.7.2"
+aequilibrae = "0.7.4"
 pyarrow = "*"
 pycountry = "*"
 
