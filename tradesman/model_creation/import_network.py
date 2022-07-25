@@ -17,7 +17,7 @@ def import_network(project: Project, model_place: str):
         raise Warning("No country borders were imported.")
     else:
         sql = """DELETE from Links where link_id not in (SELECT a.link_id
-                                                             FROM links AS a, country_borders as b
+                                                             FROM links AS a, political_subdivisions as b
                                                              WHERE ST_Intersects(a.geometry, b.geometry) = 1)"""
 
         project.conn.execute(sql)

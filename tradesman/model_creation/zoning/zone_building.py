@@ -9,11 +9,11 @@ from tradesman.model_creation.zoning.zones_with_pop import zones_with_population
 
 
 def zone_builder(project, hexbin_size: int, max_zone_pop: int, min_zone_pop: int, save_hexbins: bool):
-    sql = "SELECT division_name, level, Hex(ST_AsBinary(st_subdivide(geometry))) as geom FROM country_subdivisions;"
+    sql = "SELECT division_name, level, Hex(ST_AsBinary(st_subdivide(geometry))) as geom FROM political_subdivisions;"
     subdivisions = gpd.GeoDataFrame.from_postgis(sql, project.conn, geom_col="geom", crs=4326)
     subdivisions = subdivisions[subdivisions.level == subdivisions.level.max()]
 
-    sql_coverage = "SELECT Hex(ST_AsBinary(st_subdivide(geometry))) as geom FROM country_borders;"
+    sql_coverage = "SELECT Hex(ST_AsBinary(st_subdivide(geometry))) as geom FROM political_subdivisions where level=0;"
     coverage_area = gpd.GeoDataFrame.from_postgis(sql_coverage, project.conn, geom_col="geom", crs=4326)
     coverage_area = coverage_area.explode().reset_index(drop=True).to_crs("epsg:3857")
 

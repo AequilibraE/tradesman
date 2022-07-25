@@ -14,13 +14,16 @@ def create_clusters(hexbins, max_zone_pop=10000, min_zone_pop=500):
     """
 
     hexbins["zone_id"] = -1
+    centroids = hexbins.geometry.centroid
+    hexbins = hexbins.assign(x=centroids.x.values, y=centroids.y.values)
     list_states = list(hexbins.division_name.unique())
     data_store = []
     master_zone_id = 1
+    result_col_df = ["hex_id", "x", "y", "population", "division_name", "zone_id"]
     for i, division_name in enumerate(list_states):
         df = hexbins[hexbins.division_name == division_name].copy()
         df.loc[:, "zone_id"] = master_zone_id + i
-        data_store.append(df[["hex_id", "x", "y", "population", "division_name", "zone_id"]])
+        data_store.append(df[result_col_df])
 
     for cnt, df in enumerate(data_store):
         t = df.groupby(["zone_id"]).sum()
@@ -59,15 +62,9 @@ def create_clusters(hexbins, max_zone_pop=10000, min_zone_pop=500):
                 print(f"Queue for analysis: {zones_to_break} (Done: {ready} ({avg} people/zone))")
 
     df = pd.concat(data_store)[["hex_id", "zone_id"]]
-    df = pd.merge(
-        hexbins[["hex_id", "x", "y", "population", "division_name", "geometry"]],
-        df,
-        on="hex_id",
-    )
-    df = gpd.GeoDataFrame(
-        df[["hex_id", "x", "y", "population", "division_name", "zone_id"]],
-        geometry=df["geometry"],
-    )
+    cols_df = ["hex_id", "x", "y", "population", "division_name", "geometry"]
+    df = pd.merge(hexbins[cols_df], df, on="hex_id")
+    df = gpd.GeoDataFrame(df[result_col_df], geometry=df["geometry"])
 
     zoning = df.dissolve(by="zone_id")[["division_name", "geometry"]]
     pop_total = df[["zone_id", "population"]].groupby(["zone_id"]).sum()["population"]

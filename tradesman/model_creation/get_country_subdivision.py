@@ -20,9 +20,7 @@ def get_subdivisions_online(model_place: str, level: int):
         r = requests.get(f"https://www.geoboundaries.org/gbRequest.html?ISO={country_code}&ADM=ADM{lev}")
 
         if len(r.json()) == 0:
-            warnings.warn(
-                f"There is no administrative boundary level {lev}. \nWill use administrative boundary level 1 instead."
-            )
+            warnings.warn(f"There is no administrative boundary level {lev}.")
             continue
 
         dlPath = r.json()[0]["gjDownloadURL"]
@@ -70,18 +68,11 @@ def add_subdivisions_to_model(project: Project, model_place: str, levels_to_add=
     conn = sqlite3.connect(join("project_database.sqlite"))
     all_tables = [x[0] for x in conn.execute("SELECT name FROM sqlite_master WHERE type ='table'").fetchall()]
 
-    if overwrite or "country_subdivisions" not in all_tables:
-        project.conn.execute("DROP TABLE IF EXISTS country_subdivisions;")
-        project.conn.execute(
-            'CREATE TABLE IF NOT EXISTS country_subdivisions("country_name" TEXT, "division_name" TEXT, "level" INTEGER);'
-        )
-        project.conn.execute(
-            "SELECT AddGeometryColumn('country_subdivisions', 'geometry', 4326, 'MULTIPOLYGON', 'XY' );"
-        )
-        project.conn.execute("SELECT CreateSpatialIndex('country_subdivisions' , 'geometry' );")
+    if overwrite or "political_subdivisions" not in all_tables:
+        project.conn.execute("DELETE FROM political_subdivisions WHERE level>0;")
         project.conn.commit()
 
-        qry = "INSERT INTO country_subdivisions (country_name, division_name, level, geometry) \
+        qry = "INSERT INTO political_subdivisions (country_name, division_name, level, geometry) \
                VALUES(?, ?, ?, CastToMulti(GeomFromWKB(?, 4326)));"
         list_of_tuples = list(df.itertuples(index=False, name=None))
 
