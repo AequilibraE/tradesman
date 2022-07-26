@@ -4,9 +4,11 @@ from geopandas.tools import sjoin
 
 
 def zones_with_location(hexb, all_subdivisions):
+    # Hexbins are incredibly small, so getting their centroids from 4326 is not an issue
     centroids = gpd.GeoDataFrame(hexb[["hex_id"]], geometry=hexb.centroid, crs="EPSG:4326")
 
     states = all_subdivisions[all_subdivisions.level == all_subdivisions.level.max()]
+    states.reset_index(drop=True, inplace=True)
 
     data = sjoin(centroids, states, how="left", predicate="intersects")  # replace district by state
     data.drop_duplicates(subset=["hex_id"], inplace=True)
@@ -15,7 +17,6 @@ def zones_with_location(hexb, all_subdivisions):
     found_centroid = found_centroid.dropna()
 
     not_found = hexb[~hexb.hex_id.isin(found_centroid.hex_id)]
-    # replace district by state
     not_found_merged = sjoin(not_found, states, how="left", predicate="intersects")
     not_found_merged = not_found_merged[["hex_id", "division_name"]]
     not_found_merged.dropna(inplace=True)
@@ -26,6 +27,7 @@ def zones_with_location(hexb, all_subdivisions):
 
     dindex = states.sindex
     empties = data_complete.division_name.isna()
+
     for idx, record in data_complete[empties].iterrows():
         geo = record.geometry
         dscrt = [x for x in dindex.nearest(geo.bounds, 10)]
