@@ -46,14 +46,14 @@ def hex_builder(coverage_area, hex_height, epsg=3857):
 
         x1 = x_left + (column * x_spacing)  # far _left
         x2 = x1 + vertex_diff  # _left
-        x3 = x1 + x_spacing  # _right
+        x3 = x_left + ((column + 1) * x_spacing)  # _right
         x4 = x3 + vertex_diff  # far _right
         xm = (x2 + x3) / 2
         col_setting = 0 if (column % 2) == 0 else 1
         for row in range(tot_rows):
-            y1 = y_bottom + (((row * 2) + col_setting) * half_height)
-            y2 = y1 + half_height
-            y3 = y2 + half_height
+            y1 = y_bottom + (((row * 2) + col_setting + 0) * half_height)  # hi
+            y2 = y_bottom + (((row * 2) + col_setting + 1) * half_height)  # mid
+            y3 = y_bottom + (((row * 2) + col_setting + 2) * half_height)  # lo
 
             poly = Polygon([(x1, y2), (x2, y1), (x3, y1), (x4, y2), (x3, y3), (x2, y3), (x1, y2)])
             data.append([poly_id, xm, y2, poly])

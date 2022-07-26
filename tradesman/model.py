@@ -82,7 +82,7 @@ class Tradesman:
 
         import_population(self._project, self.__model_place, self.__population_source, overwrite=overwrite)
 
-    def build_zoning(self, hexbin_size=200, max_zone_pop=10000, min_zone_pop=500, save_hexbins=True):
+    def build_zoning(self, hexbin_size=200, max_zone_pop=10000, min_zone_pop=500, save_hexbins=True, overwrite=False):
         """Creates hexagonal bins, and then clusters it regarding the political subdivision.
 
         Args:
@@ -90,8 +90,12 @@ class Tradesman:
              *max_zone_pop*(:obj:`int`): max population living within a zone.
              *min_zone_pop*(:obj:`int`): min population living within a zone.
              *save_hexbins*(:obj:`bool`): saves the hexagonal bins with population. Defaults to True.
+             *overwrite* (:obj:`bool`): Deletes pre-existing HexBins and Zones. Defaults to False
         """
 
+        if not overwrite:
+            if sum(self._project.conn.execute('Select count(*) from Zones').fetchone()) > 0:
+                return
         zone_builder(self._project, hexbin_size, max_zone_pop, min_zone_pop, save_hexbins)
 
     def get_political_subdivisions(self, level: int = None) -> gpd.GeoDataFrame:

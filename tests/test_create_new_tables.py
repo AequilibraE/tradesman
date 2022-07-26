@@ -18,4 +18,3 @@ class Test(TestCase):
 
         for i in ['political_subdivisions', 'raw_population', 'hex_pop']:
             self.assertIn(i, list(df.name))
-

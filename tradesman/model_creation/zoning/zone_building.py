@@ -24,6 +24,9 @@ def zone_builder(project, hexbin_size: int, max_zone_pop: int, min_zone_pop: int
 
     zones_with_pop = zones_with_population(project, zones_with_locations)
 
+    project.conn.execute('DELETE FROM hex_pop;')
+    project.conn.execute('DELETE FROM zones;')
+    project.conn.commit()
     if save_hexbins:
         saves_hex_pop_to_file(project, zones_with_pop)
 
