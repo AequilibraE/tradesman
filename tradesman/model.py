@@ -94,7 +94,7 @@ class Tradesman:
         """
 
         if not overwrite:
-            if sum(self._project.conn.execute('Select count(*) from Zones').fetchone()) > 0:
+            if sum(self._project.conn.execute("Select count(*) from Zones").fetchone()) > 0:
                 return
         zone_builder(self._project, hexbin_size, max_zone_pop, min_zone_pop, save_hexbins)
 

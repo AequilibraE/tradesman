@@ -35,7 +35,8 @@ def zones_with_location(hexb, all_subdivisions):
         m = dscrt[dist.index(min(dist))]
         data_complete.loc[idx, "division_name"] = states.loc[m, "division_name"]
 
-    zones_with_location = gpd.GeoDataFrame(data_complete[["hex_id", "division_name"]],
-                                           geometry=data_complete["geometry"])
+    zones_with_location = gpd.GeoDataFrame(
+        data_complete[["hex_id", "division_name"]], geometry=data_complete["geometry"]
+    )
 
     return zones_with_location
