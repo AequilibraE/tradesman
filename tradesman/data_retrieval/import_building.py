@@ -10,7 +10,7 @@ from tradesman.data_retrieval.osm_tags.microsoft_buildings_by_zone import (
 from tradesman.data_retrieval.osm_tags.query_writer import query_writer
 
 
-def trigger_building_import(model_place: str, project: Project, osm_data: dict):
+def building_import(model_place: str, project: Project, osm_data: dict):
 
     zoning = project.zoning
     fields = zoning.fields
