@@ -12,13 +12,20 @@ def import_network(project: Project, model_place: str):
 
     project.network.create_from_osm(place_name=model_place)
 
-    place_geo = country_border_from_model(project)
-    if place_geo.area == 0:
-        raise Warning("No country borders were imported.")
-    else:
-        sql = """DELETE from Links where link_id not in (SELECT a.link_id
-                                                             FROM links AS a, political_subdivisions as b
-                                                             WHERE ST_Intersects(a.geometry, b.geometry) = 1)"""
-
-        project.conn.execute(sql)
-        project.conn.commit()
+    # place_geo = country_border_from_model(project)
+    # if place_geo.area == 0:
+    #     raise Warning("No country borders were imported.")
+    # else:
+    #     sql = """DELETE from Links
+    #                          WHERE link_id not in (SELECT a.link_id
+    #                                                FROM links AS a, political_subdivisions as b
+    #                                                WHERE ST_Intersects(a.geometry, ST_Buffer(b.geometry, 0.1)) = 1)"""
+    #     """DELETE * FROM Links
+    #             WHERE link_id NOT IN (SELECT a.link_id
+    #                                    FROM links AS a, (SELECT st_subdivide(ST_Buffer(geometry, 0.1)) geometry
+    #                                                             FROM political_subdivisions
+    #                                                             WHERE level=0) as b
+    #                                    WHERE ST_Intersects(a.geometry, b.geometry) = 1)"""
+    #
+    #     project.conn.execute(sql)
+    #     project.conn.commit()
