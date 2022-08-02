@@ -1,7 +1,6 @@
 from turtle import down
 import pycountry
-
-from tradesman.data.meta_pop_url import url_reducer
+import pandas as pd
 
 
 def link_source(model_place: str, source="WorldPop"):
@@ -17,7 +16,9 @@ def link_source(model_place: str, source="WorldPop"):
 
     elif source.lower() == "Meta".lower():
 
-        return "https://cutt.ly/" + url_reducer[country_code]
+        df = pd.read_csv("/population/all_raster_pop_source.csv")
+
+        return df[df.iso_country == country_code].meta_link
 
     else:
         raise ValueError("No population source found.")
