@@ -14,7 +14,7 @@ def import_population(project: Project, model_place: str, source: str, overwrite
     url = link_source(model_place, source)
 
     if url == "no file":
-        raise ValueError('Could not find a population file to import')
+        raise ValueError("Could not find a population file to import")
 
     df = population_raster(url, f"pop_{model_place}", project)
 

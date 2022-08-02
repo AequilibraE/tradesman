@@ -16,5 +16,5 @@ class Test(TestCase):
 
         df = pd.read_sql("SELECT name FROM sqlite_master WHERE type='table'", test_model.conn)
 
-        for i in ['political_subdivisions', 'raw_population', 'hex_pop']:
+        for i in ["political_subdivisions", "raw_population", "hex_pop"]:
             self.assertIn(i, list(df.name))
