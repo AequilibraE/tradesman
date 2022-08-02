@@ -24,12 +24,6 @@ Finally, we also take the type of road surface in consideration, as a paved stre
 will always have higher speed and capacity to a similar unpaved road, according
 to the multiplying constants listed on the :ref:`pavement_constraints` table.
 
-The Jupyter Notebook that implements these network changes is prety simple, but
-critical for the identification of network bottlenecks.  Visualizing link
-capacities is also enlightening, so we included one in the notebook that can be
-`visualized as well!
-<https://nbviewer.org/github/pedrocamargo/road_analytics/blob/main/notebooks/2.1_augments_network_data.ipynb>`_
-
 Building the travel demand model
 --------------------------------
 

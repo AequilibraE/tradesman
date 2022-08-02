@@ -68,6 +68,7 @@ Regarding surface, OSM values provide additional information about the physical 
 roads, and some other features, such as material composition and/or structure. All data
 values for road surface can be found in `their OSM webpage <https://wiki.openstreetmap.org/wiki/Key:surface>`.
 
+.. _rural_access_index:
 
 Rural Access Index
 ------------------

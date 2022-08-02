@@ -3,7 +3,7 @@
 Data sources
 ============
 
-To be included in the main portions of thisanalytics pipeline, all data sources
+To be included in the main portions of this analytics pipeline, all data sources
 have to fulfill the following requirements:
 
 - Coverage: Since this pipeline is designed to be deployable for any country in
@@ -11,7 +11,7 @@ have to fulfill the following requirements:
   countries on Earth.
 
 - Openess: The data must be free, open and cannot impose excessive red-tape for
-  its use
+  its use.
 
 - Trustworthiness: The science and/or practices behind the development of
   data source must be technically transparent and robust, and have documented
@@ -28,7 +28,21 @@ its `website <https://www.openstreetmap.org/about>`_.
 
 Point-of-Interest
 -----------------
-XXXXXXXXX INCLUDE DISCUSSION ON OSM DATA    XXXXXXXXXXXXXXXXXXXXXXXX
+
+A Point-of-Interest (POI) represents a particular feature in the space, like  
+churches, schools, pubs, or tourist attractions. It does not necessarily have to 
+be a point, but can also be other OSM elements, such as nodes or ways. 
+
+It is worth reminding that the "interest" part should not be considered too 
+literaly, once a feature can be quite ordinary, such as a postbox. In this case,
+these features are usally considered ``amenity``\=*s\ .
+
+Amenities are useful and import facilities for visitiors and residents. More 
+information on amenity values on OSM, is available `in this page <https://wiki.openstreetmap.org/wiki/Key:amenity>`_.
+
+A building can also be a POI. The OSM building tag is used to identify individual
+buildings or groups of connected buildings, and can assume several values.
+More information on building values can be found in `this page <https://wiki.openstreetmap.org/wiki/Buildings>`_.
 
 Population
 ----------
@@ -69,5 +83,13 @@ within which people live and work, which is extremely relevant for providing
 reference values for our transportation demand model, as discussed in the
 corresponding section.
 
-Data documentation can be found on its `website
+Data documentation can be found on `Meta Commuting Zones website
 <https://dataforgood.facebook.com/dfg/tools/commuting-zones>`_.
+
+Rural and Urban Areas
+---------------------
+
+Rural and urban areas information all over the world are provided by `The Global 
+Rural-Urban Mapping Project (GRUMP) <https://sedac.ciesin.columbia.edu/data/collection/grump-v1>`_.
+This is a useful resource and helps us to identify the total population 
+living in rural areas, and later calculating the :ref:`rural_access_index`.
