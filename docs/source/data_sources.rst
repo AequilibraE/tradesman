@@ -28,7 +28,20 @@ its `website <https://www.openstreetmap.org/about>`_.
 
 Point-of-Interest
 -----------------
-XXXXXXXXX INCLUDE DISCUSSION ON OSM DATA    XXXXXXXXXXXXXXXXXXXXXXXX
+A Point-of-Interest (POI) represents a particular feature in the space, like  
+churches, schools, pubs, or tourist attractions. It does not necessarily have to 
+be a point, but can also be other OSM elements, such as nodes or ways. 
+
+It is worth reminding that the "interest" part should not be considered too 
+literaly, once a feature can be quite ordinary, such as a postbox. In this case,
+these features are usally considered ``amenity``=*s.  
+
+Amenities are useful and import facilities for visitiors and residents. More 
+information on amenity values on OSM, is available `in this page <https://wiki.openstreetmap.org/wiki/Key:amenity>`.
+
+A building can also be a POI. The OSM building tag is used to identify individual
+buildings or groups of connected buildings, and can assume several values.
+More information on building values can be found in `this page <https://wiki.openstreetmap.org/wiki/Buildings>`.
 
 Population
 ----------
@@ -71,3 +84,11 @@ corresponding section.
 
 Data documentation can be found on its `website
 <https://dataforgood.facebook.com/dfg/tools/commuting-zones>`_.
+
+Rural and Urban Areas
+---------------------
+
+Rural and urban areas information all over the world are provided by `The Global 
+Rural-Urban Mapping Project (GRUMP) <https://sedac.ciesin.columbia.edu/data/collection/grump-v1>`.
+This is a useful resource and helps us to identify the total population 
+living in rural areas, and later calculating the :ref:`Rural Access Index`.
