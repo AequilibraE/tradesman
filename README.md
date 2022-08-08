@@ -13,6 +13,6 @@ Package's current capabilities:
 * Importing Building footprints data from Microsoft's building footprint datasets
 
 Upcoming capabilities:
-* Deployment of transferred 4-step models
 * Creation of synthetic populations
+* Deployment of transferred 4-step models
 * Deployment of transferred Activity-Based models
