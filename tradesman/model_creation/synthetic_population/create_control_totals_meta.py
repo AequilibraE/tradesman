@@ -1,18 +1,70 @@
+import imp
 import pandas as pd
+import csv
+from os.path import join
 from aequilibrae.project import Project
 
 
 def create_control_totals_meta(project: Project):
 
-    zoning = project.zoning
-    fields = zoning.fields
+    # TODO: fix temporary folder location
 
-    selected_fields = []
+    folder = r""  # location of temporary folder
 
-    for field in fields:
-        if 'f_pop_' or 'm_pop' in field:
-            selected_fields.append(field)
+    df = pd.read_csv(join(folder, "control_totals_taz.csv"))
 
-    selection_qry = ""
+    hh_list = df[["HHBASE", "HHBASE1", "HHBASE2", "HHBASE4", "HHBASE6"]].sum().tolist()
 
-    pass
+    total_pop = (
+        df.sum()[
+            [
+                "POPF2",
+                "POPF3",
+                "POPF4",
+                "POPF5",
+                "POPF6",
+                "POPF7",
+                "POPF8",
+                "POPF9",
+                "POPF10",
+                "POPF11",
+                "POPF12",
+                "POPF13",
+                "POPF14",
+                "POPF15",
+                "POPF16",
+                "POPF17",
+                "POPF18",
+                "POPF19",
+                "POPM2",
+                "POPM3",
+                "POPM4",
+                "POPM5",
+                "POPM6",
+                "POPM7",
+                "POPM8",
+                "POPM9",
+                "POPM10",
+                "POPM11",
+                "POPM12",
+                "POPM13",
+                "POPM14",
+                "POPM15",
+                "POPM16",
+                "POPM17",
+                "POPM18",
+                "POPM19",
+            ]
+        ]
+        .sum()
+        .tolist()
+    )
+
+    hh_list.insert(0, 1)
+    hh_list.insert(1, 1)
+    hh_list.insert(2, total_pop)
+
+    with open(join(folder, "control_totals_meta.csv"), "w", newline="") as file:
+        writer = csv.writer(file, delimiter=",")
+        writer.writerow(["PUMA", "REGION", "POPBASE", "HHBASE", "HHSIZE1", "HHSIZE2", "HHSIZE4", "HHSIZE6"])
+        writer.writerow(hh_list)
