@@ -1,4 +1,3 @@
-import imp
 import pandas as pd
 import csv
 from os.path import join
@@ -18,6 +17,7 @@ def create_control_totals_meta(project: Project):
     total_pop = (
         df.sum()[
             [
+                "POPF1",
                 "POPF2",
                 "POPF3",
                 "POPF4",
@@ -35,7 +35,7 @@ def create_control_totals_meta(project: Project):
                 "POPF16",
                 "POPF17",
                 "POPF18",
-                "POPF19",
+                "POPM1",
                 "POPM2",
                 "POPM3",
                 "POPM4",
@@ -53,7 +53,6 @@ def create_control_totals_meta(project: Project):
                 "POPM16",
                 "POPM17",
                 "POPM18",
-                "POPM19",
             ]
         ]
         .sum()

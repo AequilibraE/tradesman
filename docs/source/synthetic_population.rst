@@ -3,7 +3,10 @@
 Synthetic Populations
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Tradesman uses `PopulationSim <https://activitysim.github.io/populationsim/index.html>`_, a Python native library to create its synthetic population.
+Synthetic populations are the primary input to activity-based travel demand models (ABMs), and are used as an alternative to the collection of microdata that is usually inacessible [RMK2007]_.
+
+Tradesman uses `PopulationSim <https://activitysim.github.io/populationsim/index.html>`_, a Python native library to create its synthetic population and households.
+
 
 PopulationSim Controls
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -54,14 +57,31 @@ female_16,TAZ,persons,100000,POPF16,(persons.AGEP >= 70) & (persons.AGEP < 75) &
 female_17,TAZ,persons,100000,POPF17,(persons.AGEP >= 75) & (persons.AGEP < 80) & (persons.SEX == 2)
 female_18,TAZ,persons,100000,POPF18,(persons.AGEP >= 80) & (persons.SEX == 2)
 
-For each sex and age structure, we create a control variable, considering the geography level of TAZ. For both women and men, we have 18 variables, named POPF and POPM, for female and male inhabitants. For TAZs we also consider the expected number of households. In the following section, we discuss the premisses of the model, and explain how the expected number of households was calculated. Finally, we have the controls by REGION, an upper level rather than TAZs. For regional control, we consider the expected number of households of different sizes.
+For each sex and age structure, we create a control variable, considering the geography level of TAZ. For both women and men, we have 18 variables, named POPF and POPM, for female and male inhabitants. For TAZs we also consider the expected number of households. In the following section, we discuss the premisses of the model, and explain how the expected number of households was calculated. Finally, we have the controls by REGION, an upper level. For regional control, we consider the expected number of households of different sizes.
 
 Tradesman model premisses
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-PopulationSim library requires a control file to run its processes. In the control file, one can specify and check the requirements for the synthetic population. The only mandatory requirement for a PopulationSim is generating the right number of households in each geography and this specification is made at the lowest level. The lowest level in Tradesman is the TAZs (Traffic Assessment Zones), however, the data necessary to estimate the total households in the upper level.
+PopulationSim library requires a control file to run its processes. In the control file, one can specify and check the requirements for the synthetic population. The only mandatory requirement for a PopulationSim is generating the right number of households in each geography and this specification is made at the lowest level. The lowest level in Tradesman is the TAZs (Traffic Assessment Zones), however, the data necessary to estimate the total households in the upper level. 
 
-The estimative of total households is based on the United Nations `Population Division <https://www.un.org/development/desa/pd/data/household-size-and-composition>`_ intormation about household composition. As there is no data available for all countries or autonomous regions, for countries that are not present in the sample, we considered their household informations to be similar to their closest neighbors.
+To fulfill the TAZ requirement, we estimated the total households based on the United Nations `Population Division <https://www.un.org/development/desa/pd/data/household-size-and-composition>`_ information about household composition. As there is no data available for all countries or autonomous regions, for countries that are not present in the sample, we considered their household informations to be similar to their closest neighbors. As there are many data sources available in the Population Division sheet, we kept the most recent data for each country, as long as it had information about the total number of households.
 
 The total number of households in each TAZ is a sum of all households with different sizes. To match the information provided by the UN, we consider households with 1 person (HHBASE1), 2 to 3 persons (HHBASE2), 4 to 5 persons (HHBASE4), and with more than 6 persons (HHBASE6). Hence, we sum all population by sex and age in the zone, divide by the average number of persons in the household, and multiply by the percentage of households of each size expected for the country. Finally, we sum the integer expected values for each household size to obtain the mandatory expected number of households in the TAZ (HHBASE).
 
+As we currently do not have validation data to assess the quality of the synthetic populations created, we use the following variables from the UN Population Division file to validate the population:
+
+- Percentage of households with at least one person under 15 years old;
+- Percentage of households with at least one person under 18 years old;
+- Percentage of households with at least one person under 20 years old;
+- Percentage of households with at least one person over 60 years old;
+- Percentage of households with at least one person over 65 years old;
+- Percentage of households with at least one person under 15 and one person over 60;
+- Percentage of households with at least one person under 15 and one person over 65;
+- Percentage of households with at least one person under 18 and one person over 60;
+- Percentage of households with at least one person under 18 and one person over 65;
+- Percentage of households with at least one person under 20 and one person over 60;
+- Percentage of households with at least one person under 20 and one person over 65.
+
+As part of the validation process, we also run the validation process presented by the development team of PopulationSim, available `here <https://github.com/activitysim/populationSim/tree/master/scripts>`_.
+
+.. [RMK2007] https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1538-4632.2009.00750.x
