@@ -4,27 +4,12 @@ import sqlite3
 from os.path import join
 
 
-def export_syn_persons():
+def export_syn_pop_data(project: Project, folder: str):
 
-    path = ""
+    persons = pd.read_csv(join(folder, "output/synthetic_persons.csv"))
 
-    df = pd.read_csv(join(path, "synthetic_persons.csv"))
+    persons.to_sql("synthetic_persons", con=project.conn, if_exists="replace")
 
-    conn = sqlite3.connect(join(path, "project_database.sqlite"))
-    conn.execute(
-        "CREATE TABLE IF NOT EXISTS synthetic_persons(puma INTEGER, \
-                                                               taz INTEGER, \
-                                                               household_id INTEGER, \
-                                                               per_num INTEGER,\
-                                                               age INTEGER,\
-                                                               sex INTEGER,\
-                                                               occp INTEGER);"
-    )
+    households = pd.read_csv(join(folder, "output/synthetic_households.csv"))
 
-    df.to_sql()
-    pass
-
-
-def export_syn_households():
-
-    pass
+    households.to_sql("synthetic_households", con=project.conn, if_exists="replace")

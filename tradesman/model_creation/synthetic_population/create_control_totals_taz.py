@@ -1,53 +1,71 @@
 import csv
 from os.path import join
 import pandas as pd
+import geopandas as gpd
 import pycountry
 from aequilibrae.project import Project
 
 
-def create_control_totals_taz(project: Project, model_place: str):
+def create_control_totals_taz(project: Project, model_place: str, file_folder: str):
 
-    # TODO: fix temporary folder path
     country_code = pycountry.countries.search_fuzzy(model_place)[0].alpha_3
-    un_hh_size = pd.read_csv("")[country_code]
+    un_hh_size = pd.read_csv("tradesman\model_creation\synthetic_population\controls_and_validation\hh_size_data.csv")
+
+    un_hh_size = un_hh_size[un_hh_size.iso_code == country_code]
+
+    un_hh_size.reset_index(drop=True, inplace=True)
 
     zoning = project.zoning
     fields = zoning.fields
 
-    selected_fields = []
+    selected_fields = ["zone_id"]
 
-    for field in fields:
-        if "f_pop" in field:
+    for field in fields.all_fields():
+        if "POP" in field:
             selected_fields.append(field)
-        elif "m_pop" in field:
-            selected_fields.append(field)
+
+    df = pd.read_sql("SELECT * FROM zones;", con=project.conn)
 
     df = df[selected_fields].copy()
 
     df["POPBASE"] = df[selected_fields].transpose().sum().tolist()
 
-    df["HHBASE1"] = df["POPBASE"] / un_hh_size["AVGSIZE"] * un_hh_size["HHBASE1"]
+    df["HHBASE1"] = df["POPBASE"] / un_hh_size.AVGSIZE[0] * un_hh_size.HHBASE1[0] / 100
 
-    df["HHBASE2"] = df["POPBASE"] / un_hh_size["AVGSIZE"] * un_hh_size["HHBASE2"]
+    df["HHBASE2"] = df["POPBASE"] / un_hh_size.AVGSIZE[0] * un_hh_size.HHBASE2[0] / 100
 
-    df["HHBASE4"] = df["POPBASE"] / un_hh_size["AVGSIZE"] * un_hh_size["HHBASE4"]
+    df["HHBASE4"] = df["POPBASE"] / un_hh_size.AVGSIZE[0] * un_hh_size.HHBASE4[0] / 100
 
-    df["HHBASE6"] = df["POPBASE"] / un_hh_size["AVGSIZE"] * un_hh_size["HHBASE6"]
-
-    df["HHBASE"] = df["HHBASE1"] + df["HHBASE2"] + df["HHBASE4"] + df["HHBASE6"]
+    df["HHBASE6"] = df["POPBASE"] / un_hh_size.AVGSIZE[0] * un_hh_size.HHBASE6[0] / 100
 
     df = df.round(decimals=0).astype(int)
 
-    df.insert(0, "TAZ")
+    df["HHBASE"] = df["HHBASE1"] + df["HHBASE2"] + df["HHBASE4"] + df["HHBASE6"]
 
-    df["TAZ"] = list(range(1, len(df) + 1))
+    sql = "SELECT country_name, division_name, level, Hex(ST_AsBinary(GEOMETRY)) as geom FROM political_subdivisions WHERE level=1;"
 
-    taz_list = list(df.to_records(index=False))
+    subdivisions = gpd.GeoDataFrame.from_postgis(sql, project.conn, geom_col="geom", crs=4326)
 
-    folder = r""
+    sql = "SELECT zone_id, Hex(ST_AsBinary(geometry)) as geom FROM zones;"
 
-    with open(join(folder, "control_totals_taz.csv"), "w", newline="") as file:
-        writer = csv.writer(file, delimiter=",")
-        writer.writerow(df.columns.tolist())
-        for zone in taz_list:
-            writer.writerow(zone)
+    zones = gpd.GeoDataFrame.from_postgis(sql, con=project.conn, geom_col="geom", crs=4326)
+
+    zones["centroid"] = zones.to_crs(3857).centroid.to_crs(4326)
+
+    zones.set_geometry(col="centroid", drop=True, inplace=True)
+
+    df["PUMA"] = 1
+
+    df["REGION"] = 1
+
+    df["MAZ"] = df.zone_id.tolist()
+
+    df["xTAZ"] = gpd.sjoin(zones, subdivisions).index_right.tolist()
+
+    df["xTAZ"] = df["xTAZ"] + 1
+
+    df.rename(columns={"zone_id": "TAZ"})
+
+    df.to_csv(join(file_folder, "data/control_totals_taz.csv"), sep=",", index=False, index_label=None)
+
+    print("control_totals_taz.csv file created.")
