@@ -62,3 +62,6 @@ def create_control_totals_meta(file_folder: str):
         writer = csv.writer(file, delimiter=",")
         writer.writerow(["PUMA", "REGION", "POPBASE", "HHBASE", "HHSIZE1", "HHSIZE2", "HHSIZE4", "HHSIZE6"])
         writer.writerow(hh_list)
+
+    print('control_totals_meta.csv file created.')
+    

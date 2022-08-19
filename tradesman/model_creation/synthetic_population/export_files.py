@@ -1,4 +1,4 @@
-from aequlibrae.project import Project
+from aequilibrae.project import Project
 import pandas as pd
 import sqlite3
 from os.path import join
