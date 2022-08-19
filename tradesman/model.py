@@ -43,6 +43,7 @@ class Tradesman:
         self.import_pop_by_sex_and_age()
         self.import_amenities()
         self.import_buildings()
+        self.create_synthetic_population()
 
     def add_country_borders(self, overwrite=False):
         """Retrieves country borders from www.geoboundarries.org and adds to the model.
