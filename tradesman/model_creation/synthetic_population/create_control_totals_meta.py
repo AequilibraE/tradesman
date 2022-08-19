@@ -5,7 +5,7 @@ from os.path import join
 
 def create_control_totals_meta(file_folder: str):
 
-    df = pd.read_csv(join(file_folder, "data/ontrol_totals_taz.csv"))
+    df = pd.read_csv(join(file_folder, "data/control_totals_taz.csv"))
 
     hh_list = df[["HHBASE", "HHBASE1", "HHBASE2", "HHBASE4", "HHBASE6"]].sum().tolist()
 

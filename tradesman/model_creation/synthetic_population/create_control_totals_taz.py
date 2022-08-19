@@ -15,16 +15,13 @@ def create_control_totals_taz(project: Project, model_place: str, file_folder: s
 
     un_hh_size.reset_index(drop=True, inplace=True)
 
-    zoning = project.zoning
-    fields = zoning.fields
+    df = pd.read_sql("SELECT * FROM zones;", con=project.conn)
 
-    selected_fields = ["zone_id"]
+    selected_fields = []
 
-    for field in fields.all_fields():
+    for field in df.columns.tolist():
         if "POP" in field:
             selected_fields.append(field)
-
-    df = pd.read_sql("SELECT * FROM zones;", con=project.conn)
 
     df = df[selected_fields].copy()
 
@@ -42,6 +39,10 @@ def create_control_totals_taz(project: Project, model_place: str, file_folder: s
 
     df["HHBASE"] = df["HHBASE1"] + df["HHBASE2"] + df["HHBASE4"] + df["HHBASE6"]
 
+    df.insert(0, "TAZ", 0)
+
+    df["TAZ"] = list(range(1, len(df) + 1))
+
     sql = "SELECT country_name, division_name, level, Hex(ST_AsBinary(GEOMETRY)) as geom FROM political_subdivisions WHERE level=1;"
 
     subdivisions = gpd.GeoDataFrame.from_postgis(sql, project.conn, geom_col="geom", crs=4326)
@@ -58,13 +59,11 @@ def create_control_totals_taz(project: Project, model_place: str, file_folder: s
 
     df["REGION"] = 1
 
-    df["MAZ"] = df.zone_id.tolist()
+    df["MAZ"] = df.TAZ.tolist()
 
     df["xTAZ"] = gpd.sjoin(zones, subdivisions).index_right.tolist()
 
     df["xTAZ"] = df["xTAZ"] + 1
-
-    df.rename(columns={"zone_id": "TAZ"})
 
     df.to_csv(join(file_folder, "data/control_totals_taz.csv"), sep=",", index=False, index_label=None)
 
