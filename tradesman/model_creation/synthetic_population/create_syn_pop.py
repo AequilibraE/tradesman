@@ -66,7 +66,7 @@ def set_thread_number(folder: str, number=None):
          *number*(:obj:`int`): number of threads used. By default uses the greatest number of threads available.
 
     """
-    if number == None:
+    if number is None:
         number = mp.cpu_count()
 
     with open(join(folder, "configs/settings.yaml")) as file:
