@@ -1,6 +1,6 @@
-import yaml
-import shutil
 from os.path import join
+import shutil
+import yaml
 
 
 def user_control_import(overwrite: bool, folder: str, **kwargs):
@@ -30,13 +30,13 @@ def user_change_settings(overwrite: bool, folder: str, **kwargs):
 
     """
     if overwrite is True:
-        with open(join(folder, "configs/settings.yaml")) as file:
+        with open(join(folder, "configs/settings.yaml"), encoding='utf-8') as file:
             doc = yaml.full_load(file)
 
         doc["output_synthetic_population"]["households"]["columns"].append(kwargs["household_settings"])
         doc["output_synthetic_population"]["persons"]["columns"].append(kwargs["persons_settings"])
 
-        with open(join(folder, "configs/settings.yaml"), "w") as file:
+        with open(join(folder, "configs/settings.yaml"), "w", encoding='utf-8') as file:
             yaml.safe_dump(doc, file, default_flow_style=False)
 
 
@@ -87,11 +87,37 @@ def user_change_geographies(overwrite: bool, folder: str, **kwargs):
          *lower_geography*
     """
     if overwrite is True:
-        with open(join(folder, "configs/settings.yaml")) as file:
+        with open(join(folder, "configs/settings.yaml"), encoding='utf-8') as file:
             doc = yaml.full_load(file)
 
         doc["seed_geography"] = kwargs["seed_geography"]
         doc["geographies"] = [kwargs["upper_geography"], kwargs["seed_geography"], kwargs["lower_geography"]]
 
-        with open(join(folder, "configs/settings.yaml"), "w") as file:
+        with open(join(folder, "configs/settings.yaml"), "w", encoding='utf-8') as file:
             yaml.safe_dump(doc, file, default_flow_style=False)
+
+
+def user_change_validation_parameters(overwrite: bool, model_place: str, folder: str, **kwargs):
+    """
+    This function identifies the model's locaation, and allows the replacement of validation parameters in case of changes in geopgraphies and/or controls.
+    Args:
+          *overwrite*:
+          *model_place*:
+          *folder*: path to folder where synthetic population is
+    **kwargs:
+          *aggregate_summaries*: list of dictionaries containing the name, geography, control, and result.
+          *geographies*: list containing the existing geographies, from upper to lower levels (e.g: ['REGION', 'PUMA', 'TAZ'])
+    """
+
+    with open(join(folder, "verification.yaml"), encoding='utf-8') as file:
+        doc = yaml.full_load(file)
+
+    doc["popsim_dir"] = model_place
+    doc["region"] = model_place
+
+    if overwrite is True:
+        doc["aggregate_summaries"] = kwargs["aggregate_summaries"]
+        doc['group_geographies'] = kwargs['geographies']
+
+    with open(join(folder, "verification.yaml"), "w", encoding='utf-8') as file:
+        yaml.safe_dump(doc, file, default_flow_style=False)

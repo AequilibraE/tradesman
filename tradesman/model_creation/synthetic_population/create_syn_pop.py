@@ -8,7 +8,8 @@ from tradesman.model_creation.synthetic_population.create_control_totals_meta im
 from tradesman.model_creation.synthetic_population.create_control_totals_taz import create_control_totals_taz
 from tradesman.model_creation.synthetic_population.create_geo_crosswalk import create_geo_cross_walk
 from tradesman.model_creation.synthetic_population.export_files import export_syn_pop_data
-from tradesman.model_creation.synthetic_population.unzip_files import unzip_control_files
+from tradesman.model_creation.synthetic_population.syn_pop_validation import validate_controlled_vars, validate_non_controlled_vars
+from tradesman.model_creation.synthetic_population.unzip_files import unzip_control_and_seed_files
 from tradesman.model_creation.synthetic_population.user_control_import import (
     user_change_geographies,
     user_change_settings,
@@ -29,7 +30,7 @@ def create_syn_pop(project: Project, model_place: str, folder: str):
 
     """
 
-    unzip_control_files(file_path=folder)
+    unzip_control_and_seed_files(file_path=folder)
 
     pop_fldr = join(folder, "population")
 
@@ -51,10 +52,6 @@ def create_syn_pop(project: Project, model_place: str, folder: str):
 
     create_control_totals_meta(pop_fldr)
 
-    subprocess.Popen(["python", join(pop_fldr, "run_populationsim.py")], cwd=pop_fldr)
-
-    export_syn_pop_data(project, pop_fldr)
-
 
 def set_thread_number(folder: str, number=None):
     """
@@ -69,10 +66,29 @@ def set_thread_number(folder: str, number=None):
     if number is None:
         number = mp.cpu_count()
 
-    with open(join(folder, "configs/settings.yaml")) as file:
+    with open(join(folder, "configs/settings.yaml"), encoding='utf-8') as file:
         doc = yaml.full_load(file)
 
-    doc["num_processes"] = set_thread_number()
+    doc["num_processes"] = number
 
-    with open(join(folder, "configs/settings.yaml"), "w") as file:
+    with open(join(folder, "configs/settings.yaml"), "w", encoding='utf-8') as file:
         yaml.safe_dump(doc, file, default_flow_style=False)
+
+def run_populationsim(project: Project, model_place: str, folder: str):
+    """
+    This function runs the module PopulationSim to generate synthetic populations, exports the results, and runs the validation process.
+    Args:
+         *project*:
+         *model_place*:
+         *folder*:
+    """
+
+    pop_fldr = join(folder, "population")
+
+    subprocess.Popen(["python", "run_populationsim.py"], cwd=pop_fldr)
+
+    export_syn_pop_data(project, pop_fldr)
+
+    validate_controlled_vars(pop_fldr)
+
+    validate_non_controlled_vars(model_place, pop_fldr)
