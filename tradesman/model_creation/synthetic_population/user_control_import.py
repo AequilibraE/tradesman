@@ -14,7 +14,7 @@ def user_control_import(overwrite: bool, folder: str, **kwargs):
 
 
     """
-    if overwrite == True:
+    if overwrite is True:
         shutil.move(kwargs["new_path"], join(folder, "configs/control.csv"))
 
 
@@ -29,7 +29,7 @@ def user_change_settings(overwrite: bool, folder: str, **kwargs):
          *persons_settings*
 
     """
-    if overwrite == True:
+    if overwrite is True:
         with open(join(folder, "configs/settings.yaml")) as file:
             doc = yaml.full_load(file)
 
@@ -51,7 +51,7 @@ def user_import_new_seeds(overwrite: bool, folder: str, **kwargs):
          *household_seed_path*
 
     """
-    if overwrite == True:
+    if overwrite is True:
         shutil.move(kwargs["persons_seed_path"], join(folder, "data/seed_persons.csv"))
         shutil.move(kwargs["household_seed_path"], join(folder, "data/seed_households.csv"))
 
@@ -69,7 +69,7 @@ def user_import_new_totals(overwrite: bool, folder: str, **kwargs):
          *geographies*
 
     """
-    if overwrite == True:
+    if overwrite is True:
         shutil.move(kwargs["totals_lower_level"], join(folder, "data/control_totals_taz.csv"))
         shutil.move(kwargs["totals_upper_level"], join(folder, "data/control_totals_meta.csv"))
         shutil.move(kwargs["geographies"], join(folder, "data/geo_cross_walk.csv"))
@@ -86,7 +86,7 @@ def user_change_geographies(overwrite: bool, folder: str, **kwargs):
          *upper_geography*
          *lower_geography*
     """
-    if overwrite == True:
+    if overwrite is True:
         with open(join(folder, "configs/settings.yaml")) as file:
             doc = yaml.full_load(file)
 

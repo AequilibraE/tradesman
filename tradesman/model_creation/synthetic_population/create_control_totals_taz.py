@@ -9,7 +9,7 @@ from aequilibrae.project import Project
 def create_control_totals_taz(project: Project, model_place: str, file_folder: str):
 
     country_code = pycountry.countries.search_fuzzy(model_place)[0].alpha_3
-    un_hh_size = pd.read_csv("tradesman\model_creation\synthetic_population\controls_and_validation\hh_size_data.csv")
+    un_hh_size = pd.read_csv(r"tradesman\model_creation\synthetic_population\controls_and_validation\hh_size_data.csv")
 
     un_hh_size = un_hh_size[un_hh_size.iso_code == country_code]
 
