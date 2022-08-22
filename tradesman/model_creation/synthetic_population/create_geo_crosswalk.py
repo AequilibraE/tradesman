@@ -10,12 +10,13 @@ def create_geo_cross_walk(project: Project, file_folder: str):
 
     zone_id = [i[0] for i in project.conn.execute(qry).fetchall()]
 
-    regions_and_pumas = [1 for i in list(range(len(zone_id)))]
+    regions_and_pumas = np.ones(len(zone_id))
 
-    create_lines = list(zip(zone_id, regions_and_pumas, regions_and_pumas))
 
-    df = pd.DataFrame(create_lines, columns=["TAZ", "PUMA", "REGION"])
+    df = pd.DataFrame({"TAZ":zone_id, "PUMA":regions_and_pumas, "REGION":regions_and_pumas})
 
+    qry = "SELECT zone_id TAZ, 1 PUMA, 1, REGION FROM zones;"
+    pd.read_sql(qry, project.conn).to_csv("data/geo_cross_walk.csv", index=False, quoting=csv.QUOTE_NONNUMERIC)
     df.to_csv(
         join(file_folder, "data/geo_cross_walk.csv"),
         sep=",",

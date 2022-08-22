@@ -65,6 +65,6 @@ def create_control_totals_taz(project: Project, model_place: str, file_folder: s
 
     df["xTAZ"] = df["xTAZ"] + 1
 
-    df.to_csv(join(file_folder, "data/control_totals_taz.csv"), sep=",", index=False, index_label=None)
+    df.to_csv(join(file_folder, "data/control_totals_taz.csv"), sep=",", index=False)
 
     print("control_totals_taz.csv file created.")
