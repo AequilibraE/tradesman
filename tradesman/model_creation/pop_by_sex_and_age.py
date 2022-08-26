@@ -25,7 +25,7 @@ def get_pop_by_sex_age(project: Project, model_place: str):
             data_link = url + f"{country_code}/{country_code.lower()}_{s}_{age[a]}_2020.tif"
             field_name = "POP" + s.upper() + f"{a+1}"
 
-            df = population_raster(data_link, field_name, project)
+            df = population_raster(data_link, field_name=f"{country_code}_{field_name}", project=project)
 
             gdf_pop = gpd.GeoDataFrame(df, geometry=gpd.points_from_xy(df.longitude, df.latitude), crs=4326)
 
@@ -35,14 +35,11 @@ def get_pop_by_sex_age(project: Project, model_place: str):
 
             list_of_tuples = list(pop_per_zone[["population", "zone_id"]].itertuples(index=False, name=None))
 
-            if age[a] < 80 and s == "f":
-                fields.add(field_name, f"female population {age[a]} to {age[a+1]} years old.", "INTEGER")
-            elif age[a] < 80 and s == "m":
-                fields.add(field_name, f"male population {age[a]} to {age[a+1]} years old.", "INTEGER")
-            elif age[a] >= 80 and s == "f":
-                fields.add(field_name, f"female population over {age[a]} years old.", "INTEGER")
+            preffix = "" if s == "m" else "fe"
+            if age[a] < 80:
+                fields.add(field_name, f"{preffix}male population {age[a]} to {age[a+1]} years old.", "INTEGER")
             else:
-                fields.add(field_name, f"male population over {age[a]} years old.", "INTEGER")
+                fields.add(field_name, f"{preffix}male population over {age[a]} years old.", "INTEGER")
 
             project.conn.executemany(f"UPDATE zones SET {field_name}=? WHERE zone_id=?;", list_of_tuples)
             project.conn.commit()

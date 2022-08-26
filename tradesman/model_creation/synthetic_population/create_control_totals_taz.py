@@ -6,13 +6,13 @@ import pycountry
 from aequilibrae.project import Project
 
 
-def create_control_totals_taz(project: Project, model_place: str, file_folder: str):
+def create_control_totals_taz(project: Project, model_place: str, dest_folder: str):
     """
-    This function creates the control totals for each TAZ in the project.
-    Args:
-         *project*:
-         *model_palce*:
-         *file_folder*:
+    Create the file containing control totals for each TAZ in the project.
+    Parameters:
+         *project*(:obj:`aequilibrae.project): current project
+         *model_palce*(:obj:`str`): current model place
+         *dest_folder*(:obj:`str`): folder containing PopulationSim population files
     """
 
     country_code = pycountry.countries.search_fuzzy(model_place)[0].alpha_3
@@ -57,8 +57,8 @@ def create_control_totals_taz(project: Project, model_place: str, file_folder: s
 
     zones.set_geometry(col="centroid", drop=True, inplace=True)
 
-    df = df.assign(REGION=1, MAZ=df.TAZ.tolist(), xTAZ=[i+1 for i in gpd.sjoin(zones, subdivisions).index_right.tolist()])
+    df = df.assign(
+        REGION=1, MAZ=df.TAZ.tolist(), xTAZ=[i + 1 for i in gpd.sjoin(zones, subdivisions).index_right.tolist()]
+    )
 
-    df.to_csv(join(file_folder, "data/control_totals_taz.csv"), sep=",", index=False)
-
-    print("control_totals_taz.csv file created.")
+    df.to_csv(join(dest_folder, "data/control_totals_taz.csv"), sep=",", index=False)
