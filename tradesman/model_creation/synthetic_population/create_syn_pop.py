@@ -81,11 +81,11 @@ def run_populationsim(project: Project, model_place: str, folder: str):
 
     subprocess.run([sys.executable, "run_populationsim.py"], cwd=pop_fldr)
 
-    persons = pd.read_csv(join(pop_fldr, "output/synthetic_persons.csv")).to_sql(
+    pd.read_csv(join(pop_fldr, "output/synthetic_persons.csv")).to_sql(
         "synthetic_persons", con=project.conn, if_exists="replace"
     )
 
-    households = pd.read_csv(join(pop_fldr, "output/synthetic_households.csv")).to_sql(
+    pd.read_csv(join(pop_fldr, "output/synthetic_households.csv")).to_sql(
         "synthetic_households", con=project.conn, if_exists="replace"
     )
 

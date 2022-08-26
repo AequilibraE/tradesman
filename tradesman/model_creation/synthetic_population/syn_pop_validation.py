@@ -151,7 +151,7 @@ def validate_controlled_vars(folder: str):
         summary_df = summary_df.append(df)
 
     for geog in use_geographies:
-        if not geog in summary_df.geography.unique():
+        if geog not in summary_df.geography.unique():
             summary_df = summary_df.append(meta_geog_df(summary_df, geog, popsim_dir, geography_file, use_geographies))
 
     generate_frequencies(validation_dir, summary_df, aggregate_list, scenario, region)
@@ -161,11 +161,9 @@ def validate_controlled_vars(folder: str):
 
 def uniformity(validation_dir, seed_hh_cols, popsim_dir, seed_hh_file, exp_hh_file, exp_hh_id_col):
 
-    seed_cols = seed_hh_cols.values()
     geog = seed_hh_cols.get("geog")
     geog_weight = seed_hh_cols.get("geog_weight")
-    hh_id = seed_hh_cols.get("hh_id")
-
+    
     expanded_hhids = pd.read_csv(os.path.join(popsim_dir, exp_hh_file), usecols=[exp_hh_id_col])
 
     seed_hh_df = pd.read_csv(os.path.join(popsim_dir, seed_hh_file), usecols=["PUMA", "WGTP", "hhnum"])
