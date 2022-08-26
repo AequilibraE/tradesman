@@ -163,7 +163,6 @@ def uniformity(validation_dir, seed_hh_cols, popsim_dir, seed_hh_file, exp_hh_fi
 
     geog = seed_hh_cols.get("geog")
     geog_weight = seed_hh_cols.get("geog_weight")
-    
     expanded_hhids = pd.read_csv(os.path.join(popsim_dir, exp_hh_file), usecols=[exp_hh_id_col])
 
     seed_hh_df = pd.read_csv(os.path.join(popsim_dir, seed_hh_file), usecols=["PUMA", "WGTP", "hhnum"])
