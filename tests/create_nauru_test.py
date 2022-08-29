@@ -7,3 +7,4 @@ def create_nauru_test(folder):
     # Let's use the Nauru example project for display
     project = create_example(folder, "nauru")
     add_new_tables(project.conn)
+    return project
