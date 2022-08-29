@@ -1,27 +1,18 @@
 import csv
+from os.path import join
 import pandas as pd
 from aequilibrae import Project
-from os.path import join
 
 
-def create_geo_cross_walk(project: Project, file_folder: str):
+def create_geo_cross_walk(project: Project, dest_folder: str):
+    """
+    Creates the geographic controls over which PopulatioSim will generate the synthetic population.
+    Parameters:
+         *project*(:obj:`aequilibrae.Project`): current project
+         *dest_folder*(:obj:`str`): folder containing PopulationSim population files
+    """
 
-    qry = "SELECT zone_id FROM zones;"
-
-    zone_id = [i[0] for i in project.conn.execute(qry).fetchall()]
-
-    regions_and_pumas = [1 for i in list(range(len(zone_id)))]
-
-    create_lines = list(zip(zone_id, regions_and_pumas, regions_and_pumas))
-
-    df = pd.DataFrame(create_lines, columns=["TAZ", "PUMA", "REGION"])
-
-    df.to_csv(
-        join(file_folder, "data/geo_cross_walk.csv"),
-        sep=",",
-        index=False,
-        index_label=None,
-        quoting=csv.QUOTE_NONNUMERIC,
+    qry = "SELECT zone_id AS TAZ, 1 PUMA, 1 REGION FROM zones;"
+    pd.read_sql(qry, project.conn).to_csv(
+        join(dest_folder, "data/geo_cross_walk.csv"), index=False, quoting=csv.QUOTE_NONNUMERIC
     )
-
-    print("geo_cross_walk.csv file created.")

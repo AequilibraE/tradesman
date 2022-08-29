@@ -15,7 +15,7 @@ from tradesman.model_creation.import_network import import_network
 from tradesman.model_creation.import_population import import_population
 from tradesman.model_creation.pop_by_sex_and_age import get_pop_by_sex_age
 from tradesman.model_creation.set_source import set_source
-from tradesman.model_creation.synthetic_population.create_syn_pop import create_syn_pop
+from tradesman.model_creation.synthetic_population.create_syn_pop import create_syn_pop, run_populationsim
 from tradesman.model_creation.zoning.zone_building import zone_builder
 
 
@@ -43,7 +43,8 @@ class Tradesman:
         self.import_pop_by_sex_and_age()
         self.import_amenities()
         self.import_buildings()
-        self.create_synthetic_population()
+        self.build_population_synthesizer_data()
+        self.synthesize_population()
 
     def add_country_borders(self, overwrite=False):
         """Retrieves country borders from www.geoboundarries.org and adds to the model.
@@ -140,9 +141,19 @@ class Tradesman:
 
         building_import(self.__model_place, self._project, self.__osm_data)
 
-    def create_synthetic_population(self):
+    def build_population_synthesizer_data(self):
+        """
+        Triggers the import of data to create the synthetic population.
+        """
 
         create_syn_pop(self._project, self.__model_place, self.__folder)
+
+    def synthesize_population(self):
+        """
+        Triggers the creation of synthetic population.
+        """
+
+        run_populationsim(self._project, self.__model_place, self.__folder)
 
     def __initialize_model(self):
         if isdir(self.__folder):

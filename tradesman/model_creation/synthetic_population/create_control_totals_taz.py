@@ -6,10 +6,18 @@ import pycountry
 from aequilibrae.project import Project
 
 
-def create_control_totals_taz(project: Project, model_place: str, file_folder: str):
+def create_control_totals_taz(project: Project, model_place: str, dest_folder: str):
+    """
+    Create the file containing control totals for each TAZ in the project.
+    Parameters:
+         *project*(:obj:`aequilibrae.project): current project
+         *model_palce*(:obj:`str`): current model place
+         *dest_folder*(:obj:`str`): folder containing PopulationSim population files
+    """
 
     country_code = pycountry.countries.search_fuzzy(model_place)[0].alpha_3
-    un_hh_size = pd.read_csv(r"tradesman\model_creation\synthetic_population\controls_and_validation\hh_size_data.csv")
+
+    un_hh_size = pd.read_csv("tradesman/model_creation/synthetic_population/controls_and_validation/hh_size_data.csv")
 
     un_hh_size = un_hh_size[un_hh_size.iso_code == country_code]
 
@@ -17,11 +25,7 @@ def create_control_totals_taz(project: Project, model_place: str, file_folder: s
 
     df = pd.read_sql("SELECT * FROM zones;", con=project.conn)
 
-    selected_fields = []
-
-    for field in df.columns.tolist():
-        if "POP" in field:
-            selected_fields.append(field)
+    selected_fields = [field for field in df.columns.tolist() if "POP" in field]
 
     df = df[selected_fields].copy()
 
@@ -39,9 +43,7 @@ def create_control_totals_taz(project: Project, model_place: str, file_folder: s
 
     df["HHBASE"] = df["HHBASE1"] + df["HHBASE2"] + df["HHBASE4"] + df["HHBASE6"]
 
-    df.insert(0, "TAZ", 0)
-
-    df["TAZ"] = list(range(1, len(df) + 1))
+    df.insert(0, "TAZ", list(range(1, len(df) + 1)))
 
     sql = "SELECT country_name, division_name, level, Hex(ST_AsBinary(GEOMETRY)) as geom FROM political_subdivisions WHERE level=1;"
 
@@ -55,16 +57,8 @@ def create_control_totals_taz(project: Project, model_place: str, file_folder: s
 
     zones.set_geometry(col="centroid", drop=True, inplace=True)
 
-    df["PUMA"] = 1
+    df = df.assign(
+        REGION=1, MAZ=df.TAZ.tolist(), xTAZ=[i + 1 for i in gpd.sjoin(zones, subdivisions).index_right.tolist()]
+    )
 
-    df["REGION"] = 1
-
-    df["MAZ"] = df.TAZ.tolist()
-
-    df["xTAZ"] = gpd.sjoin(zones, subdivisions).index_right.tolist()
-
-    df["xTAZ"] = df["xTAZ"] + 1
-
-    df.to_csv(join(file_folder, "data/control_totals_taz.csv"), sep=",", index=False, index_label=None)
-
-    print("control_totals_taz.csv file created.")
+    df.to_csv(join(dest_folder, "data/control_totals_taz.csv"), sep=",", index=False)

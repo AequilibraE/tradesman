@@ -2,23 +2,23 @@ import multiprocessing as mp
 import subprocess
 import yaml
 from os.path import join
+import pandas as pd
+import sys
 
 from aequilibrae.project import Project
 from tradesman.model_creation.synthetic_population.create_control_totals_meta import create_control_totals_meta
 from tradesman.model_creation.synthetic_population.create_control_totals_taz import create_control_totals_taz
 from tradesman.model_creation.synthetic_population.create_geo_crosswalk import create_geo_cross_walk
-from tradesman.model_creation.synthetic_population.export_files import export_syn_pop_data
-from tradesman.model_creation.synthetic_population.unzip_files import unzip_control_files
-from tradesman.model_creation.synthetic_population.user_control_import import (
-    user_change_geographies,
-    user_change_settings,
-    user_control_import,
-    user_import_new_seeds,
-    user_import_new_totals,
+from tradesman.model_creation.synthetic_population.create_seeds import create_buckets
+from tradesman.model_creation.synthetic_population.syn_pop_validation import (
+    validate_controlled_vars,
+    validate_non_controlled_vars,
 )
+from tradesman.model_creation.synthetic_population.unzip_files import unzip_control_and_seed_files
+from tradesman.model_creation.synthetic_population.user_control_import import user_change_validation_parameters
 
 
-def create_syn_pop(project: Project, model_place: str, folder: str):
+def create_syn_pop(project: Project, model_place: str, cwd: str):
     """
     Creates synthetic population to be used im Activity Based Models, using PopulationSim.
 
@@ -29,31 +29,19 @@ def create_syn_pop(project: Project, model_place: str, folder: str):
 
     """
 
-    unzip_control_files(file_path=folder)
+    unzip_control_and_seed_files(file_path=cwd)
 
-    pop_fldr = join(folder, "population")
-
-    user_control_import(overwrite=False, folder=pop_fldr)
-
-    user_change_settings(overwrite=False, folder=pop_fldr)
-
-    user_change_geographies(overwrite=False, folder=pop_fldr)
-
-    user_import_new_seeds(overwrite=False, folder=pop_fldr)
-
-    user_import_new_totals(overwrite=False, folder=pop_fldr)
+    pop_fldr = join(cwd, "population")
 
     set_thread_number(pop_fldr)
+
+    create_buckets(model_place, project, folder=pop_fldr, sample=0.20)
 
     create_geo_cross_walk(project, pop_fldr)
 
     create_control_totals_taz(project, model_place, pop_fldr)
 
     create_control_totals_meta(pop_fldr)
-
-    subprocess.Popen(["python", join(pop_fldr, "run_populationsim.py")], cwd=pop_fldr)
-
-    export_syn_pop_data(project, pop_fldr)
 
 
 def set_thread_number(folder: str, number=None):
@@ -69,10 +57,38 @@ def set_thread_number(folder: str, number=None):
     if number is None:
         number = mp.cpu_count()
 
-    with open(join(folder, "configs/settings.yaml")) as file:
+    with open(join(folder, "configs/settings.yaml"), encoding="utf-8") as file:
         doc = yaml.full_load(file)
 
-    doc["num_processes"] = set_thread_number()
+    doc["num_processes"] = number
 
-    with open(join(folder, "configs/settings.yaml"), "w") as file:
+    with open(join(folder, "configs/settings.yaml"), "w", encoding="utf-8") as file:
         yaml.safe_dump(doc, file, default_flow_style=False)
+
+
+def run_populationsim(project: Project, model_place: str, folder: str):
+    """
+    This function runs the module PopulationSim to generate synthetic populations, exports the results to the project database, and runs the validation process.
+    Args:
+         *project*:
+         *model_place*:
+         *folder*:
+    """
+
+    pop_fldr = join(folder, "population")
+
+    user_change_validation_parameters(overwrite=False, model_place=model_place, dest_folder=pop_fldr)
+
+    subprocess.run([sys.executable, "run_populationsim.py"], cwd=pop_fldr)
+
+    pd.read_csv(join(pop_fldr, "output/synthetic_persons.csv")).to_sql(
+        "synthetic_persons", con=project.conn, if_exists="replace"
+    )
+
+    pd.read_csv(join(pop_fldr, "output/synthetic_households.csv")).to_sql(
+        "synthetic_households", con=project.conn, if_exists="replace"
+    )
+
+    validate_non_controlled_vars(model_place, pop_fldr)
+
+    validate_controlled_vars(pop_fldr)
