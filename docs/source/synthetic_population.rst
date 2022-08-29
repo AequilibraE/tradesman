@@ -57,7 +57,9 @@ female_16,TAZ,persons,100000,POPF16,(persons.AGEP >= 70) & (persons.AGEP < 75) &
 female_17,TAZ,persons,100000,POPF17,(persons.AGEP >= 75) & (persons.AGEP < 80) & (persons.SEX == 2)
 female_18,TAZ,persons,100000,POPF18,(persons.AGEP >= 80) & (persons.SEX == 2)
 
-For each sex and age structure, we create a control variable, considering the geography level of TAZ. For both women and men, we have 18 variables, named POPF and POPM, for female and male inhabitants. For TAZs we also consider the expected number of households. In the following section, we discuss the premisses of the model, and explain how the expected number of households was calculated. Finally, we have the controls by REGION, an upper level. For regional control, we consider the expected number of households of different sizes.
+For each sex and age bracket, we create a control variable, considering the geography level of TAZ. For both women and men, we have 18 variables, named POPF and POPM, for female and male residents. For TAZs we also consider the expected number of households. 
+
+In the following section, we discuss the premisses of the model and explain how the expected number of households was calculated. Finally, we have the controls by REGION, an upper level. For regional control, we consider the expected number of households of different sizes.
 
 Tradesman model premises
 ~~~~~~~~~~~~~~~~~~~~~~~~~
