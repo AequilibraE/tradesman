@@ -46,5 +46,3 @@ def get_pop_by_sex_age(project: Project, model_place: str):
 
             project.conn.execute(f"UPDATE zones SET {field_name}=0 WHERE {field_name} IS NULL;")
             project.conn.commit()
-
-            print(f"Obtained {s} population aged {age[a]} years old.")

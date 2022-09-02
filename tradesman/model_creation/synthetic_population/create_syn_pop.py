@@ -18,7 +18,7 @@ from tradesman.model_creation.synthetic_population.unzip_files import unzip_cont
 from tradesman.model_creation.synthetic_population.user_control_import import user_change_validation_parameters
 
 
-def create_syn_pop(project: Project, model_place: str, cwd: str):
+def create_syn_pop(project: Project, model_place: str, cwd: str, thread_number=None):
     """
     Creates synthetic population to be used im Activity Based Models, using PopulationSim.
 
@@ -26,16 +26,17 @@ def create_syn_pop(project: Project, model_place: str, cwd: str):
          *project*(:obj:`aequilibrae.project`):
          *model_place*(:obj:`str`):
          *folder*(:obj:`str`):
+         *thread_number*(:obj:`int`):
 
     """
 
-    unzip_control_and_seed_files(file_path=cwd)
+    unzip_control_and_seed_files(cwd)
 
     pop_fldr = join(cwd, "population")
 
-    set_thread_number(pop_fldr)
+    set_thread_number(pop_fldr, thread_number)
 
-    create_buckets(model_place, project, folder=pop_fldr, sample=0.20)
+    create_buckets(model_place, project, folder=pop_fldr, sample=0.02)
 
     create_geo_cross_walk(project, pop_fldr)
 
@@ -44,18 +45,22 @@ def create_syn_pop(project: Project, model_place: str, cwd: str):
     create_control_totals_meta(pop_fldr)
 
 
-def set_thread_number(folder: str, number=None):
+def set_thread_number(folder: str, number):
     """
     Set the number of threads to generate the synthetic population.
     If no number of threads is provides, the program considers it as the number of threads available in your computer.
 
     Args:
-         *folder*(:obj:`str`): folder where the project files are placed
+         *folder*(:obj:`str`): folder where the project files are.
          *number*(:obj:`int`): number of threads used. By default uses the greatest number of threads available.
 
     """
-    if number is None:
+
+    count_cpu = mp.cpu_count()
+    if number is None or int(number) > count_cpu or number == 0:
         number = mp.cpu_count()
+    else:
+        number = int(number)
 
     with open(join(folder, "configs/settings.yaml"), encoding="utf-8") as file:
         doc = yaml.full_load(file)

@@ -1,4 +1,5 @@
-from os.path import join
+from os.path import join, dirname
+from os import pardir
 import pycountry
 import pandas as pd
 import numpy as np
@@ -20,9 +21,9 @@ def create_buckets(model_place: str, project: Project, folder: str, sample=0.02)
 
     country_code = pycountry.countries.search_fuzzy(model_place)[0].alpha_3
 
-    household_info = pd.read_csv(
-        "tradesman/model_creation/synthetic_population/controls_and_validation/hh_size_data.csv"
-    )
+    pth = dirname(__file__)
+
+    household_info = pd.read_csv(join(pth, "controls_and_validation/hh_size_data.csv"))
 
     household_info = household_info[household_info.iso_code == country_code]
 
@@ -103,8 +104,6 @@ def create_buckets(model_place: str, project: Project, folder: str, sample=0.02)
     pd.concat(total_households).to_csv(join(folder, "data/seed_households.csv"), sep=",", index=False)
 
     pd.concat(total_persons).to_csv(join(folder, "data/seed_persons.csv"), sep=",", index=False)
-
-    return "Seeds created."
 
 
 def show_seed_stats(num_hh, sort_number, household_info):

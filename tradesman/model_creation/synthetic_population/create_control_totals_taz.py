@@ -1,5 +1,6 @@
 import csv
-from os.path import join
+from os.path import join, dirname
+from os import pardir
 import pandas as pd
 import geopandas as gpd
 import pycountry
@@ -17,7 +18,9 @@ def create_control_totals_taz(project: Project, model_place: str, dest_folder: s
 
     country_code = pycountry.countries.search_fuzzy(model_place)[0].alpha_3
 
-    un_hh_size = pd.read_csv("tradesman/model_creation/synthetic_population/controls_and_validation/hh_size_data.csv")
+    pth = dirname(__file__)
+
+    un_hh_size = pd.read_csv(join(pth, "controls_and_validation/hh_size_data.csv"))
 
     un_hh_size = un_hh_size[un_hh_size.iso_code == country_code]
 
@@ -57,8 +60,12 @@ def create_control_totals_taz(project: Project, model_place: str, dest_folder: s
 
     zones.set_geometry(col="centroid", drop=True, inplace=True)
 
-    df = df.assign(
-        REGION=1, MAZ=df.TAZ.tolist(), xTAZ=[i + 1 for i in gpd.sjoin(zones, subdivisions).index_right.tolist()]
+    zones_and_subdivisions = (
+        gpd.sjoin_nearest(zones, subdivisions, distance_col="dist")
+        .sort_values(by=["zone_id", "dist"])
+        .drop_duplicates(subset="zone_id", keep="last")
     )
+
+    df = df.assign(REGION=1, MAZ=df.TAZ.tolist(), xTAZ=[i + 1 for i in zones_and_subdivisions.index_right.tolist()])
 
     df.to_csv(join(dest_folder, "data/control_totals_taz.csv"), sep=",", index=False)

@@ -97,16 +97,16 @@ def user_change_validation_parameters(overwrite: bool, model_place: str, dest_fo
           *overwrite*(:obj:`bool`): replaces the validation file. Default: False
           *model_place*(:obj:`str`): current model place
           *dest_folder*(:obj:`str`): path to folder where synthetic population is
-          *aggregate_summaries*: list of dictionaries containing the name, geography, control, and result.
+          *aggregate_summaries*: list of dictionaries containing the name, geography, control, and result. Will rewrite the default summary.
           *geographies*: list containing the existing geographies, from upper to lower levels (e.g: ['REGION', 'PUMA', 'TAZ'])
     """
 
     with open(join(dest_folder, "verification.yaml"), encoding="utf-8") as file:
         doc = yaml.full_load(file)
 
-    doc["popsim_dir"] = dest_folder
+    doc["popsim_dir"] = "population"
     doc["region"] = model_place
-    doc["validation_dir"] = join(dest_folder, "validation_results")
+    doc["validation_dir"] = "validation_results"
 
     if overwrite is True:
         doc["aggregate_summaries"] = kwargs["aggregate_summaries"]

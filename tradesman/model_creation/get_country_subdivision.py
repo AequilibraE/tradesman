@@ -10,6 +10,24 @@ from aequilibrae import Project
 import sqlite3
 from os.path import join
 import warnings
+import urllib.request
+from os.path import join, isfile
+from tempfile import gettempdir
+
+
+def get_subdivisions_gadm(model_place: str):
+
+    url = "https://github.com/AequilibraE/tradesman/releases/download/V0.1b/subdivisions.gpkg"
+
+    dest_path = join(gettempdir(), "subdivisions.gpkg")
+    if not isfile(dest_path):
+        urllib.request.urlretrieve(url, dest_path)
+    level1 = gpd.read_file(dest_path, layer="level_1")
+    level1 = level1[level1.country == model_place].assign(level=1)
+    level2 = gpd.read_file(dest_path, layer="level_2")
+    level2 = level2[level2.country == model_place].assign(level=2)
+
+    return pd.concat([level1, level2])
 
 
 def get_subdivisions_online(model_place: str, level: int):
@@ -20,7 +38,7 @@ def get_subdivisions_online(model_place: str, level: int):
         r = requests.get(f"https://www.geoboundaries.org/gbRequest.html?ISO={country_code}&ADM=ADM{lev}")
 
         if len(r.json()) == 0:
-            warnings.warn(f"There is no administrative boundary level {lev}.")
+            warnings.warn(f"The administrative boundary is not available at this level.")
             continue
 
         dlPath = r.json()[0]["gjDownloadURL"]
@@ -58,11 +76,28 @@ def get_subdivisions_online(model_place: str, level: int):
     if len(all_data):
         all_data = pd.concat(all_data)
         all_data = all_data[["country_name", "division_name", "level", "geom"]]
+
     return all_data
 
 
-def add_subdivisions_to_model(project: Project, model_place: str, levels_to_add=2, overwrite=False):
-    df = get_subdivisions_online(model_place, levels_to_add)
+def add_subdivisions_to_model(project: Project, model_place: str, source: str, levels_to_add=2, overwrite=False):
+    """
+    Adds subdivisions to model.
+    Parameters:
+         *project*(:obj:`aequilibrae.project`):
+         *model_place*(:obj:`str`):
+         *source*(:obj:`str`): data source to import subdivisions. Takes GADM or GeoBoundaries. Default to GADM.
+         *levels_to_add(:obj:`int`): number of political subdivisions to add. Defaults to 2.
+         *overwrite*(:obj:`bool`):
+    """
+
+    if source.upper() == "GADM":
+        df = get_subdivisions_gadm(model_place)
+        df.rename(columns={"name": "division_name", "country": "country_name"}, inplace=True)
+    elif source.lower() == "geoboundaries":
+        df = get_subdivisions_online(model_place, levels_to_add)
+    else:
+        raise ValueError("This subdivision source is not available.")
 
     # Check if subdivisions already exists otherwise create a file with this name
     conn = sqlite3.connect(join("project_database.sqlite"))

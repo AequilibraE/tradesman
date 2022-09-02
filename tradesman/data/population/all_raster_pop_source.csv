@@ -25,7 +25,7 @@ Benin,BEN,https://data.humdata.org/dataset/ab712a75-5154-4034-802b-fbbd46c521fa/
 Bermuda,BMU,no file
 Bhutan,BTN,https://data.humdata.org/dataset/6c7491da-7b56-479d-b9e7-dda1ba905c2f/resource/afc34db6-683e-4e3a-8966-cdf03430f25e/download/btn_population_2020_geotiff.zip
 Bolivia (Plurinational State of),BOL,https://data.humdata.org/dataset/64f916a6-2f35-4399-8971-25e18fdb09bd/resource/e192c9a8-a209-4dac-8744-31cd60246660/download/bol_general_2020_geotiff.zip
-Bonaire, Saint Eustatius and Saba,https://data.worldpop.org/GIS/Population/Global_2000_2020/2020/BES/bes_ppp_2020.tif,no file,
+Bonaire Saint Eustatius and Saba,BES,no file
 Bosnia And Herzegowina,BIH,https://data.humdata.org/dataset/b1aba2dd-6b51-4953-8320-1893757cda3d/resource/6aafdaa9-cbb4-4dd0-8f60-364fe8f8c277/download/bih_general_2020_geotiff.zip
 Botswana,BWA,https://data.humdata.org/dataset/d39ba1fa-0be8-41b4-bf48-351b7b7bead7/resource/982c8153-bf3e-4650-b606-ee3ab7c37365/download/bwa_general_2020_geotiff.zip
 Bouvet Island,BVT,no file
@@ -115,7 +115,7 @@ Jordan,JOR,https://data.humdata.org/dataset/b05f91f7-1206-49d7-ae57-30daf2973363
 Kazakhstan,KAZ,https://data.humdata.org/dataset/6c7448f7-2f09-489d-b53a-65a0d3c26289/resource/65e21e2d-6329-4ab8-8ee5-a0ee4e6d49c6/download/population_kaz_2018-10-01_geotiff.zip
 Kenya,KEN,https://data.humdata.org/dataset/2964b369-c10c-4b55-94a8-495de3fc9858/resource/1271b53b-30be-4c4b-aa27-1bd104506636/download/ken_general_2020_geotiff.zip
 Kiribati,KIR,https://data.humdata.org/dataset/061e6a48-793e-4999-b500-b390300e37c4/resource/1dd9cf02-24f3-45d8-9a21-46464cce0b9d/download/population_kir_2018-10-01_geotiff.zip
-Korea, Republic Of,https://data.worldpop.org/GIS/Population/Global_2000_2020/2020/KOR/kor_ppp_2020.tif,https://data.humdata.org/dataset/97777cbe-1a07-4e0c-911a-9f781d4d3874/resource/ec622d97-af6b-4c04-9b50-f6573b003e24/download/population_kor_2018-10-01_geotiff.zip,
+Korea (Republic Of),KOR,https://data.humdata.org/dataset/97777cbe-1a07-4e0c-911a-9f781d4d3874/resource/ec622d97-af6b-4c04-9b50-f6573b003e24/download/population_kor_2018-10-01_geotiff.zip
 Kuwait,KWT,https://data.humdata.org/dataset/fa1f8ca3-1e68-4fbf-93ca-a35d7e9f8f6c/resource/eb1b784a-ed29-487b-a737-196fd9559a1b/download/population_kwt_2019-07-01_geotiff.zip
 Kyrgyzstan,KGZ,https://data.humdata.org/dataset/5d8b12a0-1f37-4b03-b1a2-d1c9f88f502b/resource/5ac43bee-1250-46bf-8f05-f4379e3c4c40/download/population_kgz_2018-10-01_geotiff.zip
 Lao People's Democratic Republic,LAO,https://data.humdata.org/dataset/2d9c5596-151a-4c8d-af6d-4ab3492c6cc7/resource/70c7a422-1716-4f92-849f-c3a1cd3e8368/download/lao_general_2020_geotiff.zip
@@ -140,8 +140,8 @@ Mauritania,MRT,https://data.humdata.org/dataset/1e5a461c-42c5-407e-86c9-370cd4a8
 Mauritius,MUS,https://data.humdata.org/dataset/41c58f31-f83a-4010-a2c2-5a816abe9ccb/resource/7fced940-3a90-4541-936f-81d175b8da29/download/population_mus_2018-10-01.zip
 Mayotte,MYT,https://data.humdata.org/dataset/3c1e01a8-17bd-4b22-96d2-3057eb54c1e6/resource/24a6ae66-fd63-49b5-86da-e329fd853901/download/population_myt_2019-07-01_geotiff.zip
 Mexico,MEX,https://data.humdata.org/dataset/66ef8eab-b09e-4092-8d0f-2a9bd0727bdd/resource/003a8bf3-f618-4bba-953e-144731593473/download/population_mex_2018-10-01.zip
-Micronesia, Federated States Of,https://data.worldpop.org/GIS/Population/Global_2000_2020/2020/FSM/fsm_ppp_2020.tif,https://data.humdata.org/dataset/b2fb60af-4354-4897-9791-efc9318373dd/resource/b287fb72-583e-49f6-8813-c76a79027ac6/download/fsm_general_2020_geotiff.zip,
-Moldova, Republic Of,https://data.worldpop.org/GIS/Population/Global_2000_2020/2020/MDA/mda_ppp_2020.tif,no file,
+Micronesia (Federated States Of),FSM,https://data.humdata.org/dataset/b2fb60af-4354-4897-9791-efc9318373dd/resource/b287fb72-583e-49f6-8813-c76a79027ac6/download/fsm_general_2020_geotiff.zip
+Moldova (Republic Of),MDA,no file
 Monaco,MCO,https://data.humdata.org/dataset/a0342d5c-0f08-4759-b488-4f1989a350d6/resource/b897b8d3-d1c6-4a62-a540-dfadb85be5e6/download/population_mco_2019-07-01_geotiff.zip
 Mongolia,MNG,https://data.humdata.org/dataset/f86169e7-637d-4168-ba02-0483206e035b/resource/d543b6df-7e68-4c5a-a5c7-455452464424/download/population_mng_2018-10-01_geotiff.zip
 Montenegro,MNE,no file
@@ -213,7 +213,7 @@ Svalbard And Jan Mayen Islands,SJM,no file
 Sweden,SWE,https://data.humdata.org/dataset/bdb28c9c-3f48-4740-b6bd-952b2dcf2574/resource/9b6f7654-6f98-4a63-9738-dfcb8f464654/download/swe_general_2020_geotiff.zip
 Switzerland,CHE,https://data.humdata.org/dataset/532fdc39-4398-412e-9dce-e057f403dad1/resource/1d4d3340-1f3f-41eb-8343-a54f0182b494/download/che_general_2020_geotiff.zip
 Syrian Arab Republic,SYR,no file
-Taiwan, Province Of China,https://data.worldpop.org/GIS/Population/Global_2000_2020/2020/TWN/twn_ppp_2020.tif,https://data.humdata.org/dataset/d2def60b-e731-4c28-8a80-2fb9084ed2ba/resource/8a3702dd-49ac-400e-9850-29ee50416047/download/population_twn_2018-10-01_geotiff.zip,
+Taiwan (Province Of China),TWN,https://data.humdata.org/dataset/d2def60b-e731-4c28-8a80-2fb9084ed2ba/resource/8a3702dd-49ac-400e-9850-29ee50416047/download/population_twn_2018-10-01_geotiff.zip
 Tajikistan,TJK,https://data.humdata.org/dataset/d2b6178a-e222-41a7-81f9-a921593f622b/resource/b4e2d072-6489-4d08-8d6b-8fadcaae9fa0/download/population_tjk_2018-10-01_geotiff.zip
 Thailand,THA,https://data.humdata.org/dataset/1ec16b2b-2a1d-4cf7-b766-0460b27b89ea/resource/c45c9659-5708-4e88-a589-6a5a8b0a0d81/download/tha_general_2020_geotiff.zip
 Timor-Leste,TLS,https://data.humdata.org/dataset/95c6e737-f0b6-47ae-af5c-292838523a34/resource/6a663af2-f7c4-4627-b9ec-b459ac6a5aef/download/tls_population_2020_geotiff.zip
@@ -242,7 +242,6 @@ Virgin Islands (British),VGB,https://data.humdata.org/dataset/0b8ad901-2b8f-4a45
 Virgin Islands (U.S.),VIR,https://data.humdata.org/dataset/181292bc-e289-4855-8b64-05655575117f/resource/007396c5-724a-4c8f-a464-95bf35354a48/download/population_vir_2018-10-01.zip
 Wallis And Futuna Islands,WLF,https://data.humdata.org/dataset/6f03111f-7f16-4e1e-a9c3-a07b6ce1478b/resource/a5b4e955-18dd-4166-b2e7-df0e4117c116/download/population_wlf_2018-10-01_geotiff.zip
 Western Sahara,ESH,no file
-World,0_Mosaicked,no file
 Yemen,YEM,no file
 Zambia,ZMB,https://data.humdata.org/dataset/0f8c218d-73f4-4d6b-b741-014f5d5a4e96/resource/f953c75d-7a68-4291-bac0-b49abd7eda40/download/zmb_general_2020_geotiff.zip
 Zimbabwe,ZWE,no file

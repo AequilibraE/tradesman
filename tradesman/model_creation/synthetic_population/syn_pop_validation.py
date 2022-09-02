@@ -6,6 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import cycler
 import pycountry
+from os.path import dirname, join
 
 
 def validate_non_controlled_vars(model_place: str, folder: str):
@@ -20,9 +21,7 @@ def validate_non_controlled_vars(model_place: str, folder: str):
 
     country_code = pycountry.countries.search_fuzzy(model_place)[0].alpha_3
 
-    controls = pd.read_csv(
-        "tradesman/model_creation/synthetic_population/controls_and_validation/hh_composition_data_validation.csv"
-    )
+    controls = pd.read_csv(join(dirname(__file__), "controls_and_validation/hh_composition_data_validation.csv"))
 
     controls = controls[controls.iso_code == country_code]
 
@@ -90,45 +89,40 @@ def validate_non_controlled_vars(model_place: str, folder: str):
     print("Under 20 and 65 years and older")
     print("{:.2f}".format((filter_20_65 / hh_num) * 100), " | ", controls.hh_with_under_20_over_65[0])
 
-    # Export as .txt or .csv file
+    return "Non-controlled vars checked."
 
 
-def validate_controlled_vars(folder: str):
+def validate_controlled_vars(fldr):
 
-    """
-    This function creates visualizations and summaries the results of a PopulationSim model run. For more information, please see: https://activitysim.github.io/populationsim/validation.html.
+    region_yaml = join(fldr, "verification.yaml")
 
-    The outputs are:
-    - A CSV summary of statistics for each control group in `aggregate_summaries`
-    - A plot of the frequency distribution for each control group
-    - A plot of the standard deviation for each control group
-    - A CSV summary of aggregated statistics for a given geography (e.g. "PUMA")
-    - A plot of the household expansion factor distribution for the given geography
-
-    Args:
-         *folder*:
-    """
-
-    region_yaml = os.path.join(folder, "verification.yaml")
+    plt.style.use("ggplot")
+    plt.rcParams["lines.linewidth"] = 1.5
+    plt.rcParams["axes.prop_cycle"] = cycler(color=["b", "g", "r", "y"])
+    plt.rcParams["savefig.dpi"] = 200
+    plt.rcParams["figure.constrained_layout.use"] = True
+    plt.rcParams["figure.constrained_layout.h_pad"] = 0.5
+    plt.rcParams["figure.figsize"] = (8, 15)
+    plt.rcParams["hist.bins"] = 25
 
     parameters = {}
 
     # ignore sys.argv if running validation notebook
     is_script = "ipykernel" not in sys.modules
 
-    if is_script and len(sys.argv) > 1:
-        if os.path.isfile(sys.argv[1]):
-            region_yaml = sys.argv[1]
+    # if is_script and len(sys.argv) > 1:
+    #     if os.path.isfile(sys.argv[1]):
+    #         region_yaml = sys.argv[1]
 
-    with open(region_yaml, "r") as f:
+    with open(region_yaml) as f:
         parameters.update(yaml.safe_load(f))
 
-    if is_script and len(sys.argv) > 2:
-        if os.path.isfile(sys.argv[2]):
-            parameters_csv = sys.argv[2]
-            parameters.update(pd.read_csv(parameters_csv, header=None, index_col=0, comment="#").to_dict()[1])
+    # if is_script and len(sys.argv) > 2:
+    #     if os.path.isfile(sys.argv[2]):
+    #         parameters_csv = sys.argv[2]
+    #         parameters.update(pd.read_csv(parameters_csv, header=None, index_col=0, comment='#').to_dict()[1])
 
-    popsim_dir = parameters.get("POPSIMDIR") or parameters.get("popsim_dir")
+    # popsim_dir      = parameters.get('POPSIMDIR') or parameters.get('popsim_dir')
     validation_dir = parameters.get("VALID_DIR") or parameters.get("validation_dir")
     geography_file = parameters.get("geographies")
     use_geographies = parameters.get("group_geographies")
@@ -141,31 +135,56 @@ def validate_controlled_vars(folder: str):
     seed_hh_file = parameters.get("seed_households")
     seed_hh_cols = parameters.get("seed_cols")
 
-    if not os.path.isdir(validation_dir):
-        os.mkdir(validation_dir)
+    if not os.path.isdir(join(fldr, validation_dir)):
+        os.mkdir(join(fldr, validation_dir))
 
     summary_df = pd.DataFrame()
     for summary_file in summary_files:
-        filepath = os.path.join(popsim_dir, summary_file)
+        filepath = os.path.join(fldr, summary_file)  # mudar popsimdir para fldr
         df = pd.read_csv(filepath)
         summary_df = summary_df.append(df)
 
+    # summary_df.head()
+
     for geog in use_geographies:
-        if geog not in summary_df.geography.unique():
-            summary_df = summary_df.append(meta_geog_df(summary_df, geog, popsim_dir, geography_file, use_geographies))
+        if not geog in summary_df.geography.unique():
+            summary_df = summary_df.append(meta_geog_df(summary_df, geog, fldr, geography_file, use_geographies))
 
-    generate_frequencies(validation_dir, summary_df, aggregate_list, scenario, region)
+    # summary_df.tail()
 
-    uniformity(validation_dir, seed_hh_cols, popsim_dir, seed_hh_file, exp_hh_file, exp_hh_id_col)
+    fig_w = 3
+    fig_l = int(len(aggregate_list) / fig_w) + 1
 
+    summary_fig, axes = plt.subplots(fig_l, fig_w, figsize=(fig_w * 5, fig_l * 5))
 
-def uniformity(validation_dir, seed_hh_cols, popsim_dir, seed_hh_file, exp_hh_file, exp_hh_id_col):
+    stats = []
+    for params, ax in zip(aggregate_list, axes.ravel()):
+        s, f, diff = process_control(summary_df, **params)
+        stats.append(s)
 
+        ax.set_title(f"{params['geography']} - {params['name']}")
+        ax.set_ylabel("Frequency")
+        ax.set_xlabel("Difference: control vs. result")
+        ax.hist(diff, bins=10, range=(-5, 5), alpha=0.5)
+
+    summary_fig.savefig(os.path.join(fldr, validation_dir, "frequencies.pdf"))
+    stats_df = pd.DataFrame(stats)
+    stats_df.to_csv(os.path.join(fldr, validation_dir, f"{scenario}_{region}_popsim_stats.csv"), index=False)
+
+    std_fig = plt.figure(figsize=(8, 15))
+    std_fig.suptitle("PopulationSim Controls Percentage Difference")
+    plt.errorbar(stats_df["mean_pc_difference"], stats_df["name"], xerr=stats_df["std"], linestyle="None", marker=".")
+
+    std_fig.savefig(os.path.join(fldr, validation_dir, f"{scenario}_{region}_popsim_convergence_stdev.pdf"))
+
+    # seed_cols = (seed_hh_cols.values())
     geog = seed_hh_cols.get("geog")
     geog_weight = seed_hh_cols.get("geog_weight")
-    expanded_hhids = pd.read_csv(os.path.join(popsim_dir, exp_hh_file), usecols=[exp_hh_id_col])
+    # hh_id = seed_hh_cols.get('hh_id')
 
-    seed_hh_df = pd.read_csv(os.path.join(popsim_dir, seed_hh_file), usecols=["PUMA", "WGTP", "hhnum"])
+    expanded_hhids = pd.read_csv(os.path.join(fldr, exp_hh_file), usecols=[exp_hh_id_col])  # popsim/fldr
+
+    seed_hh_df = pd.read_csv(os.path.join(fldr, seed_hh_file), usecols=["PUMA", "WGTP", "hhnum"])  # popsim/fldr
     seed_hh_df.rename(columns={"hhnum": "hh_id"}, inplace=True)
     seed_hh_df.set_index(keys="hh_id", inplace=True)
 
@@ -203,7 +222,8 @@ def uniformity(validation_dir, seed_hh_cols, popsim_dir, seed_hh_file, exp_hh_fi
         }
     )
 
-    uniformity_df.to_csv(os.path.join(validation_dir, "uniformity.csv"))
+    uniformity_df.to_csv(os.path.join(fldr, validation_dir, "uniformity.csv"))
+    # uniformity_df
 
     geogs = df[geog].unique()
     geog_fig = plt.figure(figsize=(10 * len(geogs), 10))
@@ -218,7 +238,7 @@ def uniformity(validation_dir, seed_hh_cols, popsim_dir, seed_hh_file, exp_hh_fi
         ax.hist(bins[:-1], bins, weights=counts * 100 / len(geog_df), alpha=0.6)
 
 
-def meta_geog_df(summary_df, meta_geog, popsim_dir, geography_file, use_geographies):
+def meta_geog_df(summary_df, meta_geog, folder, geography_file, use_geographies):
 
     """
     This function creates a ____ for the upper level geography.
@@ -226,7 +246,7 @@ def meta_geog_df(summary_df, meta_geog, popsim_dir, geography_file, use_geograph
 
     """
 
-    geography_df = pd.read_csv(os.path.join(popsim_dir, geography_file))
+    geography_df = pd.read_csv(os.path.join(folder, geography_file))
     geog = use_geographies[use_geographies.index(meta_geog) + 1]  # next geography in list
     meta_df = geography_df[[meta_geog, geog]].drop_duplicates(ignore_index=True)
     geog_df = summary_df[summary_df.geography == geog].copy()
@@ -277,47 +297,9 @@ def process_control(summary_df, name, geography, control, result):
             "pc_difference": (difference.sum() / observed.sum()) * 100,
             "mean_pc_difference": pc_difference.mean(),
             "N": non_zero_observed.shape[0],
-            "rmse": rmse.sum(),
+            "rmse": rmse,
             "std": pc_difference.std(),
         }
     )
 
     return stats, frequencies, difference
-
-
-def generate_frequencies(validation_dir, summary_df, aggregate_list, scenario, region):
-
-    plt.style.use("ggplot")
-    plt.rcParams["lines.linewidth"] = 1.5
-    plt.rcParams["axes.prop_cycle"] = cycler(color=["b", "g", "r", "y"])
-    plt.rcParams["savefig.dpi"] = 200
-    plt.rcParams["figure.constrained_layout.use"] = True
-    plt.rcParams["figure.constrained_layout.h_pad"] = 0.5
-    plt.rcParams["figure.figsize"] = (8, 15)
-    plt.rcParams["hist.bins"] = 25
-
-    fig_w = 3
-    fig_l = int(len(aggregate_list) / fig_w) + 1
-
-    summary_fig, axes = plt.subplots(fig_l, fig_w, figsize=(fig_w * 5, fig_l * 5))
-
-    stats = []
-    for params, ax in zip(aggregate_list, axes.ravel()):
-        s, f, diff = process_control(summary_df, **params)
-        stats.append(s)
-
-        ax.set_title(f"{params['geography']} - {params['name']}")
-        ax.set_ylabel("Frequency")
-        ax.set_xlabel("Difference: control vs. result")
-        ax.hist(diff, bins=10, range=(-5, 5), alpha=0.5)
-
-    summary_fig.savefig(os.path.join(validation_dir, "frequencies.pdf"))
-
-    stats_df = pd.DataFrame(stats)
-    stats_df.to_csv(os.path.join(validation_dir, f"{scenario}_{region}_popsim_stats.csv"), index=False)
-
-    std_fig = plt.figure(figsize=(8, 15))
-    std_fig.suptitle("PopulationSim Controls Percentage Difference")
-    plt.errorbar(stats_df["mean_pc_difference"], stats_df["name"], xerr=stats_df["std"], linestyle="None", marker=".")
-
-    std_fig.savefig(os.path.join(validation_dir, f"{scenario}_{region}_popsim_convergence_stdev.pdf"))

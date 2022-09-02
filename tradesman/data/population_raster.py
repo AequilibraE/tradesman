@@ -17,7 +17,6 @@ def population_raster(data_link: str, field_name: str, project: Project):
     dest_path = join(gettempdir(), f"{field_name}.tif")
     if not isfile(dest_path):
         urllib.request.urlretrieve(url, dest_path)
-
     main_area = country_border_from_model(project)
 
     dataset = rasterio.open(dest_path)
