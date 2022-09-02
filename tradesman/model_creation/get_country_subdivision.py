@@ -8,7 +8,6 @@ from shapely import wkb
 import pycountry
 from aequilibrae import Project
 import sqlite3
-from os.path import join
 import warnings
 import urllib.request
 from os.path import join, isfile
@@ -38,7 +37,7 @@ def get_subdivisions_online(model_place: str, level: int):
         r = requests.get(f"https://www.geoboundaries.org/gbRequest.html?ISO={country_code}&ADM=ADM{lev}")
 
         if len(r.json()) == 0:
-            warnings.warn(f"The administrative boundary is not available at this level.")
+            warnings.warn("The administrative boundary is not available at this level.")
             continue
 
         dlPath = r.json()[0]["gjDownloadURL"]

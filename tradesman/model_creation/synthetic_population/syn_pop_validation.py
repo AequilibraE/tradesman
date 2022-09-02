@@ -108,7 +108,7 @@ def validate_controlled_vars(fldr):
     parameters = {}
 
     # ignore sys.argv if running validation notebook
-    is_script = "ipykernel" not in sys.modules
+    # is_script = "ipykernel" not in sys.modules
 
     # if is_script and len(sys.argv) > 1:
     #     if os.path.isfile(sys.argv[1]):
@@ -147,7 +147,7 @@ def validate_controlled_vars(fldr):
     # summary_df.head()
 
     for geog in use_geographies:
-        if not geog in summary_df.geography.unique():
+        if geog not in summary_df.geography.unique():
             summary_df = summary_df.append(meta_geog_df(summary_df, geog, fldr, geography_file, use_geographies))
 
     # summary_df.tail()
