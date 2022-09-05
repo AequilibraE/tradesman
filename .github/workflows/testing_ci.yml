@@ -43,15 +43,13 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install setuptools --upgrade
-        python -m pip install poetry
         sudo apt-get install libsqlite3-mod-spatialite
         sudo apt-get install -y libspatialite-dev
         sudo ln -s /usr/lib/x86_64-linux-gnu/mod_spatialite.so /usr/lib/x86_64-linux-gnu/mod_spatialite
-        poetry install
+        pip install -r tests/requirements_test.txt
 
     - name: Runs unit tests
       run: |
-        cd docs
         poetry run pytest
 
   build_documentation:
@@ -68,11 +66,12 @@ jobs:
         sudo apt-get install -y pandoc
         python -m pip install setuptools --upgrade
         python -m pip install sphinx-gallery --user
-        python -m pip install wheel spatialite poetry
+        python -m pip install wheel spatialite
         sudo apt-get install libsqlite3-mod-spatialite
         sudo apt-get install -y libspatialite-dev
         sudo ln -s /usr/lib/x86_64-linux-gnu/mod_spatialite.so /usr/lib/x86_64-linux-gnu/mod_spatialite
-        poetry install
+        pip install -r tests/requirements_test.txt
+        pip install -r docs/requirements_docs.txt
 
     - name: Builds documentation
       run: |
@@ -107,7 +106,8 @@ jobs:
         sudo apt-get install -y pandoc
         python -m pip install setuptools --upgrade
         python -m pip install wheel poetry
-        poetry install
+#        poetry install
+        pip install -r tests/requirements_test.txt
 
     - name: Builds package
       run: poetry build
