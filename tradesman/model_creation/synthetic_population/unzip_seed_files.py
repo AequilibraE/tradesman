@@ -1,11 +1,12 @@
+from signal import raise_signal
 import requests
 from zipfile import ZipFile
 from io import BytesIO
 from os.path import isdir, join
+from urllib.request import urlopen
 
-from tradesman.model_creation.synthetic_population.seeds_url import population_url
 
-def unzip_seed_files(url:str, cwd: str):
+def unzip_seed_files(url: str, cwd: str):
     """
     This function unzips the folder containg the pre-loaded popoulation and household seeds for creating synthetic population.
     Args.:
@@ -16,10 +17,12 @@ def unzip_seed_files(url:str, cwd: str):
 
     # url = "https://github.com/AequilibraE/tradesman/releases/download/V0.1b/population.zip"
 
-    req = requests.get(url)
+    if urlopen(url).code == 200:
 
-    if req.status_code == requests.codes.ok:
+        req = requests.get(url)
 
         zf = ZipFile(BytesIO(req.content))
 
         zf.extractall(cwd)
+    else:
+        raise FileNotFoundError("The provided url presents no zip file.")
