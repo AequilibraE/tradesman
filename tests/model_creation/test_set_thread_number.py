@@ -7,7 +7,7 @@ from os import rename
 from tempfile import gettempdir
 import multiprocessing as mp
 
-from tradesman.model_creation.synthetic_population.create_syn_pop import set_thread_number
+from tradesman.model_creation.synthetic_population.create_synthetic_population import set_thread_number
 
 LAYOUT = "num_processes: 1"
 

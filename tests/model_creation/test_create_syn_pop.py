@@ -10,8 +10,8 @@ from tradesman.model_creation.synthetic_population.create_control_totals_meta im
 from tradesman.model_creation.synthetic_population.create_control_totals_taz import create_control_totals_taz
 from tradesman.model_creation.synthetic_population.create_geo_crosswalk import create_geo_cross_walk
 from tradesman.model_creation.synthetic_population.create_seeds import create_buckets
-from tradesman.model_creation.synthetic_population.create_syn_pop import set_thread_number
-from tradesman.model_creation.synthetic_population.unzip_files import unzip_control_and_seed_files
+from tradesman.model_creation.synthetic_population.create_synthetic_population import set_thread_number
+from tradesman.model_creation.synthetic_population.unzip_seed_files import unzip_seed_files
 
 
 class TestCreateSynPop(unittest.TestCase):

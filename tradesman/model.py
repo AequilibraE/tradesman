@@ -15,7 +15,7 @@ from tradesman.model_creation.import_network import import_network
 from tradesman.model_creation.import_population import import_population
 from tradesman.model_creation.pop_by_sex_and_age import get_pop_by_sex_age
 from tradesman.model_creation.set_source import set_source
-from tradesman.model_creation.synthetic_population.create_syn_pop import create_syn_pop, run_populationsim
+from tradesman.model_creation.synthetic_population.create_synthetic_population import create_syn_pop, run_populationsim
 from tradesman.model_creation.zoning.zone_building import zone_builder
 
 
