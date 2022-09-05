@@ -106,7 +106,6 @@ jobs:
         sudo apt-get install -y pandoc
         python -m pip install setuptools --upgrade
         python -m pip install wheel poetry
-#        poetry install
         pip install -r tests/requirements_test.txt
 
     - name: Builds package
