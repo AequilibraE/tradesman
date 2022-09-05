@@ -7,3 +7,4 @@ aequilibrae
 pyarrow
 pycountry
 populationsim
+tabulate
