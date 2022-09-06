@@ -16,7 +16,7 @@ class TestValidateNonControlledVars(unittest.TestCase):
         rename(temp_fldr, self.fldr)
 
         copytree(
-            src=join(abspath(dirname("tests")), "data/nauru/population_replace/output"),
+            src=join(abspath(dirname("tests")), "data/nauru/population/output"),
             dst=join(self.fldr, "output"),
         )
 

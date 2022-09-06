@@ -21,12 +21,12 @@ class TestCreateSeeds(unittest.TestCase):
         self.model_place = "Nauru"
 
         copy(
-            src=join(abspath(dirname("tests")), "data/nauru/population_replace/data/seed_households.csv"),
+            src=join(abspath(dirname("tests")), "data/nauru/population/data/seed_households.csv"),
             dst=join(gettempdir(), "data/seed_households.csv"),
         )
 
         copy(
-            src=join(abspath(dirname("tests")), "data/nauru/population_replace/data/seed_persons.csv"),
+            src=join(abspath(dirname("tests")), "data/nauru/population/data/seed_persons.csv"),
             dst=join(gettempdir(), "data/seed_persons.csv"),
         )
 

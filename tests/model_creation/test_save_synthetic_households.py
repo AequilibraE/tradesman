@@ -11,7 +11,7 @@ class TestSaveSyntheticHouseholds(unittest.TestCase):
     def setUp(self) -> None:
         self.fldr = join(gettempdir(), uuid4().hex)
         self.project = create_example(self.fldr, "nauru")
-        self.pop_fldr = join(abspath(dirname("tests")), "data/nauru/population_replace")
+        self.pop_fldr = join(abspath(dirname("tests")), "data/nauru/population")
 
     def test_save_synthetic_households(self):
 

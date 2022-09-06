@@ -17,7 +17,7 @@ def unzip_seed_files(url: str, cwd: str):
 
     # url = "https://github.com/AequilibraE/tradesman/releases/download/V0.1b/population.zip"
 
-    if urlopen(url).code == 200:
+    if urlopen(url).code == 200: #if not isfile(join(gettempdir(), "population.zip")):
 
         req = requests.get(url)
 
@@ -26,3 +26,8 @@ def unzip_seed_files(url: str, cwd: str):
         zf.extractall(cwd)
     else:
         raise FileNotFoundError("The provided url presents no zip file.")
+
+    # Um teste que verifica se o url funciona (existe)
+    # Assumindo que o url existe, faz um download do zip pro temp_folder, e dá o extract fora do zip.
+    # Coloca o zip de teste no temp folder.
+    # O que vc não tá testando é se faz o download.

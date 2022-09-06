@@ -22,10 +22,10 @@ class TestUserImportNewSeeds(unittest.TestCase):
         data_fldr = mkdtemp(dir=self.dest)
         rename(data_fldr, join(self.dest, "data"))
 
-        copy(src=join(abspath(dirname("tests")), "data/nauru/population_replace/data/seed_persons.csv"), dst=self.src)
+        copy(src=join(abspath(dirname("tests")), "data/nauru/population/data/seed_persons.csv"), dst=self.src)
 
         copy(
-            src=join(abspath(dirname("tests")), "data/nauru/population_replace/data/seed_households.csv"), dst=self.src
+            src=join(abspath(dirname("tests")), "data/nauru/population/data/seed_households.csv"), dst=self.src
         )
 
     def test_user_import_new_seeds_false(self):

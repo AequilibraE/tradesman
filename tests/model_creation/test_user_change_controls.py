@@ -22,7 +22,7 @@ class TestUserChangeControls(unittest.TestCase):
         config_fldr = mkdtemp(dir=self.dest)
         rename(config_fldr, join(self.dest, "configs"))
 
-        copy(src=join(abspath(dirname("tests")), "data/nauru/population_replace/configs/controls.csv"), dst=self.src)
+        copy(src=join(abspath(dirname("tests")), "data/nauru/population/configs/controls.csv"), dst=self.src)
 
     def test_user_change_controls_false(self):
         user_change_controls(overwrite=False)

@@ -16,7 +16,7 @@ class TestCreateTotalsMeta(unittest.TestCase):
         rename(temp_fldr, self.fldr)
 
         copy(
-            src=join(abspath(dirname("tests")), "data/nauru/population_replace/data/control_totals_taz.csv"),
+            src=join(abspath(dirname("tests")), "data/nauru/population/data/control_totals_taz.csv"),
             dst=join(gettempdir(), "data/control_totals_taz.csv"),
         )
 

@@ -18,17 +18,17 @@ class TestSubprocess(unittest.TestCase):
         rename(temp_output, join(self.fldr, "output"))
 
         copy(
-            src=join(abspath(dirname("tests")), "data/nauru/population_replace/run_populationsim.py"),
+            src=join(abspath(dirname("tests")), "data/nauru/population/run_populationsim.py"),
             dst=join(gettempdir(), "population/run_populationsim.py"),
         )
 
         copytree(
-            src=join(abspath(dirname("tests")), "data/nauru/population_replace/data"),
+            src=join(abspath(dirname("tests")), "data/nauru/population/data"),
             dst=join(gettempdir(), "population/data"),
         )
 
         copytree(
-            src=join(abspath(dirname("tests")), "data/nauru/population_replace/configs"),
+            src=join(abspath(dirname("tests")), "data/nauru/population/configs"),
             dst=join(gettempdir(), "population/configs"),
         )
 

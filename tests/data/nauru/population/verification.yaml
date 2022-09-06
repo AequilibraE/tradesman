@@ -1,5 +1,5 @@
 # directory of target run of PopulationSim, containing data/output directories
-popsim_dir: population_replace
+popsim_dir: population
 # folder to save outputs
 validation_dir: validation_results
 scenario: Base

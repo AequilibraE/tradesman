@@ -17,17 +17,17 @@ class TestValidateControlledVars(unittest.TestCase):
         rename(temp_fldr, self.fldr)
 
         copy(
-            src=join(abspath(dirname("tests")), "data/nauru/population_replace/verification.yaml"),
+            src=join(abspath(dirname("tests")), "data/nauru/population/verification.yaml"),
             dst=self.fldr,
         )
 
         copytree(
-            src=join(abspath(dirname("tests")), "data/nauru/population_replace/output"),
+            src=join(abspath(dirname("tests")), "data/nauru/population/output"),
             dst=join(self.fldr, "output"),
         )
 
         copytree(
-            src=join(abspath(dirname("tests")), "data/nauru/population_replace/data"),
+            src=join(abspath(dirname("tests")), "data/nauru/population/data"),
             dst=join(self.fldr, "data"),
         )
 
