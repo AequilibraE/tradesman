@@ -31,15 +31,15 @@ class TestSetThreadNumber(unittest.TestCase):
 
     def test_set_thread_number_integer(self):
 
-        set_thread_number(gettempdir(), number=5)
+        set_thread_number(gettempdir(), number=2)
 
-        self.assertEqual(get_layout_from_path(join(self.fldr, "settings.yaml")), {"num_processes": 5})
+        self.assertEqual(get_layout_from_path(join(self.fldr, "settings.yaml")), {"num_processes": 2})
 
     def test_set_thread_number_float(self):
 
-        set_thread_number(gettempdir(), number=5.7)
+        set_thread_number(gettempdir(), number=2.7)
 
-        self.assertEqual(get_layout_from_path(join(self.fldr, "settings.yaml")), {"num_processes": 5})
+        self.assertEqual(get_layout_from_path(join(self.fldr, "settings.yaml")), {"num_processes": 2})
 
     def test_set_thread_number_greater(self):
 
