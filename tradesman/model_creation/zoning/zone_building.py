@@ -9,6 +9,15 @@ from tradesman.model_creation.zoning.zones_with_pop import zones_with_population
 
 
 def zone_builder(project, hexbin_size: int, max_zone_pop: int, min_zone_pop: int, save_hexbins: bool):
+    """
+    Build Traffic Analysis Zones.
+    Parameters:
+         *project*(:obj:`aequilibrae.project`): currently open project
+         *hexbin_size*(:obj:`int`): size of the hexbin size. Defaults to 200
+         *max_zone_pop*(:obj:`int`): max population within a zone. Defaults to 10,000
+         *min_zone_pop*(:obj:`int`): min population within a zone. Defaults to 500
+         *save_hexbins*(:obj:`bool`): saves hexbins with population. Defaults to False
+    """
     sql = (
         "SELECT division_name, level, Hex(ST_AsBinary(st_subdivide(geometry))) as geometry FROM political_subdivisions;"
     )

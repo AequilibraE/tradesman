@@ -4,6 +4,13 @@ from geopandas.tools import sjoin
 
 
 def zones_with_location(hexb, all_subdivisions):
+    """
+    Identifies which political subdivision the hexbins belong to.
+    Parameters:
+         *hexb*(:obj:`geopandas.GeoDataFrame`): GeoDataFrame containing all hexbins within the model area.
+         *all_subdivisions*(:obj:`geopandas.GeoDataFrame`): GeoDataFrame containing all political subdivisions.
+
+    """
     # Hexbins are incredibly small, so getting their centroids from 4326 is not an issue
     centroids = gpd.GeoDataFrame(hexb[["hex_id"]], geometry=hexb.centroid, crs="EPSG:4326")
 
@@ -28,12 +35,16 @@ def zones_with_location(hexb, all_subdivisions):
     dindex = states.sindex
     empties = data_complete.division_name.isna()
 
+    dct_idx_subdivisions = {}
+
     for idx, record in data_complete[empties].iterrows():
         geo = record.geometry
-        dscrt = [x for x in dindex.nearest(geo.bounds, 10)]
-        dist = [states.loc[d, "geometry"].distance(geo) for d in dscrt]
+        dscrt = [x for x in dindex.nearest(geo, 10)]
+        dist = [states.loc[d, "geometry"].to_crs(3857).distance(geo).values.tolist()[0] for d in dscrt]
         m = dscrt[dist.index(min(dist))]
-        data_complete.loc[idx, "division_name"] = states.loc[m, "division_name"]
+        dct_idx_subdivisions[idx] = states.loc[m, "division_name"]
+
+    data_complete["division_name"] = data_complete["hex_id"].apply(lambda x: dct_idx_subdivisions.get(x))
 
     zones_with_location = gpd.GeoDataFrame(
         data_complete[["hex_id", "division_name"]], geometry=data_complete["geometry"]
