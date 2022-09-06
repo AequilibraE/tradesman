@@ -13,9 +13,12 @@ class TestCreateGeoCrossWalk(unittest.TestCase):
     def setUp(self) -> None:
         self.prj_fldr = join(gettempdir(), uuid4().hex)
         self.project = create_nauru_test(self.prj_fldr)
-        # temp_fldr = tempfile.mkdtemp()
-        # self.fldr = join(gettempdir(), "data")
-        # rename(temp_fldr, self.fldr)
+        temp_fldr = tempfile.mkdtemp()
+        self.fldr = join(gettempdir(), "data")
+        rename(temp_fldr, self.fldr)
+
+    def tearDown(self) -> None:
+        rmtree(join(gettempdir(), "data"))
 
     def test_create_geo_cross_walk(self):
 

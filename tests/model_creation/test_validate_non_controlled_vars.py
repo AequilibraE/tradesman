@@ -11,14 +11,16 @@ class TestValidateNonControlledVars(unittest.TestCase):
     def setUp(self) -> None:
 
         temp_fldr = mkdtemp()
-        rmtree(join(gettempdir(), "population"))
         self.fldr = join(gettempdir(), "population")
         rename(temp_fldr, self.fldr)
 
         copytree(
-            src=join(abspath(dirname("tests")), "data/nauru/population/output"),
+            src=join(abspath(dirname("tests")), "tests/data/nauru/population/output"),
             dst=join(self.fldr, "output"),
         )
+
+    def tearDown(self) -> None:
+        rmtree(join(gettempdir(), "population"))
 
     def test_non_controlled_vars(self):
 

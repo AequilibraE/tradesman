@@ -12,11 +12,10 @@ from tradesman.data_retrieval.country_main_area import country_border_from_model
 
 
 def population_raster(data_link: str, field_name: str, project: Project):
-    url = data_link
 
     dest_path = join(gettempdir(), f"{field_name}.tif")
     if not isfile(dest_path):
-        urllib.request.urlretrieve(url, dest_path)
+        urllib.request.urlretrieve(data_link, dest_path)
     main_area = country_border_from_model(project)
 
     dataset = rasterio.open(dest_path)

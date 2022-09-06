@@ -3,6 +3,7 @@ from os.path import join, exists, abspath, dirname
 from shutil import copy, rmtree
 from tempfile import gettempdir, mkdtemp
 import unittest
+from webbrowser import get
 
 from tradesman.model_creation.synthetic_population.user_control_import import user_change_controls
 
@@ -10,19 +11,21 @@ from tradesman.model_creation.synthetic_population.user_control_import import us
 class TestUserChangeControls(unittest.TestCase):
     def setUp(self) -> None:
         temp_src = mkdtemp()
-        rmtree(join(gettempdir(), "configs"))
         self.src = join(gettempdir(), "configs")
         rename(temp_src, self.src)
 
         temp_dest = mkdtemp()
-        rmtree(join(gettempdir(), "destination")),
         self.dest = join(gettempdir(), "destination")
         rename(temp_dest, self.dest)
 
         config_fldr = mkdtemp(dir=self.dest)
         rename(config_fldr, join(self.dest, "configs"))
 
-        copy(src=join(abspath(dirname("tests")), "data/nauru/population/configs/controls.csv"), dst=self.src)
+        copy(src=join(abspath(dirname("tests")), "tests/data/nauru/population/configs/controls.csv"), dst=self.src)
+
+    def tearDown(self) -> None:
+        rmtree(join(gettempdir(), "configs"))
+        rmtree(join(gettempdir(), "destination"))
 
     def test_user_change_controls_false(self):
         user_change_controls(overwrite=False)

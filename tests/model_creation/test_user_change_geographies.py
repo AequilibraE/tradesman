@@ -1,5 +1,6 @@
 from os import remove, rename
 from os.path import join
+from shutil import rmtree
 from tempfile import gettempdir, mkdtemp
 import unittest
 import yaml
@@ -19,7 +20,8 @@ class TestUsarChangeGeographies(unittest.TestCase):
             )
 
     def tearDown(self) -> None:
-        remove(join(self.fldr, "settings.yaml"))
+        # remove(join(self.fldr, "settings.yaml"))
+        rmtree(join(gettempdir(), "configs"))
 
     def test_user_change_geographies_false(self):
 

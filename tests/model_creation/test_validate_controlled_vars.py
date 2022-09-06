@@ -12,26 +12,28 @@ class TestValidateControlledVars(unittest.TestCase):
     def setUp(self) -> None:
 
         temp_fldr = mkdtemp()
-        rmtree(join(gettempdir(), "population"))
         self.fldr = join(gettempdir(), "population")
         rename(temp_fldr, self.fldr)
 
         copy(
-            src=join(abspath(dirname("tests")), "data/nauru/population/verification.yaml"),
+            src=join(abspath(dirname("tests")), "tests/data/nauru/population/verification.yaml"),
             dst=self.fldr,
         )
 
         copytree(
-            src=join(abspath(dirname("tests")), "data/nauru/population/output"),
+            src=join(abspath(dirname("tests")), "tests/data/nauru/population/output"),
             dst=join(self.fldr, "output"),
         )
 
         copytree(
-            src=join(abspath(dirname("tests")), "data/nauru/population/data"),
+            src=join(abspath(dirname("tests")), "tests/data/nauru/population/data"),
             dst=join(self.fldr, "data"),
         )
 
         user_change_validation_parameters(overwrite=False, model_place="Nauru", dest_folder=self.fldr)
+
+    def tearDown(self) -> None:
+        rmtree(join(gettempdir(), "population"))
 
     def test_validate_controlled_vars(self):
 

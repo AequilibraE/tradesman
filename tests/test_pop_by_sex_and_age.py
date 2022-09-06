@@ -9,7 +9,7 @@ from tradesman.model_creation.pop_by_sex_and_age import get_pop_by_sex_age
 
 class TestPopBySexAndAge(unittest.TestCase):
     def setUp(self) -> None:
-        self.model_place = "nauru"
+        self.model_place = "Nauru"
         self.fldr = join(gettempdir(), uuid4().hex)
         self.project = create_nauru_test(self.fldr)
 

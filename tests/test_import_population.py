@@ -11,7 +11,7 @@ from tradesman.model_creation.add_country_borders import add_country_borders_to_
 
 class TestImportPopulation(unittest.TestCase):
     def setUp(self) -> None:
-        self.model_place = "nauru"
+        self.model_place = "Nauru"
         self.fldr = join(gettempdir(), uuid4().hex)
         self.project = create_example(self.fldr, "nauru")
         add_new_tables(self.project.conn)

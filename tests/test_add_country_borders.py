@@ -16,6 +16,6 @@ class TestCountryBorders(TestCase):
         self.project.close()
 
     def test_add_borders(self):
-        geo = get_borders_online("Armenia", 1)
+        geo = get_borders_online("Armenia")
         self.assertGreater(geo.area, 3)
         self.assertLess(geo.area, 4)

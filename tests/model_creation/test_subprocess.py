@@ -10,7 +10,6 @@ import sys
 class TestSubprocess(unittest.TestCase):
     def setUp(self) -> None:
         temp_fldr = mkdtemp()
-        rmtree(join(gettempdir(), "population"))
         self.fldr = join(gettempdir(), "population")
         rename(temp_fldr, self.fldr)
 
@@ -18,19 +17,22 @@ class TestSubprocess(unittest.TestCase):
         rename(temp_output, join(self.fldr, "output"))
 
         copy(
-            src=join(abspath(dirname("tests")), "data/nauru/population/run_populationsim.py"),
+            src=join(abspath(dirname("tests")), "tests/data/nauru/population/run_populationsim.py"),
             dst=join(gettempdir(), "population/run_populationsim.py"),
         )
 
         copytree(
-            src=join(abspath(dirname("tests")), "data/nauru/population/data"),
+            src=join(abspath(dirname("tests")), "tests/data/nauru/population/data"),
             dst=join(gettempdir(), "population/data"),
         )
 
         copytree(
-            src=join(abspath(dirname("tests")), "data/nauru/population/configs"),
+            src=join(abspath(dirname("tests")), "tests/data/nauru/population/configs"),
             dst=join(gettempdir(), "population/configs"),
         )
+
+    def tearDown(self) -> None:
+        rmtree(join(gettempdir(), "population"))
 
     def test_subprocess(self):
 
@@ -41,7 +43,7 @@ class TestSubprocess(unittest.TestCase):
             stderr=subprocess.STDOUT,
         )
 
-        self.assertTrue(exists(join(self.fldr, "output/mem.csv")))
+        self.assertTrue(exists(join(self.fldr, "output/synthetic_households.csv")))
 
 
 if __name__ == "__name__":

@@ -13,13 +13,16 @@ from tradesman.model_creation.synthetic_population.create_control_totals_taz imp
 class TestCreateTotalsTaz(unittest.TestCase):
     def setUp(self) -> None:
         temp_fldr = mkdtemp()
-        rmtree(join(gettempdir(), "data"))
+        # rmtree(join(gettempdir(), "data"))
         self.fldr = join(gettempdir(), "data")
         rename(temp_fldr, self.fldr)
         self.prj_fldr = join(gettempdir(), uuid4().hex)
         self.project = create_nauru_test(self.prj_fldr)
         self.model_place = "Nauru"
         get_pop_by_sex_age(self.project, self.model_place)
+
+    def tearDown(self) -> None:
+        rmtree(join(gettempdir(), "data"))
 
     def test_create_control_totals_taz(self):
         create_control_totals_taz(self.project, self.model_place, gettempdir())

@@ -9,24 +9,20 @@ from tradesman.model_creation.synthetic_population.unzip_seed_files import unzip
 
 
 class TestUnzipControlAndSeedFiles(unittest.TestCase):
+    def setUp(self) -> None:
+        temp_fldr = mkdtemp()
+
+        rename(temp_fldr, join(gettempdir(), "population"))
+
+    def tearDown(self) -> None:
+        rmtree(join(gettempdir(), "population"))
+
     def test_unzip_seed_files_link_exists(self):
 
         self.assertTrue(urlopen(population_url).code == 200)
 
     def test_unzip_seed_files_early_exit(self):
 
-        rmtree(join(gettempdir(), "population"))
-
-        temp_fldr = mkdtemp()
-
-        rename(temp_fldr, join(gettempdir(), "population"))
-
-        unzip_seed_files(population_url, gettempdir())
-
-        self.assertTrue(exists(join(gettempdir(), "population")))
-
-    def test_unzip_seed_files_download_files(self):
-
-        unzip_seed_files(population_url, gettempdir())
+        unzip_seed_files(gettempdir())
 
         self.assertTrue(exists(join(gettempdir(), "population")))

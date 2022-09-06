@@ -1,5 +1,6 @@
 from os import remove, rename
 from os.path import join
+from shutil import rmtree
 from tempfile import gettempdir, mkdtemp
 import yaml
 import unittest
@@ -19,7 +20,8 @@ class TestUserChangeSettings(unittest.TestCase):
             yaml.dump(dct, file, default_flow_style=False)
 
     def tearDown(self) -> None:
-        remove(join(self.fldr, "settings.yaml"))
+        # remove(join(self.fldr, "settings.yaml"))
+        rmtree(join(gettempdir(), "configs"))
 
     def test_user_change_settings_false(self):
         user_change_settings(

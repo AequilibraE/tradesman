@@ -10,12 +10,10 @@ from tradesman.model_creation.synthetic_population.user_control_import import us
 class TestUserImportNewTotals(unittest.TestCase):
     def setUp(self) -> None:
         temp_src = mkdtemp()
-        rmtree(join(gettempdir(), "data"))
         self.src = join(gettempdir(), "data")
         rename(temp_src, self.src)
 
         temp_dest = mkdtemp()
-        rmtree(join(gettempdir(), "destination")),
         self.dest = join(gettempdir(), "destination")
         rename(temp_dest, self.dest)
 
@@ -23,16 +21,20 @@ class TestUserImportNewTotals(unittest.TestCase):
         rename(data_fldr, join(self.dest, "data"))
 
         copy(
-            src=join(abspath(dirname("tests")), "data/nauru/population/data/control_totals_taz.csv"),
+            src=join(abspath(dirname("tests")), "tests/data/nauru/population/data/control_totals_taz.csv"),
             dst=self.src,
         )
 
         copy(
-            src=join(abspath(dirname("tests")), "data/nauru/population/data/control_totals_meta.csv"),
+            src=join(abspath(dirname("tests")), "tests/data/nauru/population/data/control_totals_meta.csv"),
             dst=self.src,
         )
 
-        copy(src=join(abspath(dirname("tests")), "data/nauru/population/data/geo_cross_walk.csv"), dst=self.src)
+        copy(src=join(abspath(dirname("tests")), "tests/data/nauru/population/data/geo_cross_walk.csv"), dst=self.src)
+
+    def tearDown(self) -> None:
+        rmtree(join(gettempdir(), "data"))
+        rmtree(join(gettempdir(), "destination"))
 
     def test_user_import_new_totals_false(self):
         user_import_new_totals(

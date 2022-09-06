@@ -19,8 +19,8 @@ def create_nauru_test(folder):
     project = create_example(folder, "nauru")
 
     add_new_tables(project.conn)
-    add_country_borders_to_model("nauru", project)
-    import_population(project, model_place="nauru", source="WorldPop", overwrite=False)
+    add_country_borders_to_model("Nauru", project)
+    import_population(project, model_place="Nauru", source="WorldPop", overwrite=False)
 
     zones = 12
 

@@ -11,14 +11,16 @@ from tradesman.model_creation.synthetic_population.create_control_totals_meta im
 class TestCreateTotalsMeta(unittest.TestCase):
     def setUp(self) -> None:
         temp_fldr = mkdtemp()
-        rmtree(join(gettempdir(), "data"))
         self.fldr = join(gettempdir(), "data")
         rename(temp_fldr, self.fldr)
 
         copy(
-            src=join(abspath(dirname("tests")), "data/nauru/population/data/control_totals_taz.csv"),
+            src=join(abspath(dirname("tests")), "tests/data/nauru/population/data/control_totals_taz.csv"),
             dst=join(gettempdir(), "data/control_totals_taz.csv"),
         )
+
+    def tearDown(self) -> None:
+        rmtree(join(gettempdir(), "data"))
 
     def test_create_totals_meta(self):
 
