@@ -50,7 +50,7 @@ jobs:
 
     - name: Runs unit tests
       run: |
-        python -m pytest
+        python -m unittest
 
   build_documentation:
     needs: linting
