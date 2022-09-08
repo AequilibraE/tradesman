@@ -36,8 +36,8 @@ class Tradesman:
         """Creates the entire model"""
 
         self.add_country_borders()
+        self.import_subdivisions("geoboundaries", 2, True)
         self.import_network()
-        self.import_subdivisions("GADM", 2, True)
         self.import_population()
         self.build_zoning()
         self.import_pop_by_sex_and_age()
@@ -65,7 +65,7 @@ class Tradesman:
         If the network already exists in the folder, it will be loaded, otherwise it will be created."""
         import_network(self._project, self.__model_place)
 
-    def import_subdivisions(self, source="GADM", subdivision_levels=2, overwrite=False):
+    def import_subdivisions(self, source="geoboundaries", subdivision_levels=2, overwrite=False):
         """Imports political subdivisions.
 
         Args:
@@ -73,6 +73,7 @@ class Tradesman:
                *overwrite* (:obj:`bool`): Deletes pre-existing subdivisions. Defaults to False
 
         """
+
         add_subdivisions_to_model(self._project, self.__model_place, source, subdivision_levels, overwrite)
 
     def import_population(self, overwrite=False):

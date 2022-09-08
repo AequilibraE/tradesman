@@ -6,7 +6,6 @@ import pandas as pd
 import sys
 
 from aequilibrae.project import Project
-from tradesman.model_creation.synthetic_population.seeds_url import population_url
 from tradesman.model_creation.synthetic_population.create_control_totals_meta import create_control_totals_meta
 from tradesman.model_creation.synthetic_population.create_control_totals_taz import create_control_totals_taz
 from tradesman.model_creation.synthetic_population.create_geo_crosswalk import create_geo_cross_walk
@@ -31,7 +30,7 @@ def create_syn_pop(project: Project, model_place: str, cwd: str, thread_number=N
 
     """
 
-    unzip_seed_files(population_url, cwd)
+    unzip_seed_files(cwd)
 
     pop_fldr = join(cwd, "population")
 
