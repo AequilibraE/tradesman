@@ -1,4 +1,5 @@
 from turtle import down
+from os.path import dirname, join
 import pycountry
 import pandas as pd
 
@@ -16,9 +17,11 @@ def link_source(model_place: str, source="WorldPop"):
 
     elif source.lower() == "Meta".lower():
 
-        df = pd.read_csv("/population/all_raster_pop_source.csv")
+        pth = dirname(__file__)
 
-        return df[df.iso_country == country_code].meta_link
+        df = pd.read_csv(join(pth, "population/all_raster_pop_source.csv"))
+
+        return df[df.iso_country == country_code].meta_link.tolist()[0]
 
     else:
         raise ValueError("No population source found.")
