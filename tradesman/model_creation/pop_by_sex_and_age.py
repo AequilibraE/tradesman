@@ -23,7 +23,7 @@ def get_pop_by_sex_age(project: Project, model_place: str):
         for a in range(len(age)):
 
             data_link = url + f"{country_code}/{country_code.lower()}_{s}_{age[a]}_2020.tif"
-            field_name = "POP" + s.upper() + f"{a+1}"
+            field_name = f"POP{s.upper()}{a+1}"
 
             df = population_raster(data_link, field_name=f"{country_code}_{field_name}", project=project)
 
