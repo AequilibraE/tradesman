@@ -1,0 +1,10 @@
+pytest
+pysal
+openmatrix
+rasterio
+matplotlib
+aequilibrae
+pyarrow
+pycountry
+populationsim
+tabulate

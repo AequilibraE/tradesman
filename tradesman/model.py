@@ -15,6 +15,7 @@ from tradesman.model_creation.import_network import import_network
 from tradesman.model_creation.import_population import import_population
 from tradesman.model_creation.pop_by_sex_and_age import get_pop_by_sex_age
 from tradesman.model_creation.set_source import set_source
+from tradesman.model_creation.synthetic_population.create_synthetic_population import create_syn_pop, run_populationsim
 from tradesman.model_creation.zoning.zone_building import zone_builder
 
 
@@ -35,13 +36,15 @@ class Tradesman:
         """Creates the entire model"""
 
         self.add_country_borders()
+        self.import_subdivisions("geoboundaries", 2, True)
         self.import_network()
-        self.import_subdivisions(2, True)
         self.import_population()
         self.build_zoning()
         self.import_pop_by_sex_and_age()
-        self.import_amenities()
-        self.import_buildings()
+        # self.import_amenities()
+        # self.import_buildings()
+        self.build_population_synthesizer_data()
+        self.synthesize_population()
 
     def add_country_borders(self, overwrite=False):
         """Retrieves country borders from www.geoboundarries.org and adds to the model.
@@ -62,7 +65,7 @@ class Tradesman:
         If the network already exists in the folder, it will be loaded, otherwise it will be created."""
         import_network(self._project, self.__model_place)
 
-    def import_subdivisions(self, subdivision_levels=2, overwrite=False):
+    def import_subdivisions(self, source="geoboundaries", subdivision_levels=2, overwrite=False):
         """Imports political subdivisions.
 
         Args:
@@ -70,7 +73,8 @@ class Tradesman:
                *overwrite* (:obj:`bool`): Deletes pre-existing subdivisions. Defaults to False
 
         """
-        add_subdivisions_to_model(self._project, self.__model_place, subdivision_levels, overwrite)
+
+        add_subdivisions_to_model(self._project, self.__model_place, source, subdivision_levels, overwrite)
 
     def import_population(self, overwrite=False):
         """
@@ -137,6 +141,20 @@ class Tradesman:
         """
 
         building_import(self.__model_place, self._project, self.__osm_data)
+
+    def build_population_synthesizer_data(self):
+        """
+        Triggers the import of data to create the synthetic population.
+        """
+
+        create_syn_pop(self._project, self.__model_place, self.__folder)
+
+    def synthesize_population(self):
+        """
+        Triggers the creation of synthetic population.
+        """
+
+        run_populationsim(self._project, self.__model_place, self.__folder)
 
     def __initialize_model(self):
         if isdir(self.__folder):
