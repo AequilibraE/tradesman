@@ -1,6 +1,7 @@
 import geopandas as gpd
 import pandas as pd
 from geopandas.tools import sjoin
+from shapely.geometry import box
 
 
 def zones_with_location(hexb, all_subdivisions):
@@ -35,16 +36,12 @@ def zones_with_location(hexb, all_subdivisions):
     dindex = states.sindex
     empties = data_complete.division_name.isna()
 
-    dct_idx_subdivisions = {}
-
     for idx, record in data_complete[empties].iterrows():
-        geo = record.geometry
+        geo = box(*record.geometry.bounds)
         dscrt = [x for x in dindex.nearest(geo, 10)]
-        dist = [states.loc[d, "geometry"].to_crs(3857).distance(geo).values.tolist()[0] for d in dscrt]
+        dist = [states.loc[d, "geometry"].distance(geo).tolist() for d in dscrt]
         m = dscrt[dist.index(min(dist))]
-        dct_idx_subdivisions[idx] = states.loc[m, "division_name"]
-
-    data_complete["division_name"] = data_complete["hex_id"].apply(lambda x: dct_idx_subdivisions.get(x))
+        data_complete.loc[idx, "division_name"] = states.loc[m, "division_name"].tolist()[0]
 
     zones_with_location = gpd.GeoDataFrame(
         data_complete[["hex_id", "division_name"]], geometry=data_complete["geometry"]
