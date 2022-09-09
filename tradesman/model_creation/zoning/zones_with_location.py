@@ -39,9 +39,9 @@ def zones_with_location(hexb, all_subdivisions):
     for idx, record in data_complete[empties].iterrows():
         geo = box(*record.geometry.bounds)
         dscrt = [x for x in dindex.nearest(geo, 10)]
-        dist = [states.loc[d, "geometry"].distance(geo).tolist() for d in dscrt]
+        dist = [states.loc[d, "geometry"].distance(geo).values for d in dscrt]
         m = dscrt[dist.index(min(dist))]
-        data_complete.loc[idx, "division_name"] = states.loc[m, "division_name"].tolist()[0]
+        data_complete.loc[idx, "division_name"] = states.loc[m, "division_name"].values[0]
 
     zones_with_location = gpd.GeoDataFrame(
         data_complete[["hex_id", "division_name"]], geometry=data_complete["geometry"]
