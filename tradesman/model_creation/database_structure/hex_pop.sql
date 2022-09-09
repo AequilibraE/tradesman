@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS hex_pop(hex_id INTEGER,
-                                   country_subdivision TEXT,
+                                   division_name TEXT,
                                    geo_wkt TEXT,
                                    population INTEGER);
 
