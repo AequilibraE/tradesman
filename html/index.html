@@ -1,0 +1,471 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>1 Road Analytics &#8212; RoadAnalytics TBD documentation</title>
+  <script>
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=9b1a4fa89bdd0e95b23b" rel="stylesheet">
+<link href="_static/styles/pydata-sphinx-theme.css?digest=9b1a4fa89bdd0e95b23b" rel="stylesheet">
+
+  
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/6.1.2/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=9b1a4fa89bdd0e95b23b">
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'index';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="1. Analytics models" href="build_analytics_model.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="docsearch:language" content="en">
+  </head>
+  
+  
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="180" data-default-mode="">
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__primary" id="__primary">
+  <label class="overlay overlay-primary" for="__primary"></label>
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__secondary" id="__secondary">
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+      
+<form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+    </div>
+  </div>
+
+  
+  <nav class="bd-header navbar navbar-expand-lg bd-navbar" id="navbar-main"><div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+      <span class="fas fa-bars"></span>
+  </label>
+  <div id="navbar-start">
+    
+    
+  
+
+
+<a class="navbar-brand logo" href="#">
+
+  
+  
+  
+  
+  
+  
+  
+
+  
+  
+    <p class="title logo__title">RoadAnalytics TBD documentation</p>
+  
+</a>
+    
+  </div>
+
+  
+  <div class="col-lg-9 navbar-header-items">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <nav class="navbar-nav">
+    <p class="sidebar-header-items__title" role="heading" aria-level="1" aria-label="Site Navigation">
+        Site Navigation
+    </p>
+    <ul id="navbar-main-elements" class="navbar-nav">
+        
+                <li class="nav-item">
+                    <a class="nav-link" href="build_analytics_model.html">
+                        Analytics models
+                    </a>
+                </li>
+                
+
+                <li class="nav-item">
+                    <a class="nav-link" href="data_sources.html">
+                        Data sources
+                    </a>
+                </li>
+                
+
+                <li class="nav-item">
+                    <a class="nav-link" href="travel_modelling.html">
+                        Travel model
+                    </a>
+                </li>
+                
+
+                <li class="nav-item">
+                    <a class="nav-link" href="concepts.html">
+                        General concepts
+                    </a>
+                </li>
+                
+
+                <li class="nav-item">
+                    <a class="nav-link" href="use_instructions.html">
+                        Using this software
+                    </a>
+                </li>
+                
+    </ul>
+</nav>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      <div class="navbar-end-item navbar-end__search-button-container">
+        
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search">
+  <i class="fas fa-search"></i>
+</button>
+      </div>
+      
+      <div class="navbar-end-item">
+        <span class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle">
+    <a class="theme-switch" data-mode="light"><i class="fas fa-sun"></i></a>
+    <a class="theme-switch" data-mode="dark"><i class="far fa-moon"></i></a>
+    <a class="theme-switch" data-mode="auto"><i class="fas fa-adjust"></i></a>
+</span>
+      </div>
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+
+
+  
+  <div class="search-button-container--mobile">
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search">
+  <i class="fas fa-search"></i>
+</button>
+  </div>
+
+  
+  <label class="sidebar-toggle secondary-toggle" for="__secondary">
+      <span class="fas fa-outdent"></span>
+  </label>
+  
+
+</div>
+  </nav>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+      
+      <div class="navbar-center-item">
+        <nav class="navbar-nav">
+    <p class="sidebar-header-items__title" role="heading" aria-level="1" aria-label="Site Navigation">
+        Site Navigation
+    </p>
+    <ul id="navbar-main-elements" class="navbar-nav">
+        
+                <li class="nav-item">
+                    <a class="nav-link" href="build_analytics_model.html">
+                        Analytics models
+                    </a>
+                </li>
+                
+
+                <li class="nav-item">
+                    <a class="nav-link" href="data_sources.html">
+                        Data sources
+                    </a>
+                </li>
+                
+
+                <li class="nav-item">
+                    <a class="nav-link" href="travel_modelling.html">
+                        Travel model
+                    </a>
+                </li>
+                
+
+                <li class="nav-item">
+                    <a class="nav-link" href="concepts.html">
+                        General concepts
+                    </a>
+                </li>
+                
+
+                <li class="nav-item">
+                    <a class="nav-link" href="use_instructions.html">
+                        Using this software
+                    </a>
+                </li>
+                
+    </ul>
+</nav>
+      </div>
+      
+      </div>
+    
+
+    
+    
+    <div class="sidebar-header-items__end">
+      
+      <div class="navbar-end-item">
+        <span class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle">
+    <a class="theme-switch" data-mode="light"><i class="fas fa-sun"></i></a>
+    <a class="theme-switch" data-mode="dark"><i class="far fa-moon"></i></a>
+    <a class="theme-switch" data-mode="auto"><i class="fas fa-adjust"></i></a>
+</span>
+      </div>
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+      </div>
+      
+    </div>
+    
+  </div>
+
+  
+
+  
+  <div class="sidebar-end-items sidebar-primary__section">
+    <div class="sidebar-end-items__item">
+    </div>
+  </div>
+
+      </div>
+      <main class="bd-main">
+        
+        
+        <div class="bd-content">
+          <div class="bd-article-container">
+            
+            <div class="bd-header-article">
+                
+            </div>
+            
+            
+            <article class="bd-article" role="main">
+              
+  <section id="road-analytics">
+<h1><span class="sectnum">1 </span>Road Analytics<a class="headerlink" href="#road-analytics" title="Permalink to this heading">#</a></h1>
+<p>The Road Analytics pipeline has been developed to implement the vision laid out
+on <a class="reference external" href="https://docs.google.com/document/d/1AugI7_AiD2v-ES_actmseHsFMmi-oMdLxGF2YAcv5XY">Geospatial Planning &amp; Budgeting Platform (GPBP) Transport sector use cases</a>.</p>
+<p>Its main objective is to provide a set of tools that are:</p>
+<ol class="arabic simple">
+<li><p>Reproducible</p></li>
+<li><p>Accessible</p></li>
+<li><p>Cloud-capable</p></li>
+<li><p>Easily-deployable</p></li>
+<li><p>Accessible to non-programmers</p></li>
+</ol>
+<p>And that provide capabilities for:</p>
+<ol class="arabic simple">
+<li><p>Generating visualizations of analytics models and its results</p></li>
+<li><p>Estimating transport network demand based on Population and open-data PoI</p></li>
+<li><p>Incorporating mobility data (vehicle GPS data and LBS)</p></li>
+<li><dl class="simple">
+<dt>A variety of use-cases</dt><dd><ul class="simple">
+<li><p>Fast summary statistics for transport networks</p></li>
+<li><p>Network resilience to disruptions with respect to access to critical
+infrastructure</p></li>
+<li><p>Descriptive population analytics</p></li>
+<li><p>Rural Access Index (RAI)</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+<p>This analytics pipeline is organized in sections for ease of use, and some
+expertise in transportation planning/modelling/forecasting may be useful when
+utilizing some of the more advanced analysis.</p>
+<p>It is also noteworthy that this pipeline was designed to handle whole-of-country
+data, mas little modification would be required to work only with sub-country
+or even multi-country data.</p>
+<p>Finally, the pipeline has been tightly integrated with a few data sources, and
+while that allows for fast deployment for any region on Earth, it also makes it
+somewhat complex to incorporate bespoke data sources.</p>
+<section id="contents">
+<h2><span class="sectnum">1.1 </span>Contents<a class="headerlink" href="#contents" title="Permalink to this heading">#</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="build_analytics_model.html">1. Analytics models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="build_analytics_model.html#building-the-road-network-model">1.1. Building the road network model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build_analytics_model.html#incorporating-population-data">1.2. Incorporating population data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build_analytics_model.html#importing-amenity-and-buildings">1.3. Importing amenity and buildings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build_analytics_model.html#calculate-rural-access-index">1.4. Calculate Rural Access Index</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="data_sources.html">2. Data sources</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="data_sources.html#road-network">2.1. Road network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_sources.html#point-of-interest">2.2. Point-of-Interest</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_sources.html#population">2.3. Population</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_sources.html#commuting-zones">2.4. Commuting Zones</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_sources.html#rural-and-urban-areas">2.5. Rural and Urban Areas</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="travel_modelling.html">3. Travel model</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="travel_modelling.html#augmenting-the-road-network-model">3.1. Augmenting the road network model</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="concepts.html">4. General concepts</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="concepts.html#step-models">4.1. 4-step models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="concepts.html#road-networks-model">4.2. Road Networks model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="concepts.html#rural-access-index">4.3. Rural Access Index</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="use_instructions.html">5. Using this software</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="use_instructions.html#saturn-cloud">5.1. Saturn Cloud</a></li>
+<li class="toctree-l2"><a class="reference internal" href="use_instructions.html#hidden-functions">5.2. “Hidden functions”</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+            </article>
+            
+            
+            
+            <footer class="bd-footer-article">
+                <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+  <a class='right-next' id="next-link" href="build_analytics_model.html" title="next page">
+  <div class="prev-next-info">
+      <p class="prev-next-subtitle">next</p>
+      <p class="prev-next-title"><span class="section-number">1. </span>Analytics models</p>
+  </div>
+  <i class="fas fa-angle-right"></i>
+  </a>
+</div>
+            </footer>
+            
+          </div>
+          
+          
+          
+            <div class="bd-sidebar-secondary bd-toc">
+              
+<div class="toc-item">
+  
+<div class="tocsection onthispage">
+    <i class="fas fa-list"></i> On this page
+</div>
+<nav id="bd-toc-nav" class="page-toc">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#contents">
+   <span class="sectnum">
+    1.1
+   </span>
+   Contents
+  </a>
+ </li>
+</ul>
+
+</nav>
+</div>
+
+<div class="toc-item">
+  
+</div>
+
+<div class="toc-item">
+  
+<div class="tocsection sourcelink">
+    <a href="_sources/index.rst.txt">
+        <i class="fas fa-file-alt"></i> Show Source
+    </a>
+</div>
+
+</div>
+
+            </div>
+          
+          
+        </div>
+        <footer class="bd-footer-content">
+          <div class="bd-footer-content__inner">
+            
+          </div>
+        </footer>
+        
+      </main>
+    </div>
+  </div>
+
+  
+    
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/pydata-sphinx-theme.js?digest=9b1a4fa89bdd0e95b23b"></script>
+
+  <footer class="bd-footer"><div class="bd-footer__inner container">
+  
+  <div class="footer-item">
+    
+<p class="copyright">
+
+    &copy; Copyright 2022, Pedro Camargo.<br>
+
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+<p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.1.1.<br>
+</p>
+
+  </div>
+  
+</div>
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,500 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Synthetic Populations &#8212; RoadAnalytics TBD documentation</title>
+  <script>
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=9b1a4fa89bdd0e95b23b" rel="stylesheet">
+<link href="_static/styles/pydata-sphinx-theme.css?digest=9b1a4fa89bdd0e95b23b" rel="stylesheet">
+
+  
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/6.1.2/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=9b1a4fa89bdd0e95b23b">
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'synthetic_population';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="docsearch:language" content="en">
+  </head>
+  
+  
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="180" data-default-mode="">
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__primary" id="__primary">
+  <label class="overlay overlay-primary" for="__primary"></label>
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__secondary" id="__secondary">
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+      
+<form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+    </div>
+  </div>
+
+  
+  <nav class="bd-header navbar navbar-expand-lg bd-navbar" id="navbar-main"><div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+      <span class="fas fa-bars"></span>
+  </label>
+  <div id="navbar-start">
+    
+    
+  
+
+
+<a class="navbar-brand logo" href="index.html">
+
+  
+  
+  
+  
+  
+  
+  
+
+  
+  
+    <p class="title logo__title">RoadAnalytics TBD documentation</p>
+  
+</a>
+    
+  </div>
+
+  
+  <div class="col-lg-9 navbar-header-items">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <nav class="navbar-nav">
+    <p class="sidebar-header-items__title" role="heading" aria-level="1" aria-label="Site Navigation">
+        Site Navigation
+    </p>
+    <ul id="navbar-main-elements" class="navbar-nav">
+        
+                <li class="nav-item">
+                    <a class="nav-link" href="build_analytics_model.html">
+                        Analytics models
+                    </a>
+                </li>
+                
+
+                <li class="nav-item">
+                    <a class="nav-link" href="data_sources.html">
+                        Data sources
+                    </a>
+                </li>
+                
+
+                <li class="nav-item">
+                    <a class="nav-link" href="travel_modelling.html">
+                        Travel model
+                    </a>
+                </li>
+                
+
+                <li class="nav-item">
+                    <a class="nav-link" href="concepts.html">
+                        General concepts
+                    </a>
+                </li>
+                
+
+                <li class="nav-item">
+                    <a class="nav-link" href="use_instructions.html">
+                        Using this software
+                    </a>
+                </li>
+                
+    </ul>
+</nav>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      <div class="navbar-end-item navbar-end__search-button-container">
+        
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search">
+  <i class="fas fa-search"></i>
+</button>
+      </div>
+      
+      <div class="navbar-end-item">
+        <span class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle">
+    <a class="theme-switch" data-mode="light"><i class="fas fa-sun"></i></a>
+    <a class="theme-switch" data-mode="dark"><i class="far fa-moon"></i></a>
+    <a class="theme-switch" data-mode="auto"><i class="fas fa-adjust"></i></a>
+</span>
+      </div>
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+
+
+  
+  <div class="search-button-container--mobile">
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search">
+  <i class="fas fa-search"></i>
+</button>
+  </div>
+
+  
+  <label class="sidebar-toggle secondary-toggle" for="__secondary">
+      <span class="fas fa-outdent"></span>
+  </label>
+  
+
+</div>
+  </nav>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+      
+      <div class="navbar-center-item">
+        <nav class="navbar-nav">
+    <p class="sidebar-header-items__title" role="heading" aria-level="1" aria-label="Site Navigation">
+        Site Navigation
+    </p>
+    <ul id="navbar-main-elements" class="navbar-nav">
+        
+                <li class="nav-item">
+                    <a class="nav-link" href="build_analytics_model.html">
+                        Analytics models
+                    </a>
+                </li>
+                
+
+                <li class="nav-item">
+                    <a class="nav-link" href="data_sources.html">
+                        Data sources
+                    </a>
+                </li>
+                
+
+                <li class="nav-item">
+                    <a class="nav-link" href="travel_modelling.html">
+                        Travel model
+                    </a>
+                </li>
+                
+
+                <li class="nav-item">
+                    <a class="nav-link" href="concepts.html">
+                        General concepts
+                    </a>
+                </li>
+                
+
+                <li class="nav-item">
+                    <a class="nav-link" href="use_instructions.html">
+                        Using this software
+                    </a>
+                </li>
+                
+    </ul>
+</nav>
+      </div>
+      
+      </div>
+    
+
+    
+    
+    <div class="sidebar-header-items__end">
+      
+      <div class="navbar-end-item">
+        <span class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle">
+    <a class="theme-switch" data-mode="light"><i class="fas fa-sun"></i></a>
+    <a class="theme-switch" data-mode="dark"><i class="far fa-moon"></i></a>
+    <a class="theme-switch" data-mode="auto"><i class="fas fa-adjust"></i></a>
+</span>
+      </div>
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+      </div>
+      
+    </div>
+    
+  </div>
+
+  
+
+  
+  <div class="sidebar-end-items sidebar-primary__section">
+    <div class="sidebar-end-items__item">
+    </div>
+  </div>
+
+      </div>
+      <main class="bd-main">
+        
+        
+        <div class="bd-content">
+          <div class="bd-article-container">
+            
+            <div class="bd-header-article">
+                
+            </div>
+            
+            
+            <article class="bd-article" role="main">
+              
+  <section id="synthetic-populations">
+<span id="synthetic-population"></span><h1>Synthetic Populations<a class="headerlink" href="#synthetic-populations" title="Permalink to this heading">#</a></h1>
+<p>Synthetic populations are the primary input to activity-based travel demand models (ABMs), and are used as an alternative to the collection of microdata that is usually inacessible <a class="reference internal" href="#rmk2007" id="id1"><span>[RMK2007]</span></a>.</p>
+<p>Tradesman uses <a class="reference external" href="https://activitysim.github.io/populationsim/index.html">PopulationSim</a>, a Python native library to create its synthetic population and households.</p>
+</section>
+<section id="populationsim-controls">
+<h1>PopulationSim Controls<a class="headerlink" href="#populationsim-controls" title="Permalink to this heading">#</a></h1>
+<p>If necessary one can change the controls. In Tradesman, by default, we consider the following controls:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="go">&gt;&gt;&gt;</span>
+<span class="go">target,geography,seed_table,importance,control_field,expression</span>
+<span class="go">num_hh,TAZ,households,10000000,HHBASE,(households.WGTP &gt; 0) &amp; (households.WGTP &lt; np.inf)</span>
+<span class="go">hh_size_1,REGION,households,5000,HHSIZE1,households.NP == 1</span>
+<span class="go">hh_size_2_3,REGION,households,5000,HHSIZE2,(households.NP == 2) | (households.NP == 3)</span>
+<span class="go">hh_size_4_5,REGION,households,5000,HHSIZE4,(households.NP == 4) | (households.NP == 5)</span>
+<span class="go">hh_size_6_plus,REGION,households,5000,HHSIZE6,households.NP &gt;= 6</span>
+<span class="go">male_1,TAZ,persons,100000,POPM1,(persons.AGEP == 0) &amp; (persons.SEX == 1)</span>
+<span class="go">male_2,TAZ,persons,100000,POPM2,(persons.AGEP &gt;= 1) &amp; (persons.AGEP &lt; 5) &amp; (persons.SEX == 1)</span>
+<span class="go">male_3,TAZ,persons,100000,POPM3,(persons.AGEP &gt;= 5) &amp; (persons.AGEP &lt; 10) &amp; (persons.SEX == 1)</span>
+<span class="go">male_4,TAZ,persons,100000,POPM4,(persons.AGEP &gt;= 10) &amp; (persons.AGEP &lt; 15) &amp; (persons.SEX == 1)</span>
+<span class="go">male_5,TAZ,persons,100000,POPM5,(persons.AGEP &gt;= 15) &amp; (persons.AGEP &lt; 20) &amp; (persons.SEX == 1)</span>
+<span class="go">male_6,TAZ,persons,100000,POPM6,(persons.AGEP &gt;= 20) &amp; (persons.AGEP &lt; 25) &amp; (persons.SEX == 1)</span>
+<span class="go">male_7,TAZ,persons,100000,POPM7,(persons.AGEP &gt;= 25) &amp; (persons.AGEP &lt; 30) &amp; (persons.SEX == 1)</span>
+<span class="go">male_8,TAZ,persons,100000,POPM8,(persons.AGEP &gt;= 30) &amp; (persons.AGEP &lt; 35) &amp; (persons.SEX == 1)</span>
+<span class="go">male_9,TAZ,persons,100000,POPM9,(persons.AGEP &gt;= 35) &amp; (persons.AGEP &lt; 40) &amp; (persons.SEX == 1)</span>
+<span class="go">male_10,TAZ,persons,100000,POPM10,(persons.AGEP &gt;= 40) &amp; (persons.AGEP &lt; 45) &amp; (persons.SEX == 1)</span>
+<span class="go">male_11,TAZ,persons,100000,POPM11,(persons.AGEP &gt;= 45) &amp; (persons.AGEP &lt; 50) &amp; (persons.SEX == 1)</span>
+<span class="go">male_12,TAZ,persons,100000,POPM12,(persons.AGEP &gt;= 50) &amp; (persons.AGEP &lt; 55) &amp; (persons.SEX == 1)</span>
+<span class="go">male_13,TAZ,persons,100000,POPM13,(persons.AGEP &gt;= 55) &amp; (persons.AGEP &lt; 60) &amp; (persons.SEX == 1)</span>
+<span class="go">male_14,TAZ,persons,100000,POPM14,(persons.AGEP &gt;= 60) &amp; (persons.AGEP &lt; 65) &amp; (persons.SEX == 1)</span>
+<span class="go">male_15,TAZ,persons,100000,POPM15,(persons.AGEP &gt;= 65) &amp; (persons.AGEP &lt; 70) &amp; (persons.SEX == 1)</span>
+<span class="go">male_16,TAZ,persons,100000,POPM16,(persons.AGEP &gt;= 70) &amp; (persons.AGEP &lt; 75) &amp; (persons.SEX == 1)</span>
+<span class="go">male_17,TAZ,persons,100000,POPM17,(persons.AGEP &gt;= 75) &amp; (persons.AGEP &lt; 80) &amp; (persons.SEX == 1)</span>
+<span class="go">male_18,TAZ,persons,100000,POPM18,(persons.AGEP &gt;= 80) &amp; (persons.SEX == 1)</span>
+<span class="go">female_1,TAZ,persons,100000,POPF1,(persons.AGEP == 0) &amp; (persons.SEX == 2)</span>
+<span class="go">female_2,TAZ,persons,100000,POPF2,(persons.AGEP &gt;= 1) &amp; (persons.AGEP &lt; 5) &amp; (persons.SEX == 2)</span>
+<span class="go">female_3,TAZ,persons,100000,POPF3,(persons.AGEP &gt;= 5) &amp; (persons.AGEP &lt; 10) &amp; (persons.SEX == 2)</span>
+<span class="go">female_4,TAZ,persons,100000,POPF4,(persons.AGEP &gt;= 10) &amp; (persons.AGEP &lt; 15) &amp; (persons.SEX == 2)</span>
+<span class="go">female_5,TAZ,persons,100000,POPF5,(persons.AGEP &gt;= 15) &amp; (persons.AGEP &lt; 20) &amp; (persons.SEX == 2)</span>
+<span class="go">female_6,TAZ,persons,100000,POPF6,(persons.AGEP &gt;= 20) &amp; (persons.AGEP &lt; 25) &amp; (persons.SEX == 2)</span>
+<span class="go">female_7,TAZ,persons,100000,POPF7,(persons.AGEP &gt;= 25) &amp; (persons.AGEP &lt; 30) &amp; (persons.SEX == 2)</span>
+<span class="go">female_8,TAZ,persons,100000,POPF8,(persons.AGEP &gt;= 30) &amp; (persons.AGEP &lt; 35) &amp; (persons.SEX == 2)</span>
+<span class="go">female_9,TAZ,persons,100000,POPF9,(persons.AGEP &gt;= 35) &amp; (persons.AGEP &lt; 40) &amp; (persons.SEX == 2)</span>
+<span class="go">female_10,TAZ,persons,100000,POPF10,(persons.AGEP &gt;= 40) &amp; (persons.AGEP &lt; 45) &amp; (persons.SEX == 2)</span>
+<span class="go">female_11,TAZ,persons,100000,POPF11,(persons.AGEP &gt;= 45) &amp; (persons.AGEP &lt; 50) &amp; (persons.SEX == 2)</span>
+<span class="go">female_12,TAZ,persons,100000,POPF12,(persons.AGEP &gt;= 50) &amp; (persons.AGEP &lt; 55) &amp; (persons.SEX == 2)</span>
+<span class="go">female_13,TAZ,persons,100000,POPF13,(persons.AGEP &gt;= 55) &amp; (persons.AGEP &lt; 60) &amp; (persons.SEX == 2)</span>
+<span class="go">female_14,TAZ,persons,100000,POPF14,(persons.AGEP &gt;= 60) &amp; (persons.AGEP &lt; 65) &amp; (persons.SEX == 2)</span>
+<span class="go">female_15,TAZ,persons,100000,POPF15,(persons.AGEP &gt;= 65) &amp; (persons.AGEP &lt; 70) &amp; (persons.SEX == 2)</span>
+<span class="go">female_16,TAZ,persons,100000,POPF16,(persons.AGEP &gt;= 70) &amp; (persons.AGEP &lt; 75) &amp; (persons.SEX == 2)</span>
+<span class="go">female_17,TAZ,persons,100000,POPF17,(persons.AGEP &gt;= 75) &amp; (persons.AGEP &lt; 80) &amp; (persons.SEX == 2)</span>
+<span class="go">female_18,TAZ,persons,100000,POPF18,(persons.AGEP &gt;= 80) &amp; (persons.SEX == 2)</span>
+</pre></div>
+</div>
+<p>For each sex and age bracket, we create a control variable, considering the geography level of TAZ. For both women and men, we have 18 variables, named POPF and POPM, for female and male residents. For TAZs we also consider the expected number of households.</p>
+<p>In the following section, we discuss the premisses of the model and explain how the expected number of households was calculated. Finally, we have the controls by REGION, an upper level. For regional control, we consider the expected number of households of different sizes.</p>
+</section>
+<section id="tradesman-model-premises">
+<h1>Tradesman model premises<a class="headerlink" href="#tradesman-model-premises" title="Permalink to this heading">#</a></h1>
+<p>To create a population sample for each country, we will use PUMS data for the state of Texas. Public Use of Microdata Sampe (aka PUMS) allow data users to create estimates for user defined characteristics. More information can be found in its <a class="reference external" href="https://www.census.gov/programs-surveys/acs/data/experimental-data/2020-1-year-pums.html">webpage</a>. We cleaned up the data, removing households with no inhabitants (NP = 0), institutional and non-institutional types of household (TYPEHUGQ &gt; 1), and created a hhnum column to represent the household number, given that SERIALNO column has different types of data.</p>
+<p>Since the population of some countries is smaller than the sample and presents a populational distribution different than the sample, we split the Texas sample population into 4 different buckets, each one containing different size households. The number of buckets is related to the information on household size provided by the United Nations <a class="reference external" href="https://www.un.org/development/desa/pd/data/household-size-and-composition">Population Division</a> studies. To build our sample, we draw a number between 0 and 1, until the number of draws equals 0.02% of the population. Each number drawn is then associated with one of the buckets, and at the end, the total numbers associated with each bucket are added up. This number represents the total number of households of each size that must be drawn from each bucket. The sample is then drawn and we proceed to build the models with synthetic population.</p>
+<p>The PopulationSim library requires a control file to run. In the control file, one can specify and check the requirements for the synthetic population. The only mandatory requirement for generating a synthetic population, is to provide the right number of households in each geography, and this specification is made at the lowest level. The lowest level in an AequilibraE model is the TAZs (Traffic Analysis Zones), however, the data necessary to estimate the total households is available only in the upper level. Once again, we will use the UN Population Division household composition to fulfill this requirement, with the underlying hypothesis that the family size distribution would be equal for all TAZs in the country.</p>
+<p>As there is no data available for all countries or autonomous regions, for countries that are not present in the sample, we considered their household information to be similar to their closest (and most similar) neighbors. As there are many data sources available in the Population Division sheet, we kept the most recent data for each country, as long as it had information about the total number of households.</p>
+<p>The total number of households in each TAZ is a sum of all households with different sizes. To match the information provided by the UN, we consider households with 1 person (HHBASE1), 2 to 3 persons (HHBASE2), 4 to 5 persons (HHBASE4), and with more than 6 persons (HHBASE6). Hence, we sum all population by sex and age in the zone, divide by the average number of persons in the household, and multiply by the percentage of households of each size expected for the country. Finally, we sum the integer expected values for each household size to obtain the mandatory expected number of households in the TAZ (HHBASE).</p>
+<a class="reference internal image-reference" href="_images/hh_example.png"><img alt="_images/hh_example.png" class="align-center" src="_images/hh_example.png" style="width: 116.4px; height: 12.0px;" /></a>
+<p>As we currently do not have validation data to assess the quality of the synthetic populations created, we use the following variables from the UN Population Division file to validate the population:</p>
+<ul class="simple">
+<li><p>Percentage of households with at least one person under 15 years old;</p></li>
+<li><p>Percentage of households with at least one person under 18 years old;</p></li>
+<li><p>Percentage of households with at least one person under 20 years old;</p></li>
+<li><p>Percentage of households with at least one person over 60 years old;</p></li>
+<li><p>Percentage of households with at least one person over 65 years old;</p></li>
+<li><p>Percentage of households with at least one person under 15 and one person over 60;</p></li>
+<li><p>Percentage of households with at least one person under 15 and one person over 65;</p></li>
+<li><p>Percentage of households with at least one person under 18 and one person over 60;</p></li>
+<li><p>Percentage of households with at least one person under 18 and one person over 65;</p></li>
+<li><p>Percentage of households with at least one person under 20 and one person over 60;</p></li>
+<li><p>Percentage of households with at least one person under 20 and one person over 65.</p></li>
+</ul>
+<p>As part of the validation process, we also run the validation process presented by the development team of PopulationSim, available <a class="reference external" href="https://github.com/activitysim/populationSim/tree/master/scripts">here</a>.</p>
+</section>
+<section id="example">
+<h1>Example<a class="headerlink" href="#example" title="Permalink to this heading">#</a></h1>
+<p>San Marino is one of the smallest countries in the world. As it has no data in the UN Population Division sheet, we consider its informations to be like the nearest or most similar country, in this case, Italy. The average household size and household composition are:</p>
+<a class="reference internal image-reference" href="_images/hh_descriptive.png"><img alt="_images/hh_descriptive.png" class="align-center" src="_images/hh_descriptive.png" style="width: 120.80000000000001px; height: 43.400000000000006px;" /></a>
+<p>A zone in San Marino with 4,718 inhabitants would have 611 households with 1 member (HHBASE1), 915 households with 2-3 members (HHBASE2), 419 houeholds with 4-5 members (HHBASE4), and 21 households with 6 or more members (HHBASE6). Hence we would expect 1,966 houeholds within the TAZ.</p>
+<p>As for the number od households types by region, we sum the values of HHBASE1, HHBASE2, HHBASE4, and HHBASE6 across all TAZs.</p>
+</section>
+<section id="references">
+<h1>References<a class="headerlink" href="#references" title="Permalink to this heading">#</a></h1>
+<div role="list" class="citation-list">
+<div class="citation" id="rmk2007" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">RMK2007</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1538-4632.2009.00750.x">https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1538-4632.2009.00750.x</a></p>
+</div>
+</div>
+</section>
+
+
+            </article>
+            
+            
+            
+            <footer class="bd-footer-article">
+                <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+            </footer>
+            
+          </div>
+          
+          
+          
+            <div class="bd-sidebar-secondary bd-toc">
+              
+<div class="toc-item">
+  
+<div class="tocsection onthispage">
+    <i class="fas fa-list"></i> On this page
+</div>
+<nav id="bd-toc-nav" class="page-toc">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#">
+   Synthetic Populations
+  </a>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#populationsim-controls">
+   PopulationSim Controls
+  </a>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#tradesman-model-premises">
+   Tradesman model premises
+  </a>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#example">
+   Example
+  </a>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#references">
+   References
+  </a>
+ </li>
+</ul>
+
+</nav>
+</div>
+
+<div class="toc-item">
+  
+</div>
+
+<div class="toc-item">
+  
+<div class="tocsection sourcelink">
+    <a href="_sources/synthetic_population.rst.txt">
+        <i class="fas fa-file-alt"></i> Show Source
+    </a>
+</div>
+
+</div>
+
+            </div>
+          
+          
+        </div>
+        <footer class="bd-footer-content">
+          <div class="bd-footer-content__inner">
+            
+          </div>
+        </footer>
+        
+      </main>
+    </div>
+  </div>
+
+  
+    
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/pydata-sphinx-theme.js?digest=9b1a4fa89bdd0e95b23b"></script>
+
+  <footer class="bd-footer"><div class="bd-footer__inner container">
+  
+  <div class="footer-item">
+    
+<p class="copyright">
+
+    &copy; Copyright 2022, Pedro Camargo.<br>
+
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+<p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.1.1.<br>
+</p>
+
+  </div>
+  
+</div>
+  </footer>
+  </body>
+</html>

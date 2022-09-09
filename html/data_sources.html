@@ -1,0 +1,492 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>2. Data sources &#8212; RoadAnalytics TBD documentation</title>
+  <script>
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=9b1a4fa89bdd0e95b23b" rel="stylesheet">
+<link href="_static/styles/pydata-sphinx-theme.css?digest=9b1a4fa89bdd0e95b23b" rel="stylesheet">
+
+  
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/6.1.2/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=9b1a4fa89bdd0e95b23b">
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'data_sources';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="3. Travel model" href="travel_modelling.html" />
+    <link rel="prev" title="1. Analytics models" href="build_analytics_model.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="docsearch:language" content="en">
+  </head>
+  
+  
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="180" data-default-mode="">
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__primary" id="__primary">
+  <label class="overlay overlay-primary" for="__primary"></label>
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__secondary" id="__secondary">
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+      
+<form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+    </div>
+  </div>
+
+  
+  <nav class="bd-header navbar navbar-expand-lg bd-navbar" id="navbar-main"><div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+      <span class="fas fa-bars"></span>
+  </label>
+  <div id="navbar-start">
+    
+    
+  
+
+
+<a class="navbar-brand logo" href="index.html">
+
+  
+  
+  
+  
+  
+  
+  
+
+  
+  
+    <p class="title logo__title">RoadAnalytics TBD documentation</p>
+  
+</a>
+    
+  </div>
+
+  
+  <div class="col-lg-9 navbar-header-items">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <nav class="navbar-nav">
+    <p class="sidebar-header-items__title" role="heading" aria-level="1" aria-label="Site Navigation">
+        Site Navigation
+    </p>
+    <ul id="navbar-main-elements" class="navbar-nav">
+        
+                <li class="nav-item">
+                    <a class="nav-link" href="build_analytics_model.html">
+                        Analytics models
+                    </a>
+                </li>
+                
+
+                <li class="nav-item current active">
+                    <a class="nav-link" href="#">
+                        Data sources
+                    </a>
+                </li>
+                
+
+                <li class="nav-item">
+                    <a class="nav-link" href="travel_modelling.html">
+                        Travel model
+                    </a>
+                </li>
+                
+
+                <li class="nav-item">
+                    <a class="nav-link" href="concepts.html">
+                        General concepts
+                    </a>
+                </li>
+                
+
+                <li class="nav-item">
+                    <a class="nav-link" href="use_instructions.html">
+                        Using this software
+                    </a>
+                </li>
+                
+    </ul>
+</nav>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      <div class="navbar-end-item navbar-end__search-button-container">
+        
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search">
+  <i class="fas fa-search"></i>
+</button>
+      </div>
+      
+      <div class="navbar-end-item">
+        <span class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle">
+    <a class="theme-switch" data-mode="light"><i class="fas fa-sun"></i></a>
+    <a class="theme-switch" data-mode="dark"><i class="far fa-moon"></i></a>
+    <a class="theme-switch" data-mode="auto"><i class="fas fa-adjust"></i></a>
+</span>
+      </div>
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+
+
+  
+  <div class="search-button-container--mobile">
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search">
+  <i class="fas fa-search"></i>
+</button>
+  </div>
+
+  
+  <label class="sidebar-toggle secondary-toggle" for="__secondary">
+      <span class="fas fa-outdent"></span>
+  </label>
+  
+
+</div>
+  </nav>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+      
+      <div class="navbar-center-item">
+        <nav class="navbar-nav">
+    <p class="sidebar-header-items__title" role="heading" aria-level="1" aria-label="Site Navigation">
+        Site Navigation
+    </p>
+    <ul id="navbar-main-elements" class="navbar-nav">
+        
+                <li class="nav-item">
+                    <a class="nav-link" href="build_analytics_model.html">
+                        Analytics models
+                    </a>
+                </li>
+                
+
+                <li class="nav-item current active">
+                    <a class="nav-link" href="#">
+                        Data sources
+                    </a>
+                </li>
+                
+
+                <li class="nav-item">
+                    <a class="nav-link" href="travel_modelling.html">
+                        Travel model
+                    </a>
+                </li>
+                
+
+                <li class="nav-item">
+                    <a class="nav-link" href="concepts.html">
+                        General concepts
+                    </a>
+                </li>
+                
+
+                <li class="nav-item">
+                    <a class="nav-link" href="use_instructions.html">
+                        Using this software
+                    </a>
+                </li>
+                
+    </ul>
+</nav>
+      </div>
+      
+      </div>
+    
+
+    
+    
+    <div class="sidebar-header-items__end">
+      
+      <div class="navbar-end-item">
+        <span class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle">
+    <a class="theme-switch" data-mode="light"><i class="fas fa-sun"></i></a>
+    <a class="theme-switch" data-mode="dark"><i class="far fa-moon"></i></a>
+    <a class="theme-switch" data-mode="auto"><i class="fas fa-adjust"></i></a>
+</span>
+      </div>
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+      </div>
+      
+    </div>
+    
+  </div>
+
+  
+
+  
+  <div class="sidebar-end-items sidebar-primary__section">
+    <div class="sidebar-end-items__item">
+    </div>
+  </div>
+
+      </div>
+      <main class="bd-main">
+        
+        
+        <div class="bd-content">
+          <div class="bd-article-container">
+            
+            <div class="bd-header-article">
+                
+            </div>
+            
+            
+            <article class="bd-article" role="main">
+              
+  <section id="data-sources">
+<span id="id1"></span><h1><span class="section-number">2. </span>Data sources<a class="headerlink" href="#data-sources" title="Permalink to this heading">#</a></h1>
+<p>To be included in the main portions of thisanalytics pipeline, all data sources
+have to fulfill the following requirements:</p>
+<ul class="simple">
+<li><p>Coverage: Since this pipeline is designed to be deployable for any country in
+the world, the data source must be available for the vast majority of
+countries on Earth.</p></li>
+<li><p>Openess: The data must be free, open and cannot impose excessive red-tape for
+its use</p></li>
+<li><p>Trustworthiness: The science and/or practices behind the development of
+data source must be technically transparent and robust, and have documented
+use in research and/or practice.</p></li>
+</ul>
+<section id="road-network">
+<h2><span class="section-number">2.1. </span>Road network<a class="headerlink" href="#road-network" title="Permalink to this heading">#</a></h2>
+<p>All the road network data is obtained directly from <a class="reference external" href="https://www.openstreetmap.org/">Open-Street Maps (OSM)</a>, which is the de-facto standard for
+open transportation network data. More information about it can be found on
+its <a class="reference external" href="https://www.openstreetmap.org/about">website</a>.</p>
+</section>
+<section id="point-of-interest">
+<h2><span class="section-number">2.2. </span>Point-of-Interest<a class="headerlink" href="#point-of-interest" title="Permalink to this heading">#</a></h2>
+<p>A Point-of-Interest (POI) represents a particular feature in the space, like
+churches, schools, pubs, or tourist attractions. It does not necessarily have to
+be a point, but can also be other OSM elements, such as nodes or ways.</p>
+<p>It is worth reminding that the “interest” part should not be considered too
+literaly, once a feature can be quite ordinary, such as a postbox. In this case,
+these features are usally considered <a href="#id2"><span class="problematic" id="id3">``</span></a>amenity``=*s.</p>
+<p>Amenities are useful and import facilities for visitiors and residents. More
+information on amenity values on OSM, is available <cite>in this page &lt;https://wiki.openstreetmap.org/wiki/Key:amenity&gt;</cite>.</p>
+<p>A building can also be a POI. The OSM building tag is used to identify individual
+buildings or groups of connected buildings, and can assume several values.
+More information on building values can be found in <cite>this page &lt;https://wiki.openstreetmap.org/wiki/Buildings&gt;</cite>.</p>
+</section>
+<section id="population">
+<h2><span class="section-number">2.3. </span>Population<a class="headerlink" href="#population" title="Permalink to this heading">#</a></h2>
+<p>There are currently two data sources of spatialized population that are suitable
+for use in this project.</p>
+<ol class="arabic simple">
+<li><p><a class="reference external" href="https://dataforgood.facebook.com/dfg/tools/high-resolution-population-density-maps">Meta High Resolution Population density Maps</a></p></li>
+<li><p><a class="reference external" href="https://www.worldpop.org/about">World Pop</a></p></li>
+</ol>
+<p>Both data sources provide population estimates at a very high resolution (down
+to a grid of 100x100m) and are based on extensive research and offer similar
+results at more aggregate levels (small cities or neighborhoods within a large
+city), so they are equivalent for the purposes of this analytics pipeline.</p>
+<p>However, the World Pop data includes estimates with finer detail with respect
+to population per age bracket, which can be crucial when analyzing access to
+hospital infrastructure, schools and the labor market, so we have decided
+to use that data source.</p>
+<p>The <a class="reference external" href="https://www.github/pedrocamargo/road_analytics/blob/main/model/population/all_raster_pop_age_and_sex_source.csv">list of links for download</a>
+while the data for the total population is listed on a
+<a class="reference external" href="https://www.github/pedrocamargo/road_analytics/blob/main/model/population/all_raster_pop_source.csv">separate file</a>.</p>
+<p>All the data is downloaded from the <a class="reference external" href="https://data.humdata.org/">Humanitarian Data Exchange</a>, which provides a convenient interface for data
+download.</p>
+</section>
+<section id="commuting-zones">
+<h2><span class="section-number">2.4. </span>Commuting Zones<a class="headerlink" href="#commuting-zones" title="Permalink to this heading">#</a></h2>
+<p>The Commuting zones dataset provided by Meta consists of identifying areas
+within which people live and work, which is extremely relevant for providing
+reference values for our transportation demand model, as discussed in the
+corresponding section.</p>
+<p>Data documentation can be found on its <a class="reference external" href="https://dataforgood.facebook.com/dfg/tools/commuting-zones">website</a>.</p>
+</section>
+<section id="rural-and-urban-areas">
+<h2><span class="section-number">2.5. </span>Rural and Urban Areas<a class="headerlink" href="#rural-and-urban-areas" title="Permalink to this heading">#</a></h2>
+<p>Rural and urban areas information all over the world are provided by <cite>The Global
+Rural-Urban Mapping Project (GRUMP) &lt;https://sedac.ciesin.columbia.edu/data/collection/grump-v1&gt;</cite>.
+This is a useful resource and helps us to identify the total population
+living in rural areas, and later calculating the <span class="xref std std-ref">Rural Access Index</span>.</p>
+</section>
+</section>
+
+
+            </article>
+            
+            
+            
+            <footer class="bd-footer-article">
+                <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+  <a class='left-prev' id="prev-link" href="build_analytics_model.html" title="previous page">
+      <i class="fas fa-angle-left"></i>
+      <div class="prev-next-info">
+          <p class="prev-next-subtitle">previous</p>
+          <p class="prev-next-title"><span class="section-number">1. </span>Analytics models</p>
+      </div>
+  </a>
+  <a class='right-next' id="next-link" href="travel_modelling.html" title="next page">
+  <div class="prev-next-info">
+      <p class="prev-next-subtitle">next</p>
+      <p class="prev-next-title"><span class="section-number">3. </span>Travel model</p>
+  </div>
+  <i class="fas fa-angle-right"></i>
+  </a>
+</div>
+            </footer>
+            
+          </div>
+          
+          
+          
+            <div class="bd-sidebar-secondary bd-toc">
+              
+<div class="toc-item">
+  
+<div class="tocsection onthispage">
+    <i class="fas fa-list"></i> On this page
+</div>
+<nav id="bd-toc-nav" class="page-toc">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#road-network">
+   2.1. Road network
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#point-of-interest">
+   2.2. Point-of-Interest
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#population">
+   2.3. Population
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#commuting-zones">
+   2.4. Commuting Zones
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#rural-and-urban-areas">
+   2.5. Rural and Urban Areas
+  </a>
+ </li>
+</ul>
+
+</nav>
+</div>
+
+<div class="toc-item">
+  
+</div>
+
+<div class="toc-item">
+  
+<div class="tocsection sourcelink">
+    <a href="_sources/data_sources.rst.txt">
+        <i class="fas fa-file-alt"></i> Show Source
+    </a>
+</div>
+
+</div>
+
+            </div>
+          
+          
+        </div>
+        <footer class="bd-footer-content">
+          <div class="bd-footer-content__inner">
+            
+          </div>
+        </footer>
+        
+      </main>
+    </div>
+  </div>
+
+  
+    
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/pydata-sphinx-theme.js?digest=9b1a4fa89bdd0e95b23b"></script>
+
+  <footer class="bd-footer"><div class="bd-footer__inner container">
+  
+  <div class="footer-item">
+    
+<p class="copyright">
+
+    &copy; Copyright 2022, Pedro Camargo.<br>
+
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+<p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.1.1.<br>
+</p>
+
+  </div>
+  
+</div>
+  </footer>
+  </body>
+</html>
