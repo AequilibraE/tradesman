@@ -9,6 +9,13 @@ from shapely.geometry import Polygon
 
 
 def hex_builder(coverage_area, hex_height, epsg=3857):
+    """
+    Creates hexbins that covers all project area.
+    Parameters:
+         *coverage_area*(:obj:`geopandas.GeoDataFrame`): GeoDataFrame containing country borders
+         *hex_height*(:obj:`int`): size of the hexbin size. Defaults to 200
+         *epsg*(:obj:`int`): EPSG code specifying output projection. Defaults to 3857
+    """
     # Function adapted from http://michaelminn.com/linux/mmqgis/
 
     x_left, y_bottom, x_right, y_top = coverage_area.unary_union.bounds

@@ -10,7 +10,7 @@ from tradesman.data_retrieval.import_amenities import import_amenities
 from tradesman.data_retrieval.import_building import building_import
 from tradesman.model_creation.add_country_borders import add_country_borders_to_model
 from tradesman.model_creation.create_new_tables import add_new_tables
-from tradesman.model_creation.get_country_subdivision import add_subdivisions_to_model
+from tradesman.model_creation.get_political_subdivision import add_subdivisions_to_model
 from tradesman.model_creation.import_network import import_network
 from tradesman.model_creation.import_population import import_population
 from tradesman.model_creation.pop_by_sex_and_age import get_pop_by_sex_age
