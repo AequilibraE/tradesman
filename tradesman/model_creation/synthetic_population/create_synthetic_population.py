@@ -18,7 +18,7 @@ from tradesman.model_creation.synthetic_population.unzip_seed_files import unzip
 from tradesman.model_creation.synthetic_population.user_control_import import user_change_validation_parameters
 
 
-def create_syn_pop(project: Project, model_place: str, cwd: str, thread_number=None):
+def create_syn_pop(project: Project, model_place: str, cwd: str, thread_number=None, sample_size=0.02):
     """
     Creates synthetic population to be used im Activity Based Models, using PopulationSim.
 
@@ -36,7 +36,7 @@ def create_syn_pop(project: Project, model_place: str, cwd: str, thread_number=N
 
     set_thread_number(pop_fldr, thread_number)
 
-    create_buckets(model_place, project, folder=pop_fldr, sample=0.02)
+    create_buckets(model_place, project, folder=pop_fldr, sample=sample_size)
 
     create_geo_cross_walk(project, pop_fldr)
 
@@ -84,7 +84,9 @@ def run_populationsim(project: Project, model_place: str, folder: str):
 
     user_change_validation_parameters(overwrite=False, model_place=model_place, dest_folder=pop_fldr)
 
-    subprocess.run([sys.executable, "run_populationsim.py"], cwd=pop_fldr)
+    subprocess.run(
+        [sys.executable, "run_populationsim.py"], cwd=pop_fldr, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT
+    )
 
     pd.read_csv(join(pop_fldr, "output/synthetic_persons.csv")).to_sql(
         "synthetic_persons", con=project.conn, if_exists="replace"

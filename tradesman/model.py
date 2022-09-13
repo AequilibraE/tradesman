@@ -46,12 +46,12 @@ class Tradesman:
         self.build_population_synthesizer_data()
         self.synthesize_population()
 
-    def add_country_borders(self, overwrite=False):
+    def add_country_borders(self, overwrite=False, source="gadm"):
         """Retrieves country borders from www.geoboundarries.org and adds to the model.
         Args:
                *overwrite* (:obj:`bool`): User option for overwriting data that may already e3xist in the model. Defaults to False"""
 
-        add_country_borders_to_model(self.__model_place, self._project, overwrite)
+        add_country_borders_to_model(self.__model_place, self._project, overwrite, source)
 
     def set_population_source(self, source="WorldPop"):
         """Sets the source for the raster population data
@@ -142,12 +142,12 @@ class Tradesman:
 
         building_import(self.__model_place, self._project, self.__osm_data)
 
-    def build_population_synthesizer_data(self):
+    def build_population_synthesizer_data(self, threads: None, sample=0.02):
         """
         Triggers the import of data to create the synthetic population.
         """
 
-        create_syn_pop(self._project, self.__model_place, self.__folder)
+        create_syn_pop(self._project, self.__model_place, self.__folder, threads, sample)
 
     def synthesize_population(self):
         """

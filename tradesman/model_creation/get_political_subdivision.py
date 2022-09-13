@@ -12,24 +12,48 @@ import warnings
 import urllib.request
 from os.path import join, isfile
 from tempfile import gettempdir
+from fiona import listlayers
 
 
-def get_subdivisions_gadm(model_place: str):
+def get_subdivisions_gadm(model_place: str, lvl: int):
+    """
+    Import political subdivisions from GADM.
+    Parameters:
+         *model_place*(:obj:`str`): current model place
+         *lvl*(:obj:`int`): number of political subdivisions to add
+    """
+    country_code = pycountry.countries.search_fuzzy(model_place)[0].alpha_3
 
-    url = "https://github.com/AequilibraE/tradesman/releases/download/V0.1b/subdivisions.gpkg"
+    url = f"https://geodata.ucdavis.edu/gadm/gadm4.1/gpkg/gadm41_{country_code}.gpkg"
 
-    dest_path = join(gettempdir(), "subdivisions.gpkg")
+    dest_path = join(gettempdir(), f"gadm_{country_code}.gpkg")
     if not isfile(dest_path):
         urllib.request.urlretrieve(url, dest_path)
-    level1 = gpd.read_file(dest_path, layer="level_1")
-    level1 = level1[level1.country == model_place].assign(level=1)
-    level2 = gpd.read_file(dest_path, layer="level_2")
-    level2 = level2[level2.country == model_place].assign(level=2)
 
-    return pd.concat([level1, level2])
+    if lvl >= len(listlayers(dest_path)):
+        return
+
+    levels_to_add = []
+
+    for i in range(1, lvl + 1):
+        df = gpd.read_file(dest_path, layer=f"ADM_ADM_{i}")
+        df = df[df.COUNTRY == model_place].assign(level=i)
+        df.rename(columns={"COUNTRY": "country", f"NAME_{i}": "division_name"}, inplace=True)
+        levels_to_add.append(df[["country", "division_name", "level", "geometry"]])
+
+    df = pd.concat(levels_to_add)
+    df["geom"] = gpd.GeoSeries.to_wkb(df.geometry)
+
+    return df[["country", "division_name", "level", "geom"]]
 
 
 def get_subdivisions_online(model_place: str, level: int):
+    """
+    Import political subdivisions from GeoBoundaries.
+    Parameters:
+         *model_place*(:obj:`str`): current model place
+         *lvl*(:obj:`int`): number of political subdivisions to add
+    """
     country_code = pycountry.countries.search_fuzzy(model_place)[0].alpha_3
 
     all_data = []
@@ -83,16 +107,14 @@ def add_subdivisions_to_model(project: Project, model_place: str, source: str, l
     """
     Adds subdivisions to model.
     Parameters:
-         *project*(:obj:`aequilibrae.project`):
-         *model_place*(:obj:`str`):
+         *project*(:obj:`aequilibrae.project`): currently open project
+         *model_place*(:obj:`str`): current model place
          *source*(:obj:`str`): data source to import subdivisions. Takes GADM or GeoBoundaries. Default to GADM.
          *levels_to_add(:obj:`int`): number of political subdivisions to add. Defaults to 2.
-         *overwrite*(:obj:`bool`):
+         *overwrite*(:obj:`bool`): overwrite existing political subdivisions. Defaults to False.
     """
-
-    if source.upper() == "GADM":
-        df = get_subdivisions_gadm(model_place)
-        df.rename(columns={"name": "division_name", "country": "country_name"}, inplace=True)
+    if source.lower() == "gadm":
+        df = get_subdivisions_gadm(model_place, levels_to_add)
     elif source.lower() == "geoboundaries":
         df = get_subdivisions_online(model_place, levels_to_add)
     else:

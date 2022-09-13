@@ -21,15 +21,13 @@ class TestImportSubdivision(unittest.TestCase):
     def tearDown(self) -> None:
         return super().tearDown()
 
-    @unittest.skip
     def test_import_subdivision_gadm(self):
-        self.assertGreater(len(get_subdivisions_gadm(self.model_place, level=1)), 0)
+        self.assertGreater(len(get_subdivisions_gadm(self.model_place, lvl=1)), 0)
 
     def test_import_subdivision_geoboundaries(self):
 
         self.assertGreater(len(get_subdivisions_online(self.model_place, level=1)), 0)
 
-    @unittest.skip
     def test_add_subdivisions_to_model_gadm(self):
         add_subdivisions_to_model(self.project, self.model_place, source="GADM", levels_to_add=1, overwrite=False)
 
