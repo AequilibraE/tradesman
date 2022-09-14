@@ -149,12 +149,12 @@ class Tradesman:
 
         create_syn_pop(self._project, self.__model_place, self.__folder)
 
-    def synthesize_population(self):
+    def synthesize_population(self, multithread=False, thread_number=2):
         """
         Triggers the creation of synthetic population.
         """
 
-        run_populationsim(self._project, self.__model_place, self.__folder)
+        run_populationsim(multithread, self._project, self.__folder, thread_number)
 
     def __initialize_model(self):
         if isdir(self.__folder):
