@@ -1,33 +1,32 @@
-import io
-import re
-from tempfile import tempdir
+from tempfile import gettempdir
 import zipfile
-import requests
-from os.path import join
-from bs4 import BeautifulSoup
+from os.path import join, isfile
 import geopandas as gpd
 from aequilibrae import Project
+from urllib.request import urlretrieve
+from requests import head
+import numpy as np
+
 from tradesman.data.load_zones import load_zones
 
 
 def microsoft_buildings_by_zone(model_place: str, project: Project):
 
-    url = "https://github.com/microsoft/GlobalMLBuildingFootprints"
+    url = f"https://minedbuildings.blob.core.windows.net/global-buildings/2022-07-11/{model_place}.zip"
 
-    r = requests.get(url)
-    soup = BeautifulSoup(r.text, "html.parser")
+    if head(url).status_code != 200:
+        return
 
-    if model_place in soup.find_all(string=re.compile(f"{model_place}")):
-        downloadable_link = soup.find("td", string=f"{model_place}").find_next_siblings()[1].find("a")["href"]
-    else:
-        return ValueError("There is no available data for the country in Bing database.")
+    dest_path = join(gettempdir(), f"{model_place}_bing.zip")
 
-    r = requests.get(downloadable_link)
-    z = zipfile.ZipFile(io.BytesIO(r.content))
-    filename = z.namelist()[0]
-    var = join(tempdir, z.extract(filename))
+    if not isfile(dest_path):
+        urlretrieve(url, dest_path)
 
-    model_gdf = gpd.read_file(var)
+    zf = zipfile.ZipFile(dest_path)
+
+    zf.extractall(gettempdir())
+
+    model_gdf = gpd.read_file(join(gettempdir(), f"{model_place}.geojsonl"))
 
     model_gdf["area"] = model_gdf.to_crs(3857).geometry.area
 
@@ -37,7 +36,7 @@ def microsoft_buildings_by_zone(model_place: str, project: Project):
 
     buildings_by_zone.drop(columns=["index_right"], inplace=True)
 
-    buildings_by_zone.insert(0, column="id", value=list(range(1, len(buildings_by_zone) + 1)))
+    buildings_by_zone.insert(0, column="id", value=np.arange(1, len(buildings_by_zone) + 1))
 
     buildings_by_zone["geom"] = buildings_by_zone.geometry.to_wkb()
 
