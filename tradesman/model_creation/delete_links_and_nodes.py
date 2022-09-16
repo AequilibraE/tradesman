@@ -32,7 +32,7 @@ def get_maritime_boundaries(model_place: str):
     return
 
 
-def merge_country_borders(model_place, project: Project):
+def delete_links_and_nodes(model_place, project: Project):
     """
     Removes links and nodes outside the political subdivision.
     Parameters:
