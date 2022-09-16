@@ -1,18 +1,40 @@
-def query_writer(df, tag="building", func="set_zero", is_area=False):
+def amenity_count_query(df, **kwargs):
 
     qry = "UPDATE zones SET "
 
-    for element in df.groupby(tag).count().index:
+    if "set_zero" in kwargs.values():
+        for element in df.columns[:-1]:
+            qry += f"osm_{element}_amenity=0, "
+    else:
+        for element in df.columns[:-1]:
+            qry += f"osm_{element}_amenity=?, "
 
-        if func == "set_zero" and is_area is False:
-            qry += "osm_" + element + f"_{tag}=0, "
-        elif func == "set_zero" and is_area is True:
-            qry += "osm_" + element + f"_{tag}_area=0, "
-        elif func == "set_value" and is_area is False:
-            qry += "osm_" + element + f"_{tag}=?, "
-        else:
-            qry += "osm_" + element + f"_{tag}_area=?, "
+    return qry[:-2] + " WHERE zone_id=?;"
 
-    qry = qry[:-2] + " WHERE zone_id=?;"
 
-    return qry
+def building_area_query(df, **kwargs):
+
+    qry = "UPDATE zones SET "
+
+    if "set_zero" in kwargs.values():
+        for element in df.columns[:-1]:
+            qry += f"osm_{element}_building_area=0, "
+    else:
+        for element in df.columns[:-1]:
+            qry += f"osm_{element}_building_area=ROUND(?,2), "
+
+    return qry[:-2] + " WHERE zone_id=?;"
+
+
+def building_count_query(df, **kwargs):
+
+    qry = "UPDATE zones SET "
+
+    if "set_zero" in kwargs.values():
+        for element in df.columns[:-1]:
+            qry += f"osm_{element}_building=0, "
+    else:
+        for element in df.columns[:-1]:
+            qry += f"osm_{element}_building=?, "
+
+    return qry[:-2] + " WHERE zone_id=?;"
