@@ -1,4 +1,11 @@
 def amenity_count_query(df, **kwargs):
+    """
+    Updates the values for each amenity type.
+
+    Parameters:
+         *df*(:obj:`gpd.GeoDataFrame`):
+         *func*(:obj:`srt`): if one wants to set all values as zeros.
+    """
 
     qry = "UPDATE zones SET "
 
@@ -13,6 +20,13 @@ def amenity_count_query(df, **kwargs):
 
 
 def building_area_query(df, **kwargs):
+    """
+    Updates the values for each building type area.
+
+    Parameters:
+         *df*(:obj:`gpd.GeoDataFrame`):
+         *func*(:obj:`srt`): if one wants to set all values as zeros.
+    """
 
     qry = "UPDATE zones SET "
 
@@ -27,6 +41,13 @@ def building_area_query(df, **kwargs):
 
 
 def building_count_query(df, **kwargs):
+    """
+    Updates the values for each amenity type.
+
+    Parameters:
+         *df*(:obj:`gpd.GeoDataFrame`):
+         *func*(:obj:`srt`): if one wants to set all values as zeros.
+    """
 
     qry = "UPDATE zones SET "
 

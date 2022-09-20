@@ -1,4 +1,6 @@
+import bz2
 import logging
+import pickle
 import sys
 from os.path import isdir
 
@@ -42,7 +44,7 @@ class Tradesman:
         self.build_zoning()
         self.import_pop_by_sex_and_age()
         # self.import_amenities()
-        # self.import_buildings()
+        # self.import_buildings(True)
         # self.build_population_synthesizer_data()
         # self.synthesize_population()
 
@@ -132,15 +134,15 @@ class Tradesman:
         Data will be exported as columns in zones file and as a separate SQL file.
         """
 
-        import_amenities(self.__model_place, self._project, self.__osm_data)
+        import_amenities(self._project, self.__osm_data)
 
-    def import_buildings(self):
+    def import_buildings(self, download_from_bing=True):
         """
         Triggers the import of buildings from both OSM and Microsoft Bing.
         Data will be exported as columns in zones file and as a separate SQL file.
         """
 
-        building_import(self.__model_place, self._project, self.__osm_data)
+        building_import(self.__model_place, self._project, self.__osm_data, download_from_bing)
 
     def build_population_synthesizer_data(self):
         """

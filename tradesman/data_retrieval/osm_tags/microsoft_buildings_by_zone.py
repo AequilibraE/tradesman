@@ -1,30 +1,23 @@
 from tempfile import gettempdir
-import zipfile
-from os.path import join, isfile
+from os.path import join
 import geopandas as gpd
 from aequilibrae import Project
-from urllib.request import urlretrieve
-from requests import head
 import numpy as np
 
 from tradesman.data.load_zones import load_zones
+from tradesman.data_retrieval.osm_tags.microsoft_download_file import microsoft_download_file
 
 
 def microsoft_buildings_by_zone(model_place: str, project: Project):
+    """
+    Download and saves in project informations from Microsoft Bing buildings.
 
-    url = f"https://minedbuildings.blob.core.windows.net/global-buildings/2022-07-11/{model_place}.zip"
+    Parameters:
+         *model_palce*(:obj:`str`): current model place
+         *project*(:obj:`aequilibrae.project): current project
+    """
 
-    if head(url).status_code != 200:
-        return
-
-    dest_path = join(gettempdir(), f"{model_place}_bing.zip")
-
-    if not isfile(dest_path):
-        urlretrieve(url, dest_path)
-
-    zf = zipfile.ZipFile(dest_path)
-
-    zf.extractall(gettempdir())
+    microsoft_download_file(model_place)
 
     model_gdf = gpd.read_file(join(gettempdir(), f"{model_place}.geojsonl"))
 
@@ -42,7 +35,7 @@ def microsoft_buildings_by_zone(model_place: str, project: Project):
 
     print("Saving Microsoft buildings.")
 
-    project.conn.execute("Drop TABLE IF EXISTS microsoft_buildings;")
+    project.conn.execute("DROP TABLE IF EXISTS microsoft_buildings;")
     project.conn.execute(
         'CREATE TABLE IF NOT EXISTS microsoft_buildings("id" INTEGER, "area" FLOAT, "zone_id" INTEGER);'
     )
@@ -51,7 +44,7 @@ def microsoft_buildings_by_zone(model_place: str, project: Project):
     project.conn.execute("SELECT CreateSpatialIndex( 'microsoft_buildings' , 'geometry' );")
     project.conn.commit()
 
-    qry = """INSERT into microsoft_buildings(id, area, zone_id, geometry) VALUES(?, ?, ?, CastToMulti(GeomFromWKB(?, 4326)));"""
+    qry = """INSERT INTO microsoft_buildings(id, area, zone_id, geometry) VALUES(?, ?, ?, CastToMulti(GeomFromWKB(?, 4326)));"""
     list_of_tuples = list(buildings_by_zone[["id", "area", "zone_id", "geom"]].itertuples(index=False, name=None))
     project.conn.executemany(qry, list_of_tuples)
     project.conn.commit()
