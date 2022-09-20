@@ -9,14 +9,13 @@ from tradesman.data_retrieval.osm_tags.set_bounding_boxes import bounding_boxes
 
 class TestSetBoundingBoxes(unittest.TestCase):
     def setUp(self) -> None:
-        self.folder = join(gettempdir(), uuid4().hex)
-        self.project = create_nauru_test(self.folder)
+        self.fldr = join(gettempdir(), uuid4().hex)
+        self.project = create_nauru_test(self.fldr)
 
     # def tearDown(self) -> None:
     #     return super().tearDown()
 
     def test_set_bounding_boxes(self):
-
         self.assertEqual(type(bounding_boxes(self.project, km_side=25)), list)
 
 

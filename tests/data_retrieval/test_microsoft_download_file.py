@@ -9,7 +9,6 @@ from tradesman.data_retrieval.osm_tags.microsoft_download_file import microsoft_
 
 class TestMicrosoftDownloadFile(unittest.TestCase):
     def setUp(self) -> None:
-        # self.model_place = "Vatican City"
         copy(
             src=join(abspath(dirname("tests")), "tests/data/vatican city/Vatican City_bing.zip"),
             dst=join(gettempdir(), "Vatican City_bing.zip"),

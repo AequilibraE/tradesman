@@ -3,7 +3,7 @@ from math import ceil, sqrt
 from aequilibrae.project import Project
 
 
-def __bounding_boxes(project: Project, km_side=25):
+def bounding_boxes(project: Project, km_side=25):
     """
     Creates the bounding boxes to speed-up Overpass API query.
 

@@ -34,7 +34,7 @@ def import_osm_data(tag: str, osm_data: dict, project: Project, tile_size=25):
     else:
         raise ValueError(f"No data with {tag} tag was imported.")
 
-    df["geom"] = df.apply(__point_or_polygon, axis=1)
+    df["geom"] = df.apply(point_or_polygon, axis=1)
 
     tags = df["tags"].apply(pd.Series)[[tag]]
 
@@ -59,17 +59,17 @@ def import_osm_data(tag: str, osm_data: dict, project: Project, tile_size=25):
     all_tables = [x[0] for x in project.conn.execute("SELECT name FROM sqlite_master WHERE type ='table'").fetchall()]
 
     if tag == "building" and "osm_buildings" not in all_tables:
-        __saving_buildings(tag_by_zone, project)
+        saving_buildings(tag_by_zone, project)
     elif tag == "amenity" and "osm_amenities" not in all_tables:
-        __saving_amenities(tag_by_zone, project)
+        saving_amenities(tag_by_zone, project)
 
     return tag_by_zone
 
 
-def __point_or_polygon(row):
+def point_or_polygon(row):
     """
     Write the WKB of a Point or a Polygon.
-    
+
     Parameters:
          *row*(:obj:`pd.DataFrame`): rows of a pandas' DataFrame.
     """
@@ -86,7 +86,7 @@ def __point_or_polygon(row):
         return Polygon(poly).wkb
 
 
-def __saving_buildings(tag_by_zone, project):
+def saving_buildings(tag_by_zone, project):
     """
     Saves OSM building information.
 
@@ -113,10 +113,10 @@ def __saving_buildings(tag_by_zone, project):
     project.conn.commit()
 
 
-def __saving_amenities(tag_by_zone, project):
+def saving_amenities(tag_by_zone, project):
     """
     Saves OSM amenity information.
-    
+
     Parameters:
          *tag_by_zone*(:obj:`gpd.GeoDataFrame`): GeoDataFrame containing tag information by zone.
          *project*(:obj:`aequilibrae.project): current project.

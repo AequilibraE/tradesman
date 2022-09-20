@@ -7,7 +7,7 @@ from tempfile import gettempdir
 from time import sleep
 import requests
 from aequilibrae.project import Project
-from tradesman.data_retrieval.osm_tags.set_bounding_boxes import __bounding_boxes
+from tradesman.data_retrieval.osm_tags.set_bounding_boxes import bounding_boxes
 
 
 def load_osm_data(tag: str, osm_data: dict, tile_size, queries, project: Project):
@@ -35,13 +35,14 @@ def load_osm_data(tag: str, osm_data: dict, tile_size, queries, project: Project
 
     url = "http://overpass-api.de/api/interpreter"
 
-    bboxes = __bounding_boxes(project, tile_size)
+    bboxes = bounding_boxes(project, tile_size)
 
     http_headers = requests.utils.default_headers()
     http_headers.update({"Accept-Language": "en", "format": "json"})
 
     for query in queries:
         for bbox in bboxes:
+            print(bbox, query)
             bbox_str = ",".join([str(round(x, 6)) for x in bbox])
             data = {"data": query.format(bbox_str)}
             response = requests.post(url, data=data, timeout=180, headers=http_headers)
@@ -89,6 +90,5 @@ def __load_cache(cache_name):
     Parameter:
          *cache_name*: cache file name
     """
-
     with bz2.BZ2File(cache_name, "rb") as f:
         return pickle.load(f)
