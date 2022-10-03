@@ -28,16 +28,18 @@ class TestGenericTag(unittest.TestCase):
 
     @patch("tradesman.data_retrieval.osm_tags.osm_load_data.load_osm_data")
     def test_generic_tag(self, mock_data):
-        
-        mock_data.return_value = {"amenity": [
-            {
-                "type": "node",
-                "id": 1406312122,
-                "lat": -0.5475982,
-                "lon": 166.9175851,
-                "tags": {"amenity": "police", "name": "Police"},
-            }
-        ]}
+
+        mock_data.return_value = {
+            "amenity": [
+                {
+                    "type": "node",
+                    "id": 1406312122,
+                    "lat": -0.5475982,
+                    "lon": 166.9175851,
+                    "tags": {"amenity": "police", "name": "Police"},
+                }
+            ]
+        }
         self.assertIsNotNone(
             generic_tag(tag="amenity", osm_data=self.osm_data, tile_size=25, project=self.project),
         )

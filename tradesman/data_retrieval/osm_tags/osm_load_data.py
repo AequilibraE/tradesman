@@ -42,7 +42,6 @@ def load_osm_data(tag: str, osm_data: dict, tile_size, queries, project: Project
 
     for query in queries:
         for bbox in bboxes:
-            print(bbox, query)
             bbox_str = ",".join([str(round(x, 6)) for x in bbox])
             data = {"data": query.format(bbox_str)}
             response = requests.post(url, data=data, timeout=180, headers=http_headers)

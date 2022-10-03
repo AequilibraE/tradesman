@@ -43,8 +43,8 @@ class Tradesman:
         self.import_population()
         self.build_zoning()
         self.import_pop_by_sex_and_age()
-        # self.import_amenities()
-        # self.import_buildings(True)
+        self.import_amenities()
+        self.import_buildings(True)
         # self.build_population_synthesizer_data()
         # self.synthesize_population()
 

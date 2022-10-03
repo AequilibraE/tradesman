@@ -1,12 +1,6 @@
 from aequilibrae import Project
-
-from tradesman.data_retrieval.osm_tags.import_osm_data import import_osm_data
-from tradesman.data_retrieval.osm_tags.microsoft_buildings_by_zone import (
-    microsoft_buildings_by_zone,
-)
-
-from tradesman.data_retrieval.osm_tags.microsoft_buildings_save import save_microsoft_buildings
-from tradesman.data_retrieval.osm_tags.osm_buildings_save import save_osm_buildings
+from tradesman.data_retrieval.osm_tags.import_osm_data import ImportOsmData
+from tradesman.data_retrieval.osm_tags.microsoft_building_footage import ImportMicrosoftBuildingData
 
 
 def building_import(model_place: str, project: Project, osm_data: dict, download_from_bing=True):
@@ -21,13 +15,6 @@ def building_import(model_place: str, project: Project, osm_data: dict, download
     """
 
     if download_from_bing:
-        microsoft_buildings = microsoft_buildings_by_zone(model_place, project)
+        ImportMicrosoftBuildingData(model_place, project).microsoft_buildings()
 
-    if microsoft_buildings is None:
-        pass
-    else:
-        save_microsoft_buildings(microsoft_buildings, project)
-
-    osm_buildings = import_osm_data(tag="building", osm_data=osm_data, project=project)
-
-    save_osm_buildings(osm_buildings, project)
+    ImportOsmData(tag="building", project=project, osm_data=osm_data).import_osm_data()
