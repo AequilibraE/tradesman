@@ -10,7 +10,7 @@ from tradesman.data_retrieval.osm_tags.import_osm_data import ImportOsmData
 class TestLoadOsmData(unittest.TestCase):
     def setUp(self) -> None:
         self.fldr = join(gettempdir(), uuid4().hex)
-        copytree(src=join(abspath(dirname("tests")), "tests/data/vatican city"), dst=self.fldr)
+        copytree(src=join(abspath(dirname("tests")), "data/vatican city"), dst=self.fldr)
         self.project = Project()
         self.project.open(self.fldr)
         self.osm_data = {}
