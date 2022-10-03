@@ -1,6 +1,7 @@
+from shutil import copytree
 import unittest
-from create_nauru_test import create_nauru_test
-from os.path import join
+from aequilibrae.project import Project
+from os.path import join, abspath, dirname
 from tempfile import gettempdir
 from uuid import uuid4
 
@@ -10,10 +11,10 @@ from tradesman.data_retrieval.osm_tags.set_bounding_boxes import bounding_boxes
 class TestSetBoundingBoxes(unittest.TestCase):
     def setUp(self) -> None:
         self.fldr = join(gettempdir(), uuid4().hex)
-        self.project = create_nauru_test(self.fldr)
-
-    # def tearDown(self) -> None:
-    #     return super().tearDown()
+        copytree(src=join(abspath(dirname("tests")), "tests/data/vatican city"), dst=self.fldr)
+        self.project = Project()
+        self.project.open(self.fldr)
+        self.osm_data = {}
 
     def test_set_bounding_boxes(self):
         self.assertEqual(type(bounding_boxes(self.project, km_side=25)), list)

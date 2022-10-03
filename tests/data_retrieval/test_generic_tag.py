@@ -15,6 +15,9 @@ class TestGenericTag(unittest.TestCase):
         self.project.open(self.fldr)
         self.osm_data = {}
 
+    def tearDown(self) -> None:
+        self.project.close()
+
     def test_generic_tag_amenity(self):
 
         self.assertEqual(

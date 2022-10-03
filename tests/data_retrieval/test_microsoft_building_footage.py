@@ -16,6 +16,9 @@ class TestMicrosoftBuildingFootage(unittest.TestCase):
         self.project.open(self.fldr)
         self.osm_data = {}
 
+    def tearDown(self) -> None:
+        self.project.close()
+
     @unittest.skip
     def test_microsoft_buildings(self):
 
