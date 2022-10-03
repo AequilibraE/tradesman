@@ -17,11 +17,15 @@ class TestLoadOsmData(unittest.TestCase):
 
     def test_import_osm_data_amenity(self):
 
-        self.assertGreater(len(ImportOsmData(tag="amenity", project=self.project, osm_data=self.osm_data).import_osm_data()), 0)
+        self.assertGreater(
+            len(ImportOsmData(tag="amenity", project=self.project, osm_data=self.osm_data).import_osm_data()), 0
+        )
 
     def test_import_osm_data_building(self):
 
-        self.assertGreater(len(ImportOsmData(tag="building", project=self.project, osm_data=self.osm_data).import_osm_data()), 0)
+        self.assertGreater(
+            len(ImportOsmData(tag="building", project=self.project, osm_data=self.osm_data).import_osm_data()), 0
+        )
 
     def test_import_osm_data_exception(self):
 
