@@ -1,5 +1,5 @@
 import unittest
-from tests.create_nauru_test import create_nauru_test
+from create_nauru_test import create_nauru_test
 from os.path import join
 from tempfile import gettempdir
 from uuid import uuid4
