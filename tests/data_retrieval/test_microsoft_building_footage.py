@@ -28,6 +28,7 @@ class TestMicrosoftBuildingFootage(unittest.TestCase):
 
         self.assertEqual(len(df), 1)
 
+    @unittest.skip
     def test_initialize(self):
         with self.assertRaises(FileNotFoundError) as exception_context:
             ImportMicrosoftBuildingData(model_place="Papua New Guinea", project=self.project).microsoft_buildings()

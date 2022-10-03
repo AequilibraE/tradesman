@@ -15,6 +15,9 @@ class TestLoadOsmData(unittest.TestCase):
         self.project.open(self.fldr)
         self.osm_data = {}
 
+    def tearDown(self) -> None:
+        self.project.close()
+
     def test_import_osm_data_amenity(self):
 
         self.assertGreater(
