@@ -2,6 +2,7 @@ from os import remove
 from os.path import join, abspath, dirname
 from tempfile import gettempdir
 import unittest
+
 # from aequilibrae.project import Project
 from uuid import uuid4
 from shutil import copytree, rmtree
