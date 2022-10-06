@@ -3,7 +3,7 @@ from os.path import join, abspath, dirname, exists
 from tempfile import gettempdir
 from aequilibrae.project import Project
 from uuid import uuid4
-from shutil import copytree
+from shutil import copytree, rmtree
 import pandas as pd
 from tradesman.data_retrieval.osm_tags.microsoft_building_footage import ImportMicrosoftBuildingData
 
@@ -17,9 +17,9 @@ class TestMicrosoftBuildingFootage(unittest.TestCase):
         self.osm_data = {}
 
     def tearDown(self) -> None:
-        self.project.close()
+        rmtree(self.fldr, ignore_errors=True)
 
-    @unittest.skip
+    # @unittest.skip
     def test_microsoft_buildings(self):
 
         ImportMicrosoftBuildingData(model_place="Vatican City", project=self.project).microsoft_buildings()
@@ -28,7 +28,7 @@ class TestMicrosoftBuildingFootage(unittest.TestCase):
 
         self.assertEqual(len(df), 1)
 
-    @unittest.skip
+    # @unittest.skip
     def test_initialize(self):
         with self.assertRaises(FileNotFoundError) as exception_context:
             ImportMicrosoftBuildingData(model_place="Papua New Guinea", project=self.project).microsoft_buildings()

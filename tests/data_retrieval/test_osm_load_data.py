@@ -1,5 +1,5 @@
 from os.path import join, abspath, dirname
-from shutil import copytree
+from shutil import copytree, rmtree
 from tempfile import gettempdir
 import unittest
 from uuid import uuid4
@@ -16,6 +16,9 @@ class TestLoadOsmData(unittest.TestCase):
         self.osm_data = {}
         add_new_tables(self.project.conn)
         add_country_borders_to_model("Nauru", self.project)
+
+    def tearDown(self) -> None:
+        rmtree(self.fldr, ignore_errors=True)
 
     def test_load_osm_data_amenity(self):
         tag = "amenity"

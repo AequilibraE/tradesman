@@ -1,4 +1,4 @@
-from shutil import copytree
+from shutil import copytree, rmtree
 import unittest
 from aequilibrae.project import Project
 from os.path import join, abspath, dirname
@@ -15,6 +15,9 @@ class TestSetBoundingBoxes(unittest.TestCase):
         self.project = Project()
         self.project.open(self.fldr)
         self.osm_data = {}
+
+    def tearDown(self) -> None:
+        rmtree(self.fldr, ignore_errors=True)
 
     def test_set_bounding_boxes(self):
         self.assertEqual(type(bounding_boxes(self.project, km_side=25)), list)

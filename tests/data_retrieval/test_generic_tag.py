@@ -21,8 +21,8 @@ class TestGenericTag(unittest.TestCase):
         add_new_tables(self.project.conn)
         add_country_borders_to_model("Nauru", self.project)
 
-    # def tearDown(self) -> None:
-    #     rmtree(self.fldr)
+    def tearDown(self) -> None:
+        rmtree(self.fldr, ignore_errors=True)
 
     def test_generic_tag_amenity(self):
 
