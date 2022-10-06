@@ -7,6 +7,7 @@ from os.path import dirname, join
 from tradesman.model_creation.create_new_tables import add_new_tables
 from tradesman.model_creation.import_population import import_population
 from tradesman.model_creation.add_country_borders import add_country_borders_to_model
+from tradesman.model_creation.import_political_subdivisions import ImportPoliticalSubdivisions
 
 
 def create_nauru_test(folder):
@@ -19,7 +20,8 @@ def create_nauru_test(folder):
     project = create_example(folder, "nauru")
 
     add_new_tables(project.conn)
-    add_country_borders_to_model("Nauru", project)
+    # add_country_borders_to_model("Nauru", project)
+    ImportPoliticalSubdivisions(model_place="Nauru", project=project).add_country_borders(source="gadm", overwrite=True)
     import_population(project, model_place="Nauru", source="WorldPop", overwrite=False)
 
     zones = 12
