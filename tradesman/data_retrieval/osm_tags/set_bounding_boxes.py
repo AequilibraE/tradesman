@@ -2,12 +2,12 @@ import numpy as np
 import geopandas as gpd
 import pandas as pd
 from math import ceil, sqrt
-from tradesman.model_creation.add_country_borders import get_borders_online
+from tradesman.data_retrieval.country_main_area import model_borders
 
 
 def bounding_boxes(model_place: str, km_side=25):
 
-    country = get_borders_online(model_place)
+    country = model_borders(model_place)
 
     geo_country = gpd.GeoDataFrame(
         pd.DataFrame(

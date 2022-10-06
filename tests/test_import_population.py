@@ -7,7 +7,6 @@ from aequilibrae.utils.create_example import create_example
 from tradesman.model_creation.import_political_subdivisions import ImportPoliticalSubdivisions
 from tradesman.model_creation.create_new_tables import add_new_tables
 from tradesman.model_creation.import_population import import_population
-from tradesman.model_creation.add_country_borders import add_country_borders_to_model
 
 
 class TestImportPopulation(unittest.TestCase):
@@ -16,7 +15,6 @@ class TestImportPopulation(unittest.TestCase):
         self.fldr = join(gettempdir(), uuid4().hex)
         self.project = create_example(self.fldr, "nauru")
         add_new_tables(self.project.conn)
-        # add_country_borders_to_model(self.model_place, self.project, overwrite=False)
         ImportPoliticalSubdivisions(self.model_place, self.project).add_country_borders(source="gadm", overwrite=True)
 
     def tearDown(self) -> None:
