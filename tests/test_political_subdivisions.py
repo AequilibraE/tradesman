@@ -29,7 +29,9 @@ class TestImportPoliticalSubvisions(unittest.TestCase):
         self.assertEqual(
             len(pd.read_sql("SELECT * FROM political_subdivisions WHERE level=0;", con=self.project.conn)), 1
         )
-        self.assertGreater(len(pd.read_sql("SELECT * FROM political_subdivisions WHERE level>0;", con=self.project.conn)), 2)
+        self.assertGreater(
+            len(pd.read_sql("SELECT * FROM political_subdivisions WHERE level>0;", con=self.project.conn)), 2
+        )
 
         remove(join(gettempdir(), "nru_cache_gadm.parquet"))
 
@@ -44,7 +46,9 @@ class TestImportPoliticalSubvisions(unittest.TestCase):
         self.assertEqual(
             len(pd.read_sql("SELECT * FROM political_subdivisions WHERE level=0;", con=self.project.conn)), 1
         )
-        self.assertGreater(len(pd.read_sql("SELECT * FROM political_subdivisions WHERE level>0;", con=self.project.conn)), 2)
+        self.assertGreater(
+            len(pd.read_sql("SELECT * FROM political_subdivisions WHERE level>0;", con=self.project.conn)), 2
+        )
 
         remove(join(gettempdir(), "nru_cache_geoboundaries.parquet"))
 
