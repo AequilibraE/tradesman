@@ -45,19 +45,16 @@ def create_syn_pop(project: Project, model_place: str, cwd: str, thread_number=N
     create_control_totals_meta(pop_fldr)
 
 
-def set_thread_number(folder: str, number):
+def update_thread_number(folder: str, number):
     """
     Set the number of threads to generate the synthetic population.
-    If no number of threads is provides, the program considers it as the number of threads available in your computer.
-
-    Args:
+    If no number of threads is provided, the program considers it as the number of threads available in your computer.
+    Parameters:
          *folder*(:obj:`str`): folder where the project files are.
          *number*(:obj:`int`): number of threads used. By default uses the greatest number of threads available.
-
     """
-
     count_cpu = mp.cpu_count()
-    if number is None or int(number) > count_cpu or number == 0:
+    if int(number) > count_cpu or int(number) == 0:
         number = mp.cpu_count()
     else:
         number = int(number)
@@ -70,23 +67,40 @@ def set_thread_number(folder: str, number):
     with open(join(folder, "configs/settings.yaml"), "w", encoding="utf-8") as file:
         yaml.safe_dump(doc, file, default_flow_style=False)
 
+    with open(join(folder, "configs_mp/settings.yaml"), encoding="utf-8") as file:
+        doc = yaml.full_load(file)
 
-def run_populationsim(project: Project, model_place: str, folder: str):
-    """
-    This function runs the module PopulationSim to generate synthetic populations, exports the results to the project database, and runs the validation process.
-    Args:
-         *project*:
-         *model_place*:
-         *folder*:
-    """
+    doc["num_processes"] = number
+    doc["multiprocess_steps"][1]["num_processes"] = number
 
+    with open(join(folder, "configs_mp/settings.yaml"), "w", encoding="utf-8") as file:
+        yaml.safe_dump(doc, file, default_flow_style=False)
+
+
+def run_populationsim(multithread: bool, project: Project, folder: str, thread_number=None):
+    """
+    Runs PopulationSim and exports the results to the project database.
+    Parameters:
+         *multithread*(:obj:`bool`): run PopulationSim with multi-threads. Defaults to False
+         *project*(:obj:`aequilibrae.project`): currenty open project
+         *folder*(:obj:`str`): path to folder containing population info.
+         *thread_number*(:obj:`int`): number of threads one wants to use.
+    """
     pop_fldr = join(folder, "population")
 
-    user_change_validation_parameters(overwrite=False, model_place=model_place, dest_folder=pop_fldr)
+    if multithread:
+        update_thread_number(pop_fldr, thread_number)
 
-    subprocess.run(
-        [sys.executable, "run_populationsim.py"], cwd=pop_fldr, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT
-    )
+        subprocess.run(
+            [sys.executable, "run_populationsim.py", "-c", "configs_mp", "-c", "configs"],
+            cwd=pop_fldr,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.STDOUT,
+        )
+    else:
+        subprocess.run(
+            [sys.executable, "run_populationsim.py"], cwd=pop_fldr, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT
+        )
 
     pd.read_csv(join(pop_fldr, "output/synthetic_persons.csv")).to_sql(
         "synthetic_persons", con=project.conn, if_exists="replace"
@@ -95,6 +109,19 @@ def run_populationsim(project: Project, model_place: str, folder: str):
     pd.read_csv(join(pop_fldr, "output/synthetic_households.csv")).to_sql(
         "synthetic_households", con=project.conn, if_exists="replace"
     )
+
+
+def validate_synthetic_population(model_place: str, folder: str):
+    """
+    Validates the synthetic population created.
+    Parameters:
+         *model*(:obj:`str`): current model place
+         *folder*(:obj:`str`): path to folder containing population info.
+    """
+
+    pop_fldr = join(folder, "population")
+
+    user_change_validation_parameters(overwrite=False, model_place=model_place, dest_folder=pop_fldr)
 
     validate_non_controlled_vars(model_place, pop_fldr)
 

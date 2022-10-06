@@ -1,0 +1,35 @@
+cleanup_pipeline_after_run: true
+inherit_settings: true
+models:
+- input_pre_processor
+- setup_data_structures
+- initial_seed_balancing
+- meta_control_factoring
+- final_seed_balancing
+- integerize_final_seed_weights
+- sub_balancing.geography=TAZ
+- expand_households
+- summarize
+- write_synthetic_population
+- write_data_dictionary
+- write_tables
+multiprocess: true
+multiprocess_steps:
+- begin: input_pre_processor
+  name: mp_seed_balancing
+- begin: sub_balancing.geography=TAZ
+  name: mp_sub_balancing_TAZ
+  num_processes: 5
+  slice:
+    coalesce:
+    - TAZ_weights
+    - TAZ_weights_sparse
+    except: true
+    tables:
+    - slice_crosswalk
+    - crosswalk
+- begin: expand_households
+  name: mp_summarize
+num_processes: 5
+resume_after: null
+slice_geography: TAZ
