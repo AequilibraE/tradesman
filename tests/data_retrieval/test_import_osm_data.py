@@ -20,6 +20,7 @@ class TestLoadOsmData(unittest.TestCase):
     def tearDown(self) -> None:
         rmtree(self.fldr, ignore_errors=True)
 
+    @unittest.skip
     def test_import_osm_data_amenity(self):
 
         self.assertEqual(
