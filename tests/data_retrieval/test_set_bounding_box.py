@@ -11,7 +11,7 @@ from tradesman.data_retrieval.osm_tags.set_bounding_boxes import bounding_boxes
 class TestSetBoundingBoxes(unittest.TestCase):
     def setUp(self) -> None:
         self.fldr = join(gettempdir(), uuid4().hex)
-        copytree(src=join(abspath(dirname("tests")), "tests/data/vatican city"), dst=self.fldr)
+        copytree(src=join(abspath(dirname("tests")), "tests/data/vatican city/project"), dst=self.fldr)
         self.project = Project()
         self.project.open(self.fldr)
         self.osm_data = {}

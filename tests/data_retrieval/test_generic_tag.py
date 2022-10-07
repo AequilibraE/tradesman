@@ -24,12 +24,14 @@ class TestGenericTag(unittest.TestCase):
     def tearDown(self) -> None:
         rmtree(self.fldr, ignore_errors=True)
 
+    @unittest.skip
     def test_generic_tag_amenity(self):
 
         self.assertEqual(
             type(generic_tag(tag="amenity", osm_data=self.osm_data, tile_size=25, project=self.project)), list
         )
 
+    @unittest.skip
     def test_generic_tag_building(self):
 
         self.assertEqual(
