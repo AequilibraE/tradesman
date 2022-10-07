@@ -63,7 +63,7 @@ class ImportMicrosoftBuildingData:
         )
         self._project.conn.commit()
 
-        qry = "UPDATE zones SET microsoft_building_count=?, microsoft_building_area=ROUND(?, 0) WHERE zone_id=?;"
+        qry = "UPDATE zones SET microsoft_building_count=?, microsoft_building_area=ROUND(?, 2) WHERE zone_id=?;"
         list_of_tuples = list(
             zip(
                 buildings_by_zone.groupby("zone_id").count().id.values,
