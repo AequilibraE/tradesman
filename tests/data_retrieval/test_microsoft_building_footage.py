@@ -31,6 +31,7 @@ class TestMicrosoftBuildingFootage(unittest.TestCase):
             str(exception_context.exception), "Microsoft Bing does not provide information about this region."
         )
 
+    @unittest.skip
     def test_microsoft_buildings(self):
 
         buildings = ImportMicrosoftBuildingData(model_place="Vatican City", project=self.project)

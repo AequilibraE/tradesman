@@ -32,6 +32,7 @@ class TestLoadOsmData(unittest.TestCase):
             load_osm_data(tag="amenity", osm_data=self.osm_data, queries=query, project=self.project, tile_size=25)
         )
 
+    @unittest.skip
     def test_load_osm_data_building(self):
         tag = "building"
         query = [

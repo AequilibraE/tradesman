@@ -1,11 +1,11 @@
-from os import remove
-from os.path import join, abspath, dirname
+# from os import remove
+from os.path import join
 from tempfile import gettempdir
 import unittest
 
 # from aequilibrae.project import Project
 from uuid import uuid4
-from shutil import copytree, rmtree
+from shutil import rmtree
 from aequilibrae.utils.create_example import create_example
 from tradesman.data_retrieval.osm_tags.generic_tag import generic_tag
 from tradesman.model_creation.add_country_borders import add_country_borders_to_model

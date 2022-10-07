@@ -27,12 +27,14 @@ class TestLoadOsmData(unittest.TestCase):
             len(ImportOsmData(tag="amenity", project=self.project, osm_data=self.osm_data).import_osm_data()), 0
         )
 
+    @unittest.skip
     def test_import_osm_data_building(self):
 
         self.assertEqual(
             len(ImportOsmData(tag="building", project=self.project, osm_data=self.osm_data).import_osm_data()), 0
         )
 
+    @unittest.skip
     def test_import_osm_data_exception(self):
 
         with self.assertRaises(ValueError) as exception_context:
