@@ -18,7 +18,7 @@ class TestMicrosoftBuildingFootage(unittest.TestCase):
 
     def test_initialize(self):
         pass
-        
+
     @unittest.skip
     # @mock.patch("tradesman.data_retrieval.osm_tags.microsoft_building_footage.ZipFile")
     # @mock.patch("tradesman.data_retrieval.osm_tags.microsoft_building_footage.isfile")
