@@ -1,7 +1,7 @@
 from genericpath import isfile
 from tempfile import gettempdir
 from urllib.request import urlretrieve
-import zipfile
+from zipfile import ZipFile
 import numpy as np
 import pandas as pd
 import geopandas as gpd
@@ -22,7 +22,6 @@ class ImportMicrosoftBuildingData:
         self.__country_list = pd.read_csv(join(dirname(__file__), "data/microsoft_countries_and_territories.csv"))
 
         self.__initialize()
-        self.__downloaded_file()
 
     def __initialize(self):
         if self.__country_code not in self.__country_list.iso_code.values:
@@ -34,11 +33,14 @@ class ImportMicrosoftBuildingData:
         if not isfile(self.__dest_path):
             urlretrieve(url, self.__dest_path)
 
-        zf = zipfile.ZipFile(self.__dest_path)
+        zf = ZipFile(self.__dest_path)
 
         zf.extractall(gettempdir())
 
     def microsoft_buildings(self):
+
+        self.__downloaded_file()
+
         model_gdf = gpd.read_file(join(gettempdir(), f"{self.__model_place}.geojsonl"))
 
         model_gdf["area"] = model_gdf.to_crs(3857).geometry.area
