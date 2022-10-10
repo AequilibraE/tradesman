@@ -13,6 +13,7 @@ class TestPopBySexAndAge(unittest.TestCase):
         self.fldr = join(gettempdir(), uuid4().hex)
         self.project = create_nauru_test(self.fldr)
 
+    @unittest.skip
     def test_get_pop_by_sex_age(self):
         get_pop_by_sex_age(self.project, self.model_place)
 

@@ -1,3 +1,4 @@
+import unittest
 import uuid
 from os.path import join
 from tempfile import gettempdir
@@ -16,6 +17,7 @@ class TestCountryBorders(TestCase):
     def tearDown(self) -> None:
         self.project.close()
 
+    @unittest.skip
     def test_add_borders(self):
         geo = get_borders_online("Armenia")
         self.assertGreater(geo.area, 3)
