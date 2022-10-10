@@ -4,7 +4,7 @@ from uuid import uuid4
 from os.path import join, exists
 from os import rename
 from shutil import rmtree
-from create_nauru_test import create_nauru_test
+from tests.create_nauru_test import create_nauru_test
 from tradesman.model_creation.pop_by_sex_and_age import get_pop_by_sex_age
 
 from tradesman.model_creation.synthetic_population.create_control_totals_taz import create_control_totals_taz
