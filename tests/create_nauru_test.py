@@ -17,9 +17,12 @@ def create_nauru_test(folder):
     df["geom"] = gpd.GeoSeries.to_wkb(df["geometry"])
 
     project = create_example(folder, "nauru")
-
     add_new_tables(project.conn)
-    ImportPoliticalSubdivisions(model_place="Nauru", project=project).add_country_borders(source="gadm", overwrite=True)
+
+    data = ImportPoliticalSubdivisions(model_place="Nauru", project=project, source="gadm")
+    data.import_model_area()
+    data.add_country_borders(overwrite=True)
+
     import_population(project, model_place="Nauru", source="WorldPop", overwrite=False)
 
     zones = 12

@@ -1,3 +1,4 @@
+from shutil import copy
 import sqlite3
 from tempfile import gettempdir
 import warnings
@@ -10,63 +11,54 @@ from aequilibrae.project import Project
 from os.path import join, isfile
 from shapely.geometry import Polygon, MultiPolygon
 import pycountry
-import urllib
+from urllib.request import urlretrieve
 from numpy import arange
 
 
 class ImportPoliticalSubdivisions:
-    def __init__(self, model_place: str, project: Project):
+    def __init__(self, model_place: str, source: str, project: Project):
 
         self.__model_place = model_place
         self.__search_place = model_place.lower().replace(" ", "+")
         self._project = project
-        conn = sqlite3.connect(join("project_database.sqlite"))
-        self.__all_tables = [
-            x[0] for x in conn.execute("SELECT name FROM sqlite_master WHERE type ='table'").fetchall()
-        ]
+        self._source = source
 
-        self.__initialize()
-        self._save_model_boundaries()
+        self.__source_control(self._source)
 
-    def add_country_borders(self, source: str, overwrite: bool):
-        self.__source_control(source)
+    def add_country_borders(self, overwrite: bool):
 
-        if source == "gadm":
-            data = self._gadm_search()
-        else:
-            data = self._geoboundaries_search()
+        data = self._gadm_search() if self._source == "gadm" else self._geoboundaries_search()
 
         data = data[data.level == 0]
 
-        if overwrite or "political_subdivisions" not in self.__all_tables:
+        if overwrite:
             self._project.conn.execute("DELETE FROM political_subdivisions WHERE level=0;")
             self._project.conn.commit()
 
-            sql = """INSERT INTO political_subdivisions(country_name, division_name, level, geometry)
-                        VALUES(?, ?, ?, CastToMulti(GeomFromWKB(?, 4326)));"""
-            self._project.conn.executemany(sql, list(data.itertuples(index=False, name=None)))
-            self._project.conn.commit()
+        sql = """INSERT INTO political_subdivisions(country_name, division_name, level, geometry)
+                    VALUES(?, ?, ?, CastToMulti(GeomFromWKB(?, 4326)));"""
+        self._project.conn.executemany(sql, list(data.itertuples(index=False, name=None)))
+        self._project.conn.commit()
 
-    def import_subdivisions(self, source: str, level: int, overwrite: bool):
-        self.__source_control(source)
+    def import_subdivisions(self, level: int, overwrite: bool):
 
-        data = self.__get_subdivisions(source)[["country_name", "division_name", "level", "geom"]]
+        data = self.__get_subdivisions(self._source)[["country_name", "division_name", "level", "geom"]]
         data = data[data.level > 0]
 
         level = max(data.level) if level > max(data.level) else min(data.level) + level
         data = data[data.level <= level]
         data.sort_values(by="level", ascending=True, inplace=True)
 
-        if overwrite or "political_subdivisions" not in self.__all_tables:
+        if overwrite:
             self._project.conn.execute("DELETE FROM political_subdivisions WHERE level>0;")
             self._project.conn.commit()
 
-            qry = "INSERT INTO political_subdivisions (country_name, division_name, level, geometry) \
-                VALUES(?, ?, ?, CastToMulti(GeomFromWKB(?, 4326)));"
-            list_of_tuples = list(data.itertuples(index=False, name=None))
+        qry = "INSERT INTO political_subdivisions (country_name, division_name, level, geometry) \
+            VALUES(?, ?, ?, CastToMulti(GeomFromWKB(?, 4326)));"
+        list_of_tuples = list(data.itertuples(index=False, name=None))
 
-            self._project.conn.executemany(qry, list_of_tuples)
-            self._project.conn.commit()
+        self._project.conn.executemany(qry, list_of_tuples)
+        self._project.conn.commit()
 
     def _gadm_search(self):
         gadm_url = f"https://geodata.ucdavis.edu/gadm/gadm4.1/gpkg/gadm41_{self._country_code}.gpkg"
@@ -74,7 +66,7 @@ class ImportPoliticalSubdivisions:
         dest_path = join(gettempdir(), f"gadm_{self._country_code}.gpkg")
 
         if not isfile(dest_path):
-            urllib.request.urlretrieve(gadm_url, dest_path)
+            urlretrieve(gadm_url, dest_path)
 
         layers = listlayers(dest_path)
         layers.reverse()
@@ -87,10 +79,13 @@ class ImportPoliticalSubdivisions:
                 df = gpd.read_file(dest_path, layer=i)
                 df.reset_index(inplace=True)
                 centroids = df.to_crs(3857).centroid.to_crs(4326)
-                df = df.iloc[centroids[centroids.within(self._poly)].index]
-                df = df.assign(level=counter)
-                df.rename(columns={"COUNTRY": "country_name", f"NAME_{counter}": "division_name"}, inplace=True)
-                levels_to_add.append(df[["country_name", "division_name", "level", "geometry"]])
+                gdf = df.iloc[centroids[centroids.within(self._poly)].index]
+                if len(gdf) == 0:
+                    pos = df.sindex.query(geometry=self._poly, predicate="intersects")
+                    gdf = df.iloc[pos]
+                gdf = gdf.assign(level=counter)
+                gdf.rename(columns={"COUNTRY": "country_name", f"NAME_{counter}": "division_name"}, inplace=True)
+                levels_to_add.append(gdf[["country_name", "division_name", "level", "geometry"]])
 
                 counter -= 1
             else:
@@ -151,7 +146,11 @@ class ImportPoliticalSubdivisions:
             gdf = gpd.GeoDataFrame(df, geometry=gs, crs=4326)
             if lev > 0:
                 centroids = gdf.to_crs(3857).centroid.to_crs(4326)
-                gdf = gdf.iloc[centroids[centroids.within(self._poly)].index]
+                aux = gdf.iloc[centroids[centroids.within(self._poly)].index]
+                if len(aux) == 0:
+                    pos = gdf.sindex.query(geometry=self._poly, predicate="intersects")
+                    gdf = gdf.iloc[pos]
+                all_data.append(aux)
 
             all_data.append(gdf)
 
@@ -176,7 +175,7 @@ class ImportPoliticalSubdivisions:
             ]
             return MultiPolygon([Polygon(i) for i in poly])
 
-    def __initialize(self):
+    def import_model_area(self):
 
         nom_url = f"https://nominatim.openstreetmap.org/search?q={self.__search_place}&format=json&polygon_geojson=1&addressdetails=1&accept-language=en"
 
@@ -190,21 +189,6 @@ class ImportPoliticalSubdivisions:
         self._country_code = pycountry.countries.search_fuzzy(r.json()[0]["address"]["country"])[0].alpha_3
         self._country_name = pycountry.countries.search_fuzzy(r.json()[0]["address"]["country"])[0].name
 
-    def __source_control(self, source):
-        if source not in ["gadm", "geoboundaries"]:
-            raise ValueError("Source not available")
-
-    def __get_subdivisions(self, source):
-        if source == "gadm":
-            if not isfile(join(gettempdir(), f"{self._country_code.lower()}_cache_gadm.parquet")):
-                raise ValueError("Data Source from country_borders is different from political_subdivisions.")
-            return gpd.read_parquet(join(gettempdir(), f"{self._country_code.lower()}_cache_gadm.parquet"))
-        elif source == "geoboundaries":
-            if not isfile(join(gettempdir(), f"{self._country_code.lower()}_cache_geoboundaries.parquet")):
-                raise ValueError("Data Source from country_borders is different from political_subdivisions.")
-            return gpd.read_parquet(join(gettempdir(), f"{self._country_code.lower()}_cache_geoboundaries.parquet"))
-
-    def _save_model_boundaries(self):
         df = (
             pd.DataFrame([self._poly.wkt], columns=["geometry"])
             if type(self._poly) == Polygon
@@ -223,7 +207,20 @@ class ImportPoliticalSubdivisions:
 
         self._project.conn.executemany(qry, list_of_tuples)
         self._project.conn.commit()
-        # return gdf
+
+    def __source_control(self, source):
+        if source not in ["gadm", "geoboundaries"]:
+            raise ValueError("Source not available.")
+
+    def __get_subdivisions(self, source):
+        if source == "gadm":
+            if not isfile(join(gettempdir(), f"{self._country_code.lower()}_cache_gadm.parquet")):
+                raise ValueError("Data Source from country_borders is different from political_subdivisions.")
+            return gpd.read_parquet(join(gettempdir(), f"{self._country_code.lower()}_cache_gadm.parquet"))
+        elif source == "geoboundaries":
+            if not isfile(join(gettempdir(), f"{self._country_code.lower()}_cache_geoboundaries.parquet")):
+                raise ValueError("Data Source from country_borders is different from political_subdivisions.")
+            return gpd.read_parquet(join(gettempdir(), f"{self._country_code.lower()}_cache_geoboundaries.parquet"))
 
     @property
     def country_name(self):
