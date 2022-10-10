@@ -19,7 +19,7 @@ class TestCreateGeoCrossWalk(unittest.TestCase):
 
     def tearDown(self) -> None:
         rmtree(join(gettempdir(), "data"))
-    
+
     @unittest.skip
     def test_create_geo_cross_walk(self):
 
