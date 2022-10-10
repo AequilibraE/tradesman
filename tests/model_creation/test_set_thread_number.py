@@ -52,8 +52,6 @@ class TestSetThreadNumber(unittest.TestCase):
         self.assertEqual(doc["num_processes"], 2)
         self.assertEqual(doc["multiprocess_steps"][1]["num_processes"], 2)
 
-    def test_update_thread_number_float(self):
-
     @unittest.skip
     def test_set_thread_number_float(self):
         doc = get_layout_from_path(join(self.mp_fldr, "settings.yaml"))
@@ -69,15 +67,15 @@ class TestSetThreadNumber(unittest.TestCase):
         update_thread_number(gettempdir(), number=num)
         self.assertEqual(get_layout_from_path(join(self.fldr, "settings.yaml")), {"num_processes": mp.cpu_count()})
 
-    @unittest.skip
-    def test_set_thread_number_none(self):
+    # @unittest.skip
+    # def test_set_thread_number_none(self):
 
-        set_thread_number(gettempdir(), number=None)
-        self.assertEqual(get_layout_from_path(join(self.fldr, "settings.yaml")), {"num_processes": mp.cpu_count()})
-        self.assertEqual(doc["num_processes"], mp.cpu_count())
-        self.assertEqual(doc["multiprocess_steps"][1]["num_processes"], mp.cpu_count())
+    #     doc = get_layout_from_path(join(self.mp_fldr, "settings.yaml"))
 
-    def test_update_thread_number_zero(self):
+    #     set_thread_number(gettempdir(), number=None)
+    #     self.assertEqual(get_layout_from_path(join(self.fldr, "settings.yaml")), {"num_processes": mp.cpu_count()})
+    #     self.assertEqual(doc["num_processes"], mp.cpu_count())
+    #     self.assertEqual(doc["multiprocess_steps"][1]["num_processes"], mp.cpu_count())
 
     @unittest.skip
     def test_set_thread_number_zero(self):
