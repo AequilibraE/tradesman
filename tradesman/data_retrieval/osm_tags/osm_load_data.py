@@ -70,9 +70,7 @@ def __cache_name(element: str, project: Project):
          *project*(:obj:`aequilibrae.project): current project.
     """
 
-    sql_coverage = (
-        "SELECT Hex(ST_AsBinary(st_subdivide(geometry))) as geometry FROM political_subdivisions where level=0;"
-    )
+    sql_coverage = "SELECT Hex(ST_AsBinary(geometry)) as geometry FROM political_subdivisions where level=0;"
     coverage_area = gpd.GeoDataFrame.from_postgis(sql_coverage, project.conn, geom_col="geometry", crs=4326)
     area_bounds = coverage_area.bounds.values
     m = hashlib.md5()

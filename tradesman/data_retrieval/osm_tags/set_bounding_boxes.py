@@ -12,9 +12,7 @@ def bounding_boxes(project: Project, km_side=25):
          *tile_size*(:obj:`float`): The size of the tile we want to split our area in. Defaults to 25km side.
     """
 
-    sql_coverage = (
-        "SELECT Hex(ST_AsBinary(st_subdivide(geometry))) as geometry FROM political_subdivisions where level=0;"
-    )
+    sql_coverage = "SELECT Hex(ST_AsBinary(geometry)) as geometry FROM political_subdivisions where level=0;"
 
     coverage_area = gpd.GeoDataFrame.from_postgis(sql_coverage, project.conn, geom_col="geometry", crs=4326)
 
