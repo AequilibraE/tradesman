@@ -23,6 +23,7 @@ class TestUsarChangeGeographies(unittest.TestCase):
         # remove(join(self.fldr, "settings.yaml"))
         rmtree(join(gettempdir(), "configs"))
 
+    @unittest.skip
     def test_user_change_geographies_false(self):
 
         user_change_geographies(
@@ -39,6 +40,7 @@ class TestUsarChangeGeographies(unittest.TestCase):
         self.assertEqual(doc["seed_geography"], "PUMA")
         self.assertEqual(doc["geographies"], ["REGION", "PUMA", "TAZ"])
 
+    @unittest.skip
     def test_user_change_geographies_true(self):
 
         user_change_geographies(

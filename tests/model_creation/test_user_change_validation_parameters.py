@@ -22,6 +22,7 @@ class TestUserChangeValidationParameters(unittest.TestCase):
     def tearDown(self) -> None:
         remove(join(self.fldr, "verification.yaml"))
 
+    @unittest.skip
     def test_user_change_validation_parameters_false(self):
 
         user_change_validation_parameters(overwrite=False, model_place=self.model_place, dest_folder=self.fldr)
@@ -33,6 +34,7 @@ class TestUserChangeValidationParameters(unittest.TestCase):
         self.assertEqual(doc["region"], self.model_place)
         self.assertEqual(doc["validation_dir"], "validation_results")
 
+    @unittest.skip
     def test_user_change_validation_parameters_true(self):
 
         user_change_validation_parameters(

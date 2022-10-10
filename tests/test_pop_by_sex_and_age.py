@@ -3,7 +3,7 @@ from os.path import join
 from uuid import uuid4
 from tempfile import gettempdir
 
-from tests.create_nauru_test import create_nauru_test
+from create_nauru_test import create_nauru_test
 from tradesman.model_creation.pop_by_sex_and_age import get_pop_by_sex_age
 
 

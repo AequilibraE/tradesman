@@ -25,6 +25,7 @@ class TestImportSubdivision(unittest.TestCase):
     def test_import_subdivision_gadm(self):
         self.assertGreater(len(get_subdivisions_gadm(self.model_place, level=1)), 0)
 
+    @unittest.skip
     def test_import_subdivision_geoboundaries(self):
 
         self.assertGreater(len(get_subdivisions_online(self.model_place, level=1)), 0)
@@ -37,6 +38,7 @@ class TestImportSubdivision(unittest.TestCase):
             len(self.project.conn.execute("SELECT * FROM political_subdivisions WHERE level>0;").fetchall()), 0
         )
 
+    @unittest.skip
     def test_add_subdivisions_to_model_geoboundaries(self):
 
         add_subdivisions_to_model(
@@ -47,6 +49,7 @@ class TestImportSubdivision(unittest.TestCase):
             len(self.project.conn.execute("SELECT * FROM political_subdivisions WHERE level>0;").fetchall()), 0
         )
 
+    @unittest.skip
     def test_add_subdivisions_to_model_error(self):
         with self.assertRaises(ValueError) as exception_context:
             add_subdivisions_to_model(

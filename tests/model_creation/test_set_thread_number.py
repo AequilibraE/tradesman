@@ -29,18 +29,21 @@ class TestSetThreadNumber(unittest.TestCase):
     def tearDown(self) -> None:
         rmtree(join(tempfile.gettempdir(), "configs"))
 
+    @unittest.skip
     def test_set_thread_number_integer(self):
 
         set_thread_number(gettempdir(), number=2)
 
         self.assertEqual(get_layout_from_path(join(self.fldr, "settings.yaml")), {"num_processes": 2})
 
+    @unittest.skip
     def test_set_thread_number_float(self):
 
         set_thread_number(gettempdir(), number=2.7)
 
         self.assertEqual(get_layout_from_path(join(self.fldr, "settings.yaml")), {"num_processes": 2})
 
+    @unittest.skip
     def test_set_thread_number_greater(self):
 
         num = mp.cpu_count() + 2
@@ -48,12 +51,14 @@ class TestSetThreadNumber(unittest.TestCase):
 
         self.assertEqual(get_layout_from_path(join(self.fldr, "settings.yaml")), {"num_processes": mp.cpu_count()})
 
+    @unittest.skip
     def test_set_thread_number_none(self):
 
         set_thread_number(gettempdir(), number=None)
 
         self.assertEqual(get_layout_from_path(join(self.fldr, "settings.yaml")), {"num_processes": mp.cpu_count()})
 
+    @unittest.skip
     def test_set_thread_number_zero(self):
 
         set_thread_number(gettempdir(), number=0)

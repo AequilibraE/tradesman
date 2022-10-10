@@ -50,7 +50,7 @@ jobs:
 
     - name: Runs unit tests
       run: |
-        python -m unittest discover data_retrieval -v
+        python -m unittest -v
 
   build_documentation:
     needs: linting

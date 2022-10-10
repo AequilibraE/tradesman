@@ -6,7 +6,7 @@ import unittest
 from uuid import uuid4
 import pandas as pd
 from shutil import rmtree
-from tests.create_nauru_test import create_nauru_test
+from create_nauru_test import create_nauru_test
 from tradesman.model_creation.synthetic_population.create_seeds import create_buckets
 
 
@@ -31,6 +31,7 @@ class TestCreateSeeds(unittest.TestCase):
     def tearDown(self) -> None:
         rmtree(join(gettempdir(), "data"))
 
+    @unittest.skip
     def test_create_seeds(self):
 
         create_buckets(self.model_place, self.project, gettempdir())

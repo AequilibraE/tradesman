@@ -2,7 +2,7 @@ import uuid
 from os.path import join
 from tempfile import gettempdir
 from unittest import TestCase
-from tests.create_nauru_test import create_nauru_test
+from create_nauru_test import create_nauru_test
 
 
 from tradesman.model_creation.add_country_borders import get_borders_online

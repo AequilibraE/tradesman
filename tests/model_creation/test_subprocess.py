@@ -34,6 +34,7 @@ class TestSubprocess(unittest.TestCase):
     def tearDown(self) -> None:
         rmtree(join(gettempdir(), "population"))
 
+    @unittest.skip
     def test_subprocess(self):
 
         subprocess.run(
