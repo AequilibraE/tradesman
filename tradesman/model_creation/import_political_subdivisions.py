@@ -16,16 +16,26 @@ from numpy import arange
 
 
 class ImportPoliticalSubdivisions:
+    """
+    Imports all political subdivisions into the model.
+    """
+
     def __init__(self, model_place: str, source: str, project: Project):
 
         self.__model_place = model_place
         self.__search_place = model_place.lower().replace(" ", "+")
         self._project = project
-        self._source = source
+        self._source = source.lower()
 
         self.__source_control(self._source)
 
     def add_country_borders(self, overwrite: bool):
+        """
+        Add the model's country border.
+
+        Args.:
+             *overwrite*(:obj:`bool`): re-write country borders if it already exists. Defaults to False.
+        """
 
         data = self._gadm_search() if self._source == "gadm" else self._geoboundaries_search()
 
@@ -41,6 +51,13 @@ class ImportPoliticalSubdivisions:
         self._project.conn.commit()
 
     def import_subdivisions(self, level: int, overwrite: bool):
+        """
+        Add the model's subdivisions. If the model area is smaller than the smallest geographical subdivision from GADM or geoBoundaries, it adds the upper-level geometries to the model file. Otherwise, it adds the lower-level geometries which intersect model area.
+
+        Args.:
+             *level*(:obj:`int`): number of levels to download.
+             *overwrite*(:obj:`bool`): re-write political subdivisions if it already exists. Defaults to False.
+        """
 
         data = self.__get_subdivisions(self._source)[["country_name", "division_name", "level", "geom"]]
         data = data[data.level > 0]
@@ -61,6 +78,9 @@ class ImportPoliticalSubdivisions:
         self._project.conn.commit()
 
     def _gadm_search(self):
+        """
+        Download political subdivisions from GADM.
+        """
         gadm_url = f"https://geodata.ucdavis.edu/gadm/gadm4.1/gpkg/gadm41_{self._country_code}.gpkg"
 
         dest_path = join(gettempdir(), f"gadm_{self._country_code}.gpkg")
@@ -103,7 +123,9 @@ class ImportPoliticalSubdivisions:
         return df[["country_name", "division_name", "level", "geom"]]
 
     def _geoboundaries_search(self):
-
+        """
+        Download political geometries from geoBoundaries
+        """
         counter = 5
         link_list = []
         level_list = []
@@ -165,6 +187,12 @@ class ImportPoliticalSubdivisions:
         return all_data[["country_name", "division_name", "level", "geom"]]
 
     def __geometry_type(self, dct):
+        """
+        Returns shalepy.Polygons or shapeply.MultiPolygons depending on the data type.
+
+        Args.:
+             *dct*(:obj:`dict`): dictionary with coordinates.
+        """
 
         if dct["type"] == "Polygon":
             return Polygon([(coordinate[0], coordinate[1]) for coordinate in dct["coordinates"][0]])
@@ -176,6 +204,9 @@ class ImportPoliticalSubdivisions:
             return MultiPolygon([Polygon(i) for i in poly])
 
     def import_model_area(self):
+        """
+        Add model area into project database.
+        """
 
         nom_url = f"https://nominatim.openstreetmap.org/search?q={self.__search_place}&format=json&polygon_geojson=1&addressdetails=1&accept-language=en"
 
@@ -209,23 +240,28 @@ class ImportPoliticalSubdivisions:
         self._project.conn.commit()
 
     def __source_control(self, source):
+        """Checks if the political subdivision source exists."""
         if source not in ["gadm", "geoboundaries"]:
             raise ValueError("Source not available.")
 
     def __get_subdivisions(self, source):
+        """
+        Returns the temporary file with poitical subdivisions.
+
+        Args.:
+             *source*(:obj:`str`): political subdivision source. Takes GADM or geoBoundaries.
+        """
         if source == "gadm":
-            if not isfile(join(gettempdir(), f"{self._country_code.lower()}_cache_gadm.parquet")):
-                raise ValueError("Data Source from country_borders is different from political_subdivisions.")
             return gpd.read_parquet(join(gettempdir(), f"{self._country_code.lower()}_cache_gadm.parquet"))
-        elif source == "geoboundaries":
-            if not isfile(join(gettempdir(), f"{self._country_code.lower()}_cache_geoboundaries.parquet")):
-                raise ValueError("Data Source from country_borders is different from political_subdivisions.")
+        else:
             return gpd.read_parquet(join(gettempdir(), f"{self._country_code.lower()}_cache_geoboundaries.parquet"))
 
     @property
     def country_name(self):
+        """Returns the name of the country/territory for which this model area is."""
         return self._country_name
 
     @property
     def model_place(self):
+        """Returns the name of the place for which this model was made."""
         return self.__model_place

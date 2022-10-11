@@ -19,7 +19,7 @@ def create_nauru_test(folder):
     project = create_example(folder, "nauru")
     add_new_tables(project.conn)
 
-    data = ImportPoliticalSubdivisions(model_place="Nauru", project=project, source="gadm")
+    data = ImportPoliticalSubdivisions(model_place="Nauru", project=project, source="GADM")
     data.import_model_area()
     data.add_country_borders(overwrite=True)
 

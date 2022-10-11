@@ -6,6 +6,7 @@ from tempfile import gettempdir
 from unittest import mock
 from uuid import uuid4
 import pandas as pd
+
 # from aequilibrae.utils.create_example import create_example
 from tradesman.model_creation.import_political_subdivisions import ImportPoliticalSubdivisions
 from tradesman.model_creation.create_new_tables import add_new_tables
@@ -20,20 +21,37 @@ class TestImportPoliticalSubvisions(unittest.TestCase):
         self.project.new(self.fldr)
         add_new_tables(self.project.conn)
 
-        copy(src=join(abspath(dirname("tests")), "tests/data/nauru/gadm_NRU.gpkg"), dst=join(gettempdir(), "gadm_NRU.gpkg"))
+        copy(
+            src=join(abspath(dirname("tests")), "tests/data/nauru/gadm_NRU.gpkg"),
+            dst=join(gettempdir(), "gadm_NRU.gpkg"),
+        )
 
-        self.gadm_data = ImportPoliticalSubdivisions(model_place=self.model_place, source="gadm", project=self.project)
-        self.geob_data = ImportPoliticalSubdivisions(model_place=self.model_place, source="geoboundaries", project=self.project)
+        self.gadm_data = ImportPoliticalSubdivisions(model_place=self.model_place, source="GADM", project=self.project)
+        self.geob_data = ImportPoliticalSubdivisions(
+            model_place=self.model_place, source="geoBoundaries", project=self.project
+        )
 
     def tearDown(self) -> None:
         self.project.close()
 
-    def test_import_model_area_exception(self):
-        data = ImportPoliticalSubdivisions(model_place="Charlie and the Chocolate Factory", source="gadm", project=self.project)
+    def test_import_model_area_gadm_exception(self):
+        data = ImportPoliticalSubdivisions(
+            model_place="Charlie and the Chocolate Factory", source="GADM", project=self.project
+        )
 
         with self.assertRaises(ValueError) as exception_context:
             data.import_model_area()
-        
+
+        self.assertEqual(str(exception_context.exception), "The desired model place is not available.")
+
+    def test_import_model_area_exception(self):
+        data = ImportPoliticalSubdivisions(
+            model_place="Charlie and the Chocolate Factory", source="geoBoundaries", project=self.project
+        )
+
+        with self.assertRaises(ValueError) as exception_context:
+            data.import_model_area()
+
         self.assertEqual(str(exception_context.exception), "The desired model place is not available.")
 
     def test_source_control_exception(self):

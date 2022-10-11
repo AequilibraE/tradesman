@@ -25,8 +25,6 @@ def import_population(project: Project, model_place: str, source: str, overwrite
 
     select_pop = gdf.sjoin(model_area)[["longitude", "latitude", "population"]]
 
-    select_pop.to_sql(
-        "raw_population", project.conn, if_exists="append", index=False
-    )
+    select_pop.to_sql("raw_population", project.conn, if_exists="append", index=False)
     project.conn.execute("UPDATE raw_population SET Geometry=MakePoint(longitude, latitude, 4326)")
     project.conn.commit()

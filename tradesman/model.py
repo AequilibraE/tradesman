@@ -29,16 +29,18 @@ class Tradesman:
         self.__folder = network_path
         self._project = Project()
         self.__osm_data = {}
+        self._boundaries_source = "GADM"
         self.__starts_logging()
 
         self.__initialize_model()
-        self._boundaries = ImportPoliticalSubdivisions(self.__model_place, self._project)
+        self._boundaries = ImportPoliticalSubdivisions(self.__model_place, self._boundaries_source, self._project)
 
     def create(self):
         """Creates the entire model"""
 
+        self.import_model_area()
         self.add_country_borders()
-        self.import_subdivisions("gadm", 2, True)
+        self.import_subdivisions(2)
         self.import_network()
         self.import_population()
         self.build_zoning()
@@ -48,12 +50,19 @@ class Tradesman:
         # self.build_population_synthesizer_data()
         # self.synthesize_population()
 
-    def add_country_borders(self, overwrite=False, source="gadm"):
-        """Retrieves country borders from www.geoboundarries.org and adds to the model.
-        Args:
-               *overwrite* (:obj:`bool`): User option for overwriting data that may already e3xist in the model. Defaults to False"""
+    def import_model_area(self):
+        """
+        Retrieve model area.
+        """
 
-        self._boundaries.add_country_borders(source, overwrite)
+        self._boundaries.import_model_area()
+
+    def add_country_borders(self, overwrite=False):
+        """Retrieves country borders and adds to the model.
+        Args:
+               *overwrite* (:obj:`bool`): User option for overwriting data that may already exist in the model. Defaults to False"""
+
+        self._boundaries.add_country_borders(overwrite)
 
     def set_population_source(self, source="WorldPop"):
         """Sets the source for the raster population data
@@ -67,7 +76,7 @@ class Tradesman:
         If the network already exists in the folder, it will be loaded, otherwise it will be created."""
         import_network(self._project, self.__model_place)
 
-    def import_subdivisions(self, source="gadm", subdivision_levels=2, overwrite=False):
+    def import_subdivisions(self, subdivision_levels=2, overwrite=False):
         """Imports political subdivisions.
 
         Args:
@@ -76,7 +85,7 @@ class Tradesman:
 
         """
 
-        self._boundaries.import_subdivisions(source, subdivision_levels, overwrite)
+        self._boundaries.import_subdivisions(subdivision_levels, overwrite)
 
     def import_population(self, overwrite=False):
         """
@@ -144,7 +153,7 @@ class Tradesman:
 
     #     building_import(self.__model_place, self._project, self.__osm_data)
 
-    # def build_population_synthesizer_data(self, threads: None, sample=0.02):
+    # def build_population_synthesizer_data(self, threads: None, sample=0.01):
     #     """
     #     Triggers the import of data to create the synthetic population.
     #     """

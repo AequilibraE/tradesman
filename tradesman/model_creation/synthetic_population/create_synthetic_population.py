@@ -31,7 +31,7 @@ def create_syn_pop(project: Project, model_place: str, cwd: str, thread_number=N
 
     pop_fldr = join(cwd, "population")
 
-    set_thread_number(pop_fldr, thread_number)
+    update_thread_number(pop_fldr, thread_number)
 
     create_buckets(model_place, project, folder=pop_fldr, sample=sample_size)
 
