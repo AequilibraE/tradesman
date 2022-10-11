@@ -252,9 +252,9 @@ class ImportPoliticalSubdivisions:
              *source*(:obj:`str`): political subdivision source. Takes GADM or geoBoundaries.
         """
         if source == "gadm":
-            return gpd.read_parquet(join(gettempdir(), f"{self._country_code.lower()}_cache_gadm.parquet"))
+            return gpd.read_parquet(join(gettempdir(), f"{self.__model_place}_cache_gadm.parquet"))
         else:
-            return gpd.read_parquet(join(gettempdir(), f"{self._country_code.lower()}_cache_geoboundaries.parquet"))
+            return gpd.read_parquet(join(gettempdir(), f"{self.__model_place}_cache_geoboundaries.parquet"))
 
     @property
     def country_name(self):

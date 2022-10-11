@@ -1,4 +1,5 @@
 from os import remove
+from re import U
 from shutil import copy
 import unittest
 from os.path import join, abspath, dirname
@@ -60,6 +61,7 @@ class TestImportPoliticalSubvisions(unittest.TestCase):
 
         self.assertEqual(str(exception_context.exception), "Source not available.")
 
+    # @unittest.skip
     @mock.patch("tradesman.model_creation.import_political_subdivisions.urlretrieve")
     def test_add_country_borders_gadm(self, mock_request):
         self.gadm_data.import_model_area()
@@ -78,7 +80,7 @@ class TestImportPoliticalSubvisions(unittest.TestCase):
             len(pd.read_sql("SELECT * FROM political_subdivisions WHERE level>0;", con=self.project.conn)), 1
         )
 
-        # remove(join(gettempdir(), "nru_cache_gadm.parquet"))
+        remove(join(gettempdir(), "nru_cache_gadm.parquet"))
 
     def test_add_country_borders_geoboundaries(self):
 
@@ -98,7 +100,7 @@ class TestImportPoliticalSubvisions(unittest.TestCase):
             len(pd.read_sql("SELECT * FROM political_subdivisions WHERE level>0;", con=self.project.conn)), 1
         )
 
-        # remove(join(gettempdir(), "nru_cache_geoboundaries.parquet"))
+        remove(join(gettempdir(), "nru_cache_geoboundaries.parquet"))
 
 
 if __name__ == "__name__":
