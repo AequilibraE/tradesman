@@ -25,6 +25,10 @@ All the road network data is obtained directly from `Open-Street Maps (OSM)
 open transportation network data. More information about it can be found on
 its `website <https://www.openstreetmap.org/about>`_.
 
+Political Subdivisions
+----------------------
+
+Political Subdivisions can be downloaded from either `GADM <https://gadm.org/data.html>`_  or `geoBoundaries <https://www.geoboundaries.org/>`_. Both databases are open source, and provide information with respect to countries and territories, and the existing political subdivisions that might exists.
 
 Point-of-Interest
 -----------------
@@ -86,10 +90,3 @@ corresponding section.
 Data documentation can be found on `Meta Commuting Zones website
 <https://dataforgood.facebook.com/dfg/tools/commuting-zones>`_.
 
-Rural and Urban Areas
----------------------
-
-Rural and urban areas information all over the world are provided by `The Global 
-Rural-Urban Mapping Project (GRUMP) <https://sedac.ciesin.columbia.edu/data/collection/grump-v1>`_.
-This is a useful resource and helps us to identify the total population 
-living in rural areas, and later calculating the :ref:`rural_access_index`.

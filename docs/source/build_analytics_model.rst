@@ -16,7 +16,6 @@ from the raster layers available at the  `Humanitarian Data Exchange
    * Importing population pyramid data
 
 3. Incorporating amenity and building data
-4. Calculate Rural Access Index
 
 At the end of the creation of the analytics models, the user will have a
 all their data inside and :ref:`aequilibrae` model, which is a Python-native
@@ -38,14 +37,6 @@ This step includes the following sub-steps:
   model
 * Veryfing if the network can be used for computing routes from two arbitrary
   points
-
-Use Cases enabled:
-~~~~~~~~~~~~~~~~~~
-
-* Displaying general stats regarding link types and pavement surfaces
-
-* Displaying specific stats for bridges, tolls, and tunnels and their link types
-  and pavement surfaces
 
 Incorporating population data
 _____________________________
@@ -73,8 +64,6 @@ This process includes the following steps:
   the country borders for our model
 * Importing this point layer into a *raw_population* layer inside our model
   database
-* Comparing the total vectorized population to a (`World Bank source
-  <https://data.worldbank.org/indicator/SP.POP.TOTL>`_)
 
 Importing amenity and buildings
 _______________________________
@@ -84,8 +73,7 @@ OSM. Both amenity and building information provides us useful information regard
 land-use. Later, we can use this information as an input for the trip
 generation model.
 
-Calculate Rural Access Index
-_____________________________
+Create Synthetic Population
+____________________________
 
-:ref:`RAI <rural_access_index>` is an useful index, and represents the percentage of 
-rural people who live within a two-kilometer radius from an all-seasoned road.
+
