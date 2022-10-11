@@ -9,6 +9,7 @@ from tempfile import gettempdir
 from urllib.request import urlretrieve
 import pycountry
 from aequilibrae.project.project_creation import remove_triggers, add_triggers
+import re
 
 
 def get_maritime_boundaries(model_place: str):
@@ -45,7 +46,7 @@ def is_country(model_place: str):
 
     country_name = pycountry.countries.search_fuzzy(r.json()[0]["address"]["country"])[0].name
 
-    if country_name == model_place:
+    if re.search(model_place, country_name):
         return True
     return False
 
