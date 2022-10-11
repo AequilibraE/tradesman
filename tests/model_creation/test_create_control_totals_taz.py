@@ -24,6 +24,7 @@ class TestCreateTotalsTaz(unittest.TestCase):
     def tearDown(self) -> None:
         rmtree(join(gettempdir(), "data"))
 
+    @unittest.skip
     def test_create_control_totals_taz(self):
         create_control_totals_taz(self.project, self.model_place, gettempdir())
 

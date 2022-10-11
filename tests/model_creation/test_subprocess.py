@@ -43,6 +43,7 @@ class TestSubprocess(unittest.TestCase):
     def tearDown(self) -> None:
         rmtree(self.fldr)
 
+    @unittest.skip
     def test_subprocess_false(self):
 
         run_populationsim(multithread=False, project=self.project, folder=self.project_folder, thread_number=1)
@@ -51,6 +52,7 @@ class TestSubprocess(unittest.TestCase):
 
         # self.project.close()
 
+    @unittest.skip
     def test_subprocess_true(self):
 
         run_populationsim(multithread=True, project=self.project, folder=self.project_folder, thread_number=3)

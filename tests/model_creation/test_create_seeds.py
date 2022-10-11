@@ -31,6 +31,7 @@ class TestCreateSeeds(unittest.TestCase):
     def tearDown(self) -> None:
         rmtree(join(gettempdir(), "data"))
 
+    @unittest.skip
     def test_create_seeds(self):
 
         create_buckets(self.model_place, self.project, gettempdir())
