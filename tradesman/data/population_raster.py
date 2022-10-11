@@ -6,17 +6,16 @@ import numpy as np
 import pandas as pd
 import rasterio
 from scipy.sparse import coo_matrix
+from aequilibrae import Project
 
 from tradesman.data_retrieval.country_main_area import country_border_from_model
 
 
-def population_raster(data_link, field_name, project):
-    url = data_link
+def population_raster(data_link: str, field_name: str, project: Project):
 
-    dest_path = join(gettempdir(), f"pop_{field_name}.tif")
+    dest_path = join(gettempdir(), f"{field_name}.tif")
     if not isfile(dest_path):
-        urllib.request.urlretrieve(url, dest_path)
-
+        urllib.request.urlretrieve(data_link, dest_path)
     main_area = country_border_from_model(project)
 
     dataset = rasterio.open(dest_path)

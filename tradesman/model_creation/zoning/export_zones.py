@@ -1,4 +1,10 @@
 def export_zones(zone_data, project):
+    """
+    Saves zones with population into project.
+    Parameters:
+         *zone_data*(:obj:`geopandas.GeoDataFrame`): GeoDataFrame with zones and population info
+         *project*(:obj:`aequilibrae.project`): currently open project
+    """
     max_zone = zone_data.index.max()
 
     min_node = project.conn.execute("Select min(node_id) from nodes").fetchone()[0]

@@ -6,21 +6,29 @@ import libpysal
 import numpy as np
 import pandas as pd
 from sklearn.cluster import KMeans
+from shapely.geometry import box
 
 
 def create_clusters(hexbins, max_zone_pop=10000, min_zone_pop=500):
     """
     This function creates population clusters by state.
+    Parameters:
+         *hexbins*(:obj:`geopandas.GeoDataFrame`): GeoDataFrame containing hexbins and population info
+         *max_zone_pop*(:obj:`int`): max population within a zone. Defaults to 10,000
+         *min_zone_pop*(:obj:`int`): min population within a zone. Defaults to 500
     """
 
     hexbins["zone_id"] = -1
+    centroids = hexbins.geometry.centroid
+    hexbins = hexbins.assign(x=centroids.x.values, y=centroids.y.values)
     list_states = list(hexbins.division_name.unique())
     data_store = []
     master_zone_id = 1
+    result_col_df = ["hex_id", "x", "y", "population", "division_name", "zone_id"]
     for i, division_name in enumerate(list_states):
         df = hexbins[hexbins.division_name == division_name].copy()
         df.loc[:, "zone_id"] = master_zone_id + i
-        data_store.append(df[["hex_id", "x", "y", "population", "division_name", "zone_id"]])
+        data_store.append(df[result_col_df])
 
     for cnt, df in enumerate(data_store):
         t = df.groupby(["zone_id"]).sum()
@@ -59,15 +67,9 @@ def create_clusters(hexbins, max_zone_pop=10000, min_zone_pop=500):
                 print(f"Queue for analysis: {zones_to_break} (Done: {ready} ({avg} people/zone))")
 
     df = pd.concat(data_store)[["hex_id", "zone_id"]]
-    df = pd.merge(
-        hexbins[["hex_id", "x", "y", "population", "division_name", "geometry"]],
-        df,
-        on="hex_id",
-    )
-    df = gpd.GeoDataFrame(
-        df[["hex_id", "x", "y", "population", "division_name", "zone_id"]],
-        geometry=df["geometry"],
-    )
+    cols_df = ["hex_id", "x", "y", "population", "division_name", "geometry"]
+    df = pd.merge(hexbins[cols_df], df, on="hex_id")
+    df = gpd.GeoDataFrame(df[result_col_df], geometry=df["geometry"])
 
     zoning = df.dissolve(by="zone_id")[["division_name", "geometry"]]
     pop_total = df[["zone_id", "population"]].groupby(["zone_id"]).sum()["population"]
@@ -94,7 +96,7 @@ def create_clusters(hexbins, max_zone_pop=10000, min_zone_pop=500):
 
                 closeby = []
                 for island_geo in zone_df[adj_mtx.component_labels == rmv].geometry.values:
-                    closeby.extend([x[1] for x in df.sindex.nearest(island_geo, 6)])
+                    closeby.extend([x for x in df.sindex.nearest(box(*island_geo.bounds), 6)[1]])
                 closeby = list(set(list(closeby)))
                 if not closeby:
                     failed = 1

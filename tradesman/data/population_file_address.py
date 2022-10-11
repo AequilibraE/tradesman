@@ -1,19 +1,27 @@
 from turtle import down
+from os.path import dirname, join
+import pycountry
 import pandas as pd
 
 
 def link_source(model_place: str, source="WorldPop"):
 
-    pop_path = "/home/jovyan/workspace/road_analytics/tradesman/data/population/all_raster_pop_source.csv"
-    df = pd.read_csv(pop_path)
+    country_code = pycountry.countries.search_fuzzy(model_place)[0].alpha_3
 
-    if source == "WorldPop":
+    if source.lower() == "WorldPop".lower():
 
-        return df[df.Country.str.upper() == model_place.upper()].worldpop_link.values[0]
+        return (
+            "https://data.worldpop.org/GIS/Population/Global_2000_2020/2020/"
+            + f"{country_code}/{country_code.lower()}_ppp_2020.tif"
+        )
 
-    elif source == "Meta":
+    elif source.lower() == "Meta".lower():
 
-        return df[df.Country.str.upper() == model_place.upper()].meta_link.values[0]
+        pth = dirname(__file__)
+
+        df = pd.read_csv(join(pth, "population/all_raster_pop_source.csv"))
+
+        return df[df.iso_country == country_code].meta_link.tolist()[0]
 
     else:
         raise ValueError("No population source found.")

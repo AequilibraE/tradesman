@@ -1,8 +1,8 @@
-def set_source(source):
+def set_source(source: str):
 
-    if source == "WorldPop":
+    if source.lower() == "WorldPop".lower():
         return "WorldPop"
-    elif source == "Meta":
+    elif source.lower() == "Meta".lower():
         return "Meta"
     else:
         raise ValueError("No population source found.")

@@ -1,0 +1,186 @@
+# directory of target run of PopulationSim, containing data/output directories
+popsim_dir: population
+# folder to save outputs
+validation_dir: validation_results
+scenario: Base
+region: Nauru
+geographies: data/geo_cross_walk.csv
+group_geographies:
+    - REGION
+    - PUMA
+    - TAZ
+seed_households: data/seed_households.csv
+seed_cols:
+    geog: PUMA
+    geog_weight: WGTP
+    hh_id: hh_id
+expanded_hhid: output/final_expanded_household_ids.csv
+expanded_hhid_col: hh_id
+summaries:
+    - output/final_summary_TAZ_PUMA.csv
+    - output/final_summary_TAZ.csv
+aggregate_summaries:
+    - name: Total Households
+      geography: TAZ
+      control: num_hh_control
+      result: num_hh_result
+    - name: 'Household Size: 1 person HH'
+      geography: REGION
+      control: hh_size_1_control
+      result: hh_size_1_result
+    - name: 'Household Size: 2-3 person HH'
+      geography: REGION
+      control: hh_size_2_3_control
+      result: hh_size_2_3_result
+    - name: 'Household Size: 4-5 person HH'
+      geography: REGION
+      control: hh_size_4_5_control
+      result: hh_size_4_5_result
+    - name: 'Household Size: 6+ person HH'
+      geography: REGION
+      control: hh_size_6_plus_control
+      result: hh_size_6_plus_result
+    - name: 'Male Age: 0-1 years'
+      geography: TAZ
+      control: male_1_control
+      result: male_1_result
+    - name: 'Male Age: 1-5 years'
+      geography: TAZ
+      control: male_2_control
+      result: male_2_result
+    - name: 'Male Age: 5-10 years'
+      geography: TAZ
+      control: male_3_control
+      result: male_3_result
+    - name: 'Male Age: 10-15 years'
+      geography: TAZ
+      control: male_4_control
+      result: male_4_result
+    - name: 'Male Age: 15-20 years'
+      geography: TAZ
+      control: male_5_control
+      result: male_5_result
+    - name: 'Male Age: 20-25 years'
+      geography: TAZ
+      control: male_6_control
+      result: male_6_result
+    - name: 'Male Age: 25-30 years'
+      geography: TAZ
+      control: male_7_control
+      result: male_7_result
+    - name: 'Male Age: 30-35 years'
+      geography: TAZ
+      control: male_8_control
+      result: male_8_result
+    - name: 'Male Age: 35-40 years'
+      geography: TAZ
+      control: male_9_control
+      result: male_9_result
+    - name: 'Male Age: 40-45 years'
+      geography: TAZ
+      control: male_10_control
+      result: male_10_result
+    - name: 'Male Age: 45-50 years'
+      geography: TAZ
+      control: male_11_control
+      result: male_11_result
+    - name: 'Male Age: 50-55 years'
+      geography: TAZ
+      control: male_12_control
+      result: male_12_result
+    - name: 'Male Age: 55-60 years'
+      geography: TAZ
+      control: male_13_control
+      result: male_13_result
+    - name: 'Male Age: 60-65 years'
+      geography: TAZ
+      control: male_14_control
+      result: male_14_result
+    - name: 'Male Age: 65-70 years'
+      geography: TAZ
+      control: male_15_control
+      result: male_15_result
+    - name: 'Male Age: 70-75 years'
+      geography: TAZ
+      control: male_16_control
+      result: male_16_result
+    - name: 'Male Age: 75-80 years'
+      geography: TAZ
+      control: male_17_control
+      result: male_17_result
+    - name: 'Male Age: 80+ years'
+      geography: TAZ
+      control: male_18_control
+      result: male_18_result
+    - name: 'Female Age: 0-1 years'
+      geography: TAZ
+      control: female_1_control
+      result: female_1_result
+    - name: 'Female Age: 1-5 years'
+      geography: TAZ
+      control: female_2_control
+      result: female_2_result
+    - name: 'Female Age: 5-10 years'
+      geography: TAZ
+      control: female_3_control
+      result: female_3_result
+    - name: 'Female Age: 10-15 years'
+      geography: TAZ
+      control: female_4_control
+      result: female_4_result
+    - name: 'Female Age: 15-20 years'
+      geography: TAZ
+      control: female_5_control
+      result: female_5_result
+    - name: 'Female Age: 20-25 years'
+      geography: TAZ
+      control: female_6_control
+      result: female_6_result
+    - name: 'Female Age: 25-30 years'
+      geography: TAZ
+      control: female_7_control
+      result: female_7_result
+    - name: 'Female Age: 30-35 years'
+      geography: TAZ
+      control: female_8_control
+      result: female_8_result
+    - name: 'Female Age: 35-40 years'
+      geography: TAZ
+      control: female_9_control
+      result: female_9_result
+    - name: 'Female Age: 40-45 years'
+      geography: TAZ
+      control: female_10_control
+      result: female_10_result
+    - name: 'Female Age: 45-50 years'
+      geography: TAZ
+      control: female_11_control
+      result: female_11_result
+    - name: 'Female Age: 50-55 years'
+      geography: TAZ
+      control: female_12_control
+      result: female_12_result
+    - name: 'Female Age: 55-60 years'
+      geography: TAZ
+      control: female_13_control
+      result: female_13_result
+    - name: 'Female Age: 60-65 years'
+      geography: TAZ
+      control: female_14_control
+      result: female_14_result
+    - name: 'Female Age: 65-70 years'
+      geography: TAZ
+      control: female_15_control
+      result: female_15_result
+    - name: 'Female Age: 70-75 years'
+      geography: TAZ
+      control: female_16_control
+      result: female_16_result
+    - name: 'Female Age: 75-80 years'
+      geography: TAZ
+      control: female_17_control
+      result: female_17_result
+    - name: 'Female Age: 80+ years'
+      geography: TAZ
+      control: female_18_control
+      result: female_18_result

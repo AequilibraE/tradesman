@@ -31,6 +31,27 @@ jobs:
         run: black --check .
 
 
+  unit_tests:
+    needs: linting
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.9
+    - name: Install dependencies
+      run: |
+        python -m pip install setuptools --upgrade
+        sudo apt-get install libsqlite3-mod-spatialite
+        sudo apt-get install -y libspatialite-dev
+        sudo ln -s /usr/lib/x86_64-linux-gnu/mod_spatialite.so /usr/lib/x86_64-linux-gnu/mod_spatialite
+        pip install -r tests/requirements_test.txt
+
+    - name: Runs unit tests
+      run: |
+        python -m unittest
+
   build_documentation:
     needs: linting
     runs-on: ubuntu-latest
@@ -45,16 +66,17 @@ jobs:
         sudo apt-get install -y pandoc
         python -m pip install setuptools --upgrade
         python -m pip install sphinx-gallery --user
-        python -m pip install wheel spatialite poetry
+        python -m pip install wheel spatialite
         sudo apt-get install libsqlite3-mod-spatialite
         sudo apt-get install -y libspatialite-dev
         sudo ln -s /usr/lib/x86_64-linux-gnu/mod_spatialite.so /usr/lib/x86_64-linux-gnu/mod_spatialite
-        poetry install
+        pip install -r tests/requirements_test.txt
+        pip install -r docs/requirements_docs.txt
 
     - name: Builds documentation
       run: |
         cd docs
-        poetry run sphinx-build -b html source build
+        make html
 
     - name: Keeps documentation on GitHub
       uses: actions/upload-artifact@v2
@@ -62,13 +84,13 @@ jobs:
         name: documentation
         path: docs/build/
         if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn`
-
-#    - name: Deploy 🚀
-#      if: github.event_name == 'push'
-#      uses: JamesIves/github-pages-deploy-action@4.1.4
-#      with:
-#        branch: gh-pages # The branch the action should deploy to.
-#        folder: docs/build # The folder the action should deploy.
+        
+    - name: Deploy 🚀
+      if: github.event_name == 'push'
+      uses: JamesIves/github-pages-deploy-action@4.1.4
+      with:
+        branch: gh-pages # The branch the action should deploy to.
+        folder: docs/build/html # The folder the action should deploy.
 
   builds_package:
     needs: build_documentation
