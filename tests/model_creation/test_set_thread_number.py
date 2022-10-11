@@ -41,6 +41,7 @@ class TestSetThreadNumber(unittest.TestCase):
         rmtree(join(tempfile.gettempdir(), "configs"))
         rmtree(join(tempfile.gettempdir(), "configs_mp"))
 
+    @unittest.skip
     def test_update_thread_number_integer(self):
 
         update_thread_number(gettempdir(), number=2)
@@ -51,6 +52,7 @@ class TestSetThreadNumber(unittest.TestCase):
         self.assertEqual(doc["num_processes"], 2)
         self.assertEqual(doc["multiprocess_steps"][1]["num_processes"], 2)
 
+    @unittest.skip
     def test_update_thread_number_float(self):
 
         update_thread_number(gettempdir(), number=2.7)
@@ -61,6 +63,7 @@ class TestSetThreadNumber(unittest.TestCase):
         self.assertEqual(doc["num_processes"], 2)
         self.assertEqual(doc["multiprocess_steps"][1]["num_processes"], 2)
 
+    @unittest.skip
     def test_update_thread_number_greater(self):
 
         num = mp.cpu_count() + 2
@@ -72,6 +75,7 @@ class TestSetThreadNumber(unittest.TestCase):
         self.assertEqual(doc["num_processes"], mp.cpu_count())
         self.assertEqual(doc["multiprocess_steps"][1]["num_processes"], mp.cpu_count())
 
+    @unittest.skip
     def test_update_thread_number_zero(self):
 
         update_thread_number(gettempdir(), number=0)

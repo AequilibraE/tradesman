@@ -22,7 +22,7 @@ class TestImportPoliticalSubvisions(unittest.TestCase):
         add_new_tables(self.project.conn)
 
         copy(
-            src=join(abspath(dirname("tests")), "tests/data/nauru/gadm_NRU.gpkg"),
+            src=join(abspath(dirname("tests")), "data/nauru/gadm_NRU.gpkg"),
             dst=join(gettempdir(), "gadm_NRU.gpkg"),
         )
 
@@ -78,7 +78,7 @@ class TestImportPoliticalSubvisions(unittest.TestCase):
             len(pd.read_sql("SELECT * FROM political_subdivisions WHERE level>0;", con=self.project.conn)), 1
         )
 
-        remove(join(gettempdir(), "nru_cache_gadm.parquet"))
+        # remove(join(gettempdir(), "nru_cache_gadm.parquet"))
 
     def test_add_country_borders_geoboundaries(self):
 
@@ -98,7 +98,7 @@ class TestImportPoliticalSubvisions(unittest.TestCase):
             len(pd.read_sql("SELECT * FROM political_subdivisions WHERE level>0;", con=self.project.conn)), 1
         )
 
-        remove(join(gettempdir(), "nru_cache_geoboundaries.parquet"))
+        # remove(join(gettempdir(), "nru_cache_geoboundaries.parquet"))
 
 
 if __name__ == "__name__":
