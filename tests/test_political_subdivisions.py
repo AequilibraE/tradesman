@@ -22,7 +22,7 @@ class TestImportPoliticalSubvisions(unittest.TestCase):
         add_new_tables(self.project.conn)
 
         copy(
-            src=join(abspath(dirname("tests")), "data/nauru/gadm_NRU.gpkg"),
+            src=join(abspath(dirname("tests")), "tests/data/nauru/gadm_NRU.gpkg"),
             dst=join(gettempdir(), "gadm_NRU.gpkg"),
         )
 
