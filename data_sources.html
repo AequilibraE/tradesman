@@ -140,11 +140,26 @@
                 
 
                 <li class="nav-item">
+                    <a class="nav-link" href="synthetic_population.html">
+                        Synthetic Populations
+                    </a>
+                </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                <li class="nav-item">
                     <a class="nav-link" href="use_instructions.html">
                         Using this software
                     </a>
                 </li>
                 
+                </div>
+            </div>
+            
     </ul>
 </nav>
       </div>
@@ -240,11 +255,26 @@
                 
 
                 <li class="nav-item">
+                    <a class="nav-link" href="synthetic_population.html">
+                        Synthetic Populations
+                    </a>
+                </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                <li class="nav-item">
                     <a class="nav-link" href="use_instructions.html">
                         Using this software
                     </a>
                 </li>
                 
+                </div>
+            </div>
+            
     </ul>
 </nav>
       </div>
@@ -297,14 +327,14 @@
               
   <section id="data-sources">
 <span id="id1"></span><h1><span class="section-number">2. </span>Data sources<a class="headerlink" href="#data-sources" title="Permalink to this heading">#</a></h1>
-<p>To be included in the main portions of thisanalytics pipeline, all data sources
+<p>To be included in the main portions of this analytics pipeline, all data sources
 have to fulfill the following requirements:</p>
 <ul class="simple">
 <li><p>Coverage: Since this pipeline is designed to be deployable for any country in
 the world, the data source must be available for the vast majority of
 countries on Earth.</p></li>
 <li><p>Openess: The data must be free, open and cannot impose excessive red-tape for
-its use</p></li>
+its use.</p></li>
 <li><p>Trustworthiness: The science and/or practices behind the development of
 data source must be technically transparent and robust, and have documented
 use in research and/or practice.</p></li>
@@ -315,22 +345,26 @@ use in research and/or practice.</p></li>
 open transportation network data. More information about it can be found on
 its <a class="reference external" href="https://www.openstreetmap.org/about">website</a>.</p>
 </section>
+<section id="political-subdivisions">
+<h2><span class="section-number">2.2. </span>Political Subdivisions<a class="headerlink" href="#political-subdivisions" title="Permalink to this heading">#</a></h2>
+<p>Political Subdivisions can be downloaded from either <a class="reference external" href="https://gadm.org/data.html">GADM</a>  or <a class="reference external" href="https://www.geoboundaries.org/">geoBoundaries</a>. Both databases are open source, and provide information with respect to countries and territories, and the existing political subdivisions that might exists.</p>
+</section>
 <section id="point-of-interest">
-<h2><span class="section-number">2.2. </span>Point-of-Interest<a class="headerlink" href="#point-of-interest" title="Permalink to this heading">#</a></h2>
+<h2><span class="section-number">2.3. </span>Point-of-Interest<a class="headerlink" href="#point-of-interest" title="Permalink to this heading">#</a></h2>
 <p>A Point-of-Interest (POI) represents a particular feature in the space, like
 churches, schools, pubs, or tourist attractions. It does not necessarily have to
 be a point, but can also be other OSM elements, such as nodes or ways.</p>
 <p>It is worth reminding that the “interest” part should not be considered too
 literaly, once a feature can be quite ordinary, such as a postbox. In this case,
-these features are usally considered <a href="#id2"><span class="problematic" id="id3">``</span></a>amenity``=*s.</p>
+these features are usally considered <code class="docutils literal notranslate"><span class="pre">amenity</span></code>=*s.</p>
 <p>Amenities are useful and import facilities for visitiors and residents. More
-information on amenity values on OSM, is available <cite>in this page &lt;https://wiki.openstreetmap.org/wiki/Key:amenity&gt;</cite>.</p>
+information on amenity values on OSM, is available <a class="reference external" href="https://wiki.openstreetmap.org/wiki/Key:amenity">in this page</a>.</p>
 <p>A building can also be a POI. The OSM building tag is used to identify individual
 buildings or groups of connected buildings, and can assume several values.
-More information on building values can be found in <cite>this page &lt;https://wiki.openstreetmap.org/wiki/Buildings&gt;</cite>.</p>
+More information on building values can be found in <a class="reference external" href="https://wiki.openstreetmap.org/wiki/Buildings">this page</a>.</p>
 </section>
 <section id="population">
-<h2><span class="section-number">2.3. </span>Population<a class="headerlink" href="#population" title="Permalink to this heading">#</a></h2>
+<h2><span class="section-number">2.4. </span>Population<a class="headerlink" href="#population" title="Permalink to this heading">#</a></h2>
 <p>There are currently two data sources of spatialized population that are suitable
 for use in this project.</p>
 <ol class="arabic simple">
@@ -352,19 +386,12 @@ while the data for the total population is listed on a
 download.</p>
 </section>
 <section id="commuting-zones">
-<h2><span class="section-number">2.4. </span>Commuting Zones<a class="headerlink" href="#commuting-zones" title="Permalink to this heading">#</a></h2>
+<h2><span class="section-number">2.5. </span>Commuting Zones<a class="headerlink" href="#commuting-zones" title="Permalink to this heading">#</a></h2>
 <p>The Commuting zones dataset provided by Meta consists of identifying areas
 within which people live and work, which is extremely relevant for providing
 reference values for our transportation demand model, as discussed in the
 corresponding section.</p>
-<p>Data documentation can be found on its <a class="reference external" href="https://dataforgood.facebook.com/dfg/tools/commuting-zones">website</a>.</p>
-</section>
-<section id="rural-and-urban-areas">
-<h2><span class="section-number">2.5. </span>Rural and Urban Areas<a class="headerlink" href="#rural-and-urban-areas" title="Permalink to this heading">#</a></h2>
-<p>Rural and urban areas information all over the world are provided by <cite>The Global
-Rural-Urban Mapping Project (GRUMP) &lt;https://sedac.ciesin.columbia.edu/data/collection/grump-v1&gt;</cite>.
-This is a useful resource and helps us to identify the total population
-living in rural areas, and later calculating the <span class="xref std std-ref">Rural Access Index</span>.</p>
+<p>Data documentation can be found on <a class="reference external" href="https://dataforgood.facebook.com/dfg/tools/commuting-zones">Meta Commuting Zones website</a>.</p>
 </section>
 </section>
 
@@ -412,23 +439,23 @@ living in rural areas, and later calculating the <span class="xref std std-ref">
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#political-subdivisions">
+   2.2. Political Subdivisions
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#point-of-interest">
-   2.2. Point-of-Interest
+   2.3. Point-of-Interest
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#population">
-   2.3. Population
+   2.4. Population
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#commuting-zones">
-   2.4. Commuting Zones
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#rural-and-urban-areas">
-   2.5. Rural and Urban Areas
+   2.5. Commuting Zones
   </a>
  </li>
 </ul>

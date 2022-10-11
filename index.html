@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>1 Road Analytics &#8212; RoadAnalytics TBD documentation</title>
+    <title>1 Tradesman &#8212; RoadAnalytics TBD documentation</title>
   <script>
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
@@ -139,11 +139,26 @@
                 
 
                 <li class="nav-item">
+                    <a class="nav-link" href="synthetic_population.html">
+                        Synthetic Populations
+                    </a>
+                </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                <li class="nav-item">
                     <a class="nav-link" href="use_instructions.html">
                         Using this software
                     </a>
                 </li>
                 
+                </div>
+            </div>
+            
     </ul>
 </nav>
       </div>
@@ -239,11 +254,26 @@
                 
 
                 <li class="nav-item">
+                    <a class="nav-link" href="synthetic_population.html">
+                        Synthetic Populations
+                    </a>
+                </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                <li class="nav-item">
                     <a class="nav-link" href="use_instructions.html">
                         Using this software
                     </a>
                 </li>
                 
+                </div>
+            </div>
+            
     </ul>
 </nav>
       </div>
@@ -294,41 +324,14 @@
             
             <article class="bd-article" role="main">
               
-  <section id="road-analytics">
-<h1><span class="sectnum">1 </span>Road Analytics<a class="headerlink" href="#road-analytics" title="Permalink to this heading">#</a></h1>
-<p>The Road Analytics pipeline has been developed to implement the vision laid out
-on <a class="reference external" href="https://docs.google.com/document/d/1AugI7_AiD2v-ES_actmseHsFMmi-oMdLxGF2YAcv5XY">Geospatial Planning &amp; Budgeting Platform (GPBP) Transport sector use cases</a>.</p>
-<p>Its main objective is to provide a set of tools that are:</p>
-<ol class="arabic simple">
-<li><p>Reproducible</p></li>
-<li><p>Accessible</p></li>
-<li><p>Cloud-capable</p></li>
-<li><p>Easily-deployable</p></li>
-<li><p>Accessible to non-programmers</p></li>
-</ol>
-<p>And that provide capabilities for:</p>
-<ol class="arabic simple">
-<li><p>Generating visualizations of analytics models and its results</p></li>
-<li><p>Estimating transport network demand based on Population and open-data PoI</p></li>
-<li><p>Incorporating mobility data (vehicle GPS data and LBS)</p></li>
-<li><dl class="simple">
-<dt>A variety of use-cases</dt><dd><ul class="simple">
-<li><p>Fast summary statistics for transport networks</p></li>
-<li><p>Network resilience to disruptions with respect to access to critical
-infrastructure</p></li>
-<li><p>Descriptive population analytics</p></li>
-<li><p>Rural Access Index (RAI)</p></li>
-</ul>
-</dd>
-</dl>
-</li>
-</ol>
+  <section id="tradesman">
+<h1><span class="sectnum">1 </span>Tradesman<a class="headerlink" href="#tradesman" title="Permalink to this heading">#</a></h1>
+<p>Tradesman is a package for building transport models from open data sources. You can easily download network data from OpenStreetMap, import population, and build zones. It is also possible to download information related to female and male population per age bracket, as well as import amenities and building information from OpenStreetMap. An modulo for building synthetic population from the model data is also provided.</p>
 <p>This analytics pipeline is organized in sections for ease of use, and some
 expertise in transportation planning/modelling/forecasting may be useful when
 utilizing some of the more advanced analysis.</p>
-<p>It is also noteworthy that this pipeline was designed to handle whole-of-country
-data, mas little modification would be required to work only with sub-country
-or even multi-country data.</p>
+<p>It is also noteworthy that this pipeline was designed to handle both whole-of-country
+data, but smaller areas, such as states or cities, for example.</p>
 <p>Finally, the pipeline has been tightly integrated with a few data sources, and
 while that allows for fast deployment for any region on Earth, it also makes it
 somewhat complex to incorporate bespoke data sources.</p>
@@ -340,15 +343,15 @@ somewhat complex to incorporate bespoke data sources.</p>
 <li class="toctree-l2"><a class="reference internal" href="build_analytics_model.html#building-the-road-network-model">1.1. Building the road network model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="build_analytics_model.html#incorporating-population-data">1.2. Incorporating population data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="build_analytics_model.html#importing-amenity-and-buildings">1.3. Importing amenity and buildings</a></li>
-<li class="toctree-l2"><a class="reference internal" href="build_analytics_model.html#calculate-rural-access-index">1.4. Calculate Rural Access Index</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build_analytics_model.html#create-synthetic-population">1.4. Create Synthetic Population</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="data_sources.html">2. Data sources</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="data_sources.html#road-network">2.1. Road network</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_sources.html#point-of-interest">2.2. Point-of-Interest</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_sources.html#population">2.3. Population</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_sources.html#commuting-zones">2.4. Commuting Zones</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_sources.html#rural-and-urban-areas">2.5. Rural and Urban Areas</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_sources.html#political-subdivisions">2.2. Political Subdivisions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_sources.html#point-of-interest">2.3. Point-of-Interest</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_sources.html#population">2.4. Population</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_sources.html#commuting-zones">2.5. Commuting Zones</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="travel_modelling.html">3. Travel model</a><ul>
@@ -358,12 +361,15 @@ somewhat complex to incorporate bespoke data sources.</p>
 <li class="toctree-l1"><a class="reference internal" href="concepts.html">4. General concepts</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="concepts.html#step-models">4.1. 4-step models</a></li>
 <li class="toctree-l2"><a class="reference internal" href="concepts.html#road-networks-model">4.2. Road Networks model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="concepts.html#rural-access-index">4.3. Rural Access Index</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="use_instructions.html">5. Using this software</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="use_instructions.html#saturn-cloud">5.1. Saturn Cloud</a></li>
-<li class="toctree-l2"><a class="reference internal" href="use_instructions.html#hidden-functions">5.2. “Hidden functions”</a></li>
+<li class="toctree-l1"><a class="reference internal" href="synthetic_population.html">5. Synthetic Populations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="synthetic_population.html#populationsim-controls">6. PopulationSim Controls</a></li>
+<li class="toctree-l1"><a class="reference internal" href="synthetic_population.html#tradesman-model-premises">7. Tradesman model premises</a></li>
+<li class="toctree-l1"><a class="reference internal" href="synthetic_population.html#example">8. Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="synthetic_population.html#references">9. References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="use_instructions.html">10. Using this software</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="use_instructions.html#usage">10.1. Usage</a></li>
 </ul>
 </li>
 </ul>

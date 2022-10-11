@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>5. Using this software &#8212; RoadAnalytics TBD documentation</title>
+    <title>10. Using this software &#8212; RoadAnalytics TBD documentation</title>
   <script>
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
@@ -41,7 +41,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'use_instructions';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="4. General concepts" href="concepts.html" />
+    <link rel="prev" title="5. Synthetic Populations" href="synthetic_population.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="docsearch:language" content="en">
   </head>
@@ -138,12 +138,27 @@
                 </li>
                 
 
+                <li class="nav-item">
+                    <a class="nav-link" href="synthetic_population.html">
+                        Synthetic Populations
+                    </a>
+                </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
                 <li class="nav-item current active">
                     <a class="nav-link" href="#">
                         Using this software
                     </a>
                 </li>
                 
+                </div>
+            </div>
+            
     </ul>
 </nav>
       </div>
@@ -238,12 +253,27 @@
                 </li>
                 
 
+                <li class="nav-item">
+                    <a class="nav-link" href="synthetic_population.html">
+                        Synthetic Populations
+                    </a>
+                </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
                 <li class="nav-item current active">
                     <a class="nav-link" href="#">
                         Using this software
                     </a>
                 </li>
                 
+                </div>
+            </div>
+            
     </ul>
 </nav>
       </div>
@@ -295,46 +325,29 @@
             <article class="bd-article" role="main">
               
   <section id="using-this-software">
-<span id="use-instructions"></span><h1><span class="section-number">5. </span>Using this software<a class="headerlink" href="#using-this-software" title="Permalink to this heading">#</a></h1>
-<p>These Jupyter Notebooks can be run locally or in the Cloud (we recommend using
-<a class="reference external" href="https://saturncloud.io/">SaturnCloud</a> , although Google Colab should be
-powerful enough for very small countries), and we provide the documentation for
-running it in both the Saturn Cloud and locally [TODO].</p>
-<section id="saturn-cloud">
-<h2><span class="section-number">5.1. </span>Saturn Cloud<a class="headerlink" href="#saturn-cloud" title="Permalink to this heading">#</a></h2>
-<p>We have no association with Saturn Cloud whatsoever, but we have found their
-cloud offering to be the most capable and user-friendly of all alternatives
-currently on the market.</p>
-<p>To set up Saturn Cloud, you should <cite>sign up &lt;https://saturncloud.io/&gt;</cite> first. If you do not have an account,
-you should create one first, otherwise, you can just login. The next step is creating
-a resource (aka environment) so we can execute the package. When setting up your
-resource, make sure to include the following Python libs, otherwise we cannot assure
-the complete functionality of the package.</p>
-<ul class="simple">
-<li><p>aequilibrae</p></li>
-<li><p>openmatrix</p></li>
-<li><p>geopandas</p></li>
-<li><p>pyarrow</p></li>
-<li><p>numpy v. 1.22.3</p></li>
-<li><p>folium</p></li>
-<li><p>rasterio</p></li>
-<li><p>rtree</p></li>
-<li><p>libpysal v. 4.3.0</p></li>
+<span id="use-instructions"></span><h1><span class="section-number">10. </span>Using this software<a class="headerlink" href="#using-this-software" title="Permalink to this heading">#</a></h1>
+<p>Tradesman is a Python package that lets you build transportation models. You can
+build transportation networks importing data from OSM, import political sub-divisions,
+population information, amenities, and building information, as well as create zones.
+At the end, the user will have all their data inside and <a class="reference internal" href="concepts.html#aequilibrae"><span class="std std-ref">AequilibraE</span></a> model,
+which is a Python-native transport modelling software. In turn, all files used in
+AequilibraE are open-format (SQLite, Spatialite) and can be used by virtually any
+current data and GIS software/platform available.</p>
+<section id="usage">
+<h2><span class="section-number">10.1. </span>Usage<a class="headerlink" href="#usage" title="Permalink to this heading">#</a></h2>
+<p>To get started with Tradesman, read its user reference and work through its examples
+repo for introductory usage demonstrations and sample code.</p>
+<p>Tradesman is built on top of AequilibraE and interacts with OpenStreetMap’s API to:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Download transportation networks for any country in the world</p></li>
+<li><p>Import population information from WorldPop and Meta Data for Good sources</p></li>
+<li><p>Create transportation zones and aggregate population into each zone</p></li>
+<li><p>Import population by age and sex for any country in the world</p></li>
+<li><p>Import amenities and building information to find more information on land-use</p></li>
+<li><p>Estimate the rural population livin within two kilometers from an all-seasoned road</p></li>
 </ul>
-<p>Also, when setting up Saturn Cloud, it is possible to choose one of many disk spaces.
-For most small countries, a 40 GB disk memory should be enough.</p>
-</section>
-<section id="hidden-functions">
-<h2><span class="section-number">5.2. </span>“Hidden functions”<a class="headerlink" href="#hidden-functions" title="Permalink to this heading">#</a></h2>
-<p>Many of the steps and processes developed as part of this analytics pipeline
-can be be either convoluted or technically complex (sometimes both), and that
-has the potential of confusing users that are less comfortable with programming.</p>
-<p>For this reason, we have removed all purely technical processes from the
-Juypyter notebooks in favor of self-contained functions that accompany the
-notebooks shipped with this analytics pipeline, but that the user can simply use
-and not interact with, as they do with any Python library being used.</p>
-<p>These “hidden functions” are organized inside the aptly named folder
-<em>functions</em>, alongside the jupyter notebooks.</p>
+</div></blockquote>
 </section>
 </section>
 
@@ -346,11 +359,11 @@ and not interact with, as they do with any Python library being used.</p>
             <footer class="bd-footer-article">
                 <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-  <a class='left-prev' id="prev-link" href="concepts.html" title="previous page">
+  <a class='left-prev' id="prev-link" href="synthetic_population.html" title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
           <p class="prev-next-subtitle">previous</p>
-          <p class="prev-next-title"><span class="section-number">4. </span>General concepts</p>
+          <p class="prev-next-title"><span class="section-number">5. </span>Synthetic Populations</p>
       </div>
   </a>
 </div>
@@ -370,13 +383,8 @@ and not interact with, as they do with any Python library being used.</p>
 <nav id="bd-toc-nav" class="page-toc">
     <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#saturn-cloud">
-   5.1. Saturn Cloud
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#hidden-functions">
-   5.2. “Hidden functions”
+  <a class="reference internal nav-link" href="#usage">
+   10.1. Usage
   </a>
  </li>
 </ul>
