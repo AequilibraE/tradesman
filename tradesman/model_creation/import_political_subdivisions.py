@@ -118,7 +118,7 @@ class ImportPoliticalSubdivisions:
 
         df["geom"] = gpd.GeoSeries.to_wkb(df.geometry)
 
-        df.to_parquet(join(gettempdir(), f"{self._country_code.lower()}_cache_gadm.parquet"))
+        df.to_parquet(join(gettempdir(), f"{self.__model_place}_cache_gadm.parquet"))
 
         return df[["country_name", "division_name", "level", "geom"]]
 
@@ -182,7 +182,7 @@ class ImportPoliticalSubdivisions:
             all_data.set_index("idx", inplace=True)
             all_data.at[0, "division_name"] = "country_border"
 
-        all_data.to_parquet(join(gettempdir(), f"{self._country_code.lower()}_cache_geoboundaries.parquet"))
+        all_data.to_parquet(join(gettempdir(), f"{self.__model_place}_cache_geoboundaries.parquet"))
 
         return all_data[["country_name", "division_name", "level", "geom"]]
 
