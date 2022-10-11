@@ -80,7 +80,7 @@ class TestImportPoliticalSubvisions(unittest.TestCase):
             len(pd.read_sql("SELECT * FROM political_subdivisions WHERE level>0;", con=self.project.conn)), 1
         )
 
-        remove(join(gettempdir(), "nru_cache_gadm.parquet"))
+        # remove(join(gettempdir(), "nru_cache_gadm.parquet"))
 
     def test_add_country_borders_geoboundaries(self):
 
@@ -100,7 +100,7 @@ class TestImportPoliticalSubvisions(unittest.TestCase):
             len(pd.read_sql("SELECT * FROM political_subdivisions WHERE level>0;", con=self.project.conn)), 1
         )
 
-        remove(join(gettempdir(), "nru_cache_geoboundaries.parquet"))
+        # remove(join(gettempdir(), "nru_cache_geoboundaries.parquet"))
 
 
 if __name__ == "__name__":
