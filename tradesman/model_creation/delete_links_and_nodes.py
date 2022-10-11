@@ -2,6 +2,7 @@ import geopandas as gpd
 import pandas as pd
 import numpy as np
 from aequilibrae.project import Project
+import requests
 from shapely.geometry import Polygon
 from os.path import join, isfile
 from tempfile import gettempdir
@@ -32,6 +33,23 @@ def get_maritime_boundaries(model_place: str):
     return
 
 
+def is_country(model_place: str):
+
+    search_place = model_place.lower().replace(" ", "+")
+
+    nom_url = (
+        f"https://nominatim.openstreetmap.org/search?q={search_place}&format=json&addressdetails=1&accept-language=en"
+    )
+
+    r = requests.get(nom_url)
+
+    country_name = pycountry.countries.search_fuzzy(r.json()[0]["address"]["country"])[0].name
+
+    if country_name == model_place:
+        return True
+    return False
+
+
 def delete_links_and_nodes(model_place, project: Project):
     """
     Removes links and nodes outside the political subdivision.
@@ -39,6 +57,9 @@ def delete_links_and_nodes(model_place, project: Project):
          *model_place*(:obj:`str`):
          *project*(:obj:`aequilibrae.project.Project`): currently open project
     """
+
+    if not is_country(model_place):
+        return
 
     coast = get_maritime_boundaries(model_place)
 
