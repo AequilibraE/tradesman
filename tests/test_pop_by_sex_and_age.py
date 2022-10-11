@@ -23,7 +23,7 @@ class TestPopBySexAndAge(unittest.TestCase):
         self.project.close()
         self.mock_raster.stop()
         self.mock_sjoin.stop()
-    
+
     @unittest.skip
     def test_get_pop_by_sex_age(self):
         get_pop_by_sex_age(self.project, self.model_place)
