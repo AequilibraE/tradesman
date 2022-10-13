@@ -27,14 +27,12 @@ class TestUserChangeControls(unittest.TestCase):
         rmtree(join(gettempdir(), "configs"))
         rmtree(join(gettempdir(), "destination"))
 
-    @unittest.skip
     def test_user_change_controls_false(self):
         user_change_controls(overwrite=False)
 
         self.assertTrue(exists(join(self.src, "controls.csv")))
         self.assertFalse(exists(join(self.dest, "configs/controls.csv")))
 
-    @unittest.skip
     def test_user_change_controls_true(self):
         user_change_controls(
             overwrite=True,

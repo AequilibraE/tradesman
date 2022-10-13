@@ -27,7 +27,6 @@ class TestUserImportNewSeeds(unittest.TestCase):
         rmtree(join(gettempdir(), "data"))
         rmtree(join(gettempdir(), "destination"))
 
-    @unittest.skip
     def test_user_import_new_seeds_false(self):
         user_import_new_seeds(
             overwrite=False,
@@ -41,7 +40,6 @@ class TestUserImportNewSeeds(unittest.TestCase):
         self.assertFalse(exists(join(self.dest, "data/seed_households.csv")))
         self.assertTrue(exists(join(self.src, "seed_households.csv")))
 
-    @unittest.skip
     def test_user_import_new_seeds_true(self):
         user_import_new_seeds(
             overwrite=True,

@@ -13,7 +13,6 @@ class TestSaveSyntheticPersons(unittest.TestCase):
         self.project = create_example(self.fldr, "nauru")
         self.pop_fldr = join(abspath(dirname("tests")), "tests/data/nauru/population")
 
-    @unittest.skip
     def test_save_synthetic_persons(self):
 
         pd.read_csv(join(self.pop_fldr, "output/synthetic_persons.csv")).to_sql(

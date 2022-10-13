@@ -22,7 +22,6 @@ class TestCreateTotalsMeta(unittest.TestCase):
     def tearDown(self) -> None:
         rmtree(join(gettempdir(), "data"))
 
-    @unittest.skip
     def test_create_totals_meta(self):
 
         create_control_totals_meta(gettempdir())

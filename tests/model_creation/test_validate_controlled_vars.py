@@ -35,7 +35,6 @@ class TestValidateControlledVars(unittest.TestCase):
     def tearDown(self) -> None:
         rmtree(join(gettempdir(), "population"))
 
-    @unittest.skip
     def test_validate_controlled_vars(self):
 
         validate_controlled_vars(self.fldr)

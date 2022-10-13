@@ -23,7 +23,6 @@ class TestUserChangeSettings(unittest.TestCase):
         # remove(join(self.fldr, "settings.yaml"))
         rmtree(join(gettempdir(), "configs"))
 
-    @unittest.skip
     def test_user_change_settings_false(self):
         user_change_settings(
             overwrite=False, household_settings=["FULFP"], persons_settings=["CIT", "DDRS"], dest_folder=self.fldr
@@ -36,7 +35,6 @@ class TestUserChangeSettings(unittest.TestCase):
         self.assertNotIn("CIT", doc["output_synthetic_population"]["persons"]["columns"])
         self.assertNotIn("DDRS", doc["output_synthetic_population"]["persons"]["columns"])
 
-    @unittest.skip
     def test_user_change_settings_true(self):
 
         user_change_settings(

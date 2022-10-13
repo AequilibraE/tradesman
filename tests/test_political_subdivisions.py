@@ -1,17 +1,19 @@
+import unittest
 from os import remove
+from os.path import abspath, dirname, join
 from re import U
 from shutil import copy
-import unittest
-from os.path import join, abspath, dirname
 from tempfile import gettempdir
 from unittest import mock
 from uuid import uuid4
+
 import pandas as pd
+from aequilibrae.project import Project
+
+from tradesman.model_creation.create_new_tables import add_new_tables
 
 # from aequilibrae.utils.create_example import create_example
 from tradesman.model_creation.import_political_subdivisions import ImportPoliticalSubdivisions
-from tradesman.model_creation.create_new_tables import add_new_tables
-from aequilibrae.project import Project
 
 
 class TestImportPoliticalSubvisions(unittest.TestCase):
@@ -61,7 +63,7 @@ class TestImportPoliticalSubvisions(unittest.TestCase):
 
         self.assertEqual(str(exception_context.exception), "Source not available.")
 
-    # @unittest.skip
+    #
     @mock.patch("tradesman.model_creation.import_political_subdivisions.urlretrieve")
     def test_add_country_borders_gadm(self, mock_request):
         self.gadm_data.import_model_area()

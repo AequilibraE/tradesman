@@ -1,8 +1,8 @@
 import unittest
 from os.path import join
+from tempfile import gettempdir
 from unittest import mock
 from uuid import uuid4
-from tempfile import gettempdir
 
 from tests.create_nauru_test import create_nauru_test
 from tradesman.model_creation.pop_by_sex_and_age import get_pop_by_sex_age
@@ -24,7 +24,6 @@ class TestPopBySexAndAge(unittest.TestCase):
         self.mock_raster.stop()
         self.mock_sjoin.stop()
 
-    @unittest.skip
     def test_get_pop_by_sex_age(self):
         get_pop_by_sex_age(self.project, self.model_place)
 

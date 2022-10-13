@@ -36,7 +36,6 @@ class TestUserImportNewTotals(unittest.TestCase):
         rmtree(join(gettempdir(), "data"))
         rmtree(join(gettempdir(), "destination"))
 
-    @unittest.skip
     def test_user_import_new_totals_false(self):
         user_import_new_totals(
             overwrite=False,
@@ -53,7 +52,6 @@ class TestUserImportNewTotals(unittest.TestCase):
         self.assertFalse(exists(join(self.dest, "data/control_totals_meta.csv")))
         self.assertTrue(exists(join(self.src, "geo_cross_walk.csv")))
 
-    @unittest.skip
     def test_user_import_new_totals_true(self):
         user_import_new_totals(
             overwrite=True,
