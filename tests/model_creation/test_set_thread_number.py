@@ -8,8 +8,7 @@ from tempfile import gettempdir
 
 import yaml
 
-from tradesman.model_creation.synthetic_population.create_synthetic_population import \
-    update_thread_number
+from tradesman.model_creation.synthetic_population.create_synthetic_population import update_thread_number
 
 LAYOUT = """num_processes: 1
 multiprocess_steps:
@@ -54,7 +53,7 @@ class TestSetThreadNumber(unittest.TestCase):
         self.assertEqual(doc["multiprocess_steps"][1]["num_processes"], 2)
 
     def test_set_thread_number_float(self):
-        
+
         update_thread_number(gettempdir(), number=2.5)
 
         doc = get_layout_from_path(join(self.mp_fldr, "settings.yaml"))
@@ -72,7 +71,7 @@ class TestSetThreadNumber(unittest.TestCase):
         self.assertEqual(get_layout_from_path(join(self.fldr, "settings.yaml")), {"num_processes": mp.cpu_count()})
 
     def test_set_thread_number_zero(self):
-        
+
         update_thread_number(gettempdir(), number=0)
 
         doc = get_layout_from_path(join(self.mp_fldr, "settings.yaml"))

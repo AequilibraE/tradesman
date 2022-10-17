@@ -7,7 +7,10 @@ from aequilibrae.utils.create_example import create_example
 
 from tradesman.model_creation.create_new_tables import add_new_tables
 from tradesman.model_creation.get_political_subdivision import (
-    add_subdivisions_to_model, get_subdivisions_gadm, get_subdivisions_online)
+    add_subdivisions_to_model,
+    get_subdivisions_gadm,
+    get_subdivisions_online,
+)
 
 
 class TestImportSubdivision(unittest.TestCase):

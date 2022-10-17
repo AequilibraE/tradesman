@@ -4,8 +4,7 @@ from os.path import abspath, dirname, exists, join
 from shutil import copy, rmtree
 from tempfile import gettempdir, mkdtemp
 
-from tradesman.model_creation.synthetic_population.user_control_import import \
-    user_import_new_totals
+from tradesman.model_creation.synthetic_population.user_control_import import user_import_new_totals
 
 
 class TestUserImportNewTotals(unittest.TestCase):
