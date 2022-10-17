@@ -1,15 +1,12 @@
-from aequilibrae.project import Project
-import pandas as pd
-import numpy as np
-from shapely.geometry import Point, Polygon
 import geopandas as gpd
+import numpy as np
+import pandas as pd
+from aequilibrae.project import Project
+from shapely.geometry import Point, Polygon
 
 from tradesman.data.load_zones import load_zones
 from tradesman.data_retrieval.osm_tags.generic_tag import generic_tag
-from tradesman.data_retrieval.osm_tags.osm_tag_values import (
-    building_values,
-    amenity_values,
-)
+from tradesman.data_retrieval.osm_tags.osm_tag_values import amenity_values, building_values
 
 
 class ImportOsmData:
@@ -79,7 +76,7 @@ class ImportOsmData:
         # For small geographical regions, some zones can have zero buildings and/or amenitites
         # So we execute the following query to replace NaN values in zones table by zeros
         zero_counts = [i for i in np.arange(1, len(self.__zones) + 1) if i not in counting_table.zone_id.values]
-        count_qry = f"UPDATE zones SET osm_{self.__tag}_count=0 WHERE osm_{self.__tag}_count IS NULL;"
+        count_qry = f"UPDATE zones SET osm_{self.__tag}_count=0 WHERE zone_id=?;"
         self._project.conn.executemany(count_qry, list((x,) for x in zero_counts))
         self._project.conn.commit()
 
@@ -98,7 +95,7 @@ class ImportOsmData:
 
             zero_area = [i for i in np.arange(1, len(self.__zones) + 1) if i not in area_table.zone_id.values]
             # area_qry = area_query(area_table, func="set_zero")
-            area_qry = "UPDATE zones SET osm_building_area=0 WHERE osm_building_area IS NULL;"
+            area_qry = "UPDATE zones SET osm_building_area=0 WHERE zone_id=?"
             self._project.conn.executemany(area_qry, list((x,) for x in zero_area))
             self._project.conn.commit()
 
@@ -126,6 +123,7 @@ class ImportOsmData:
 
         self._project.conn.executemany(qry, list_of_tuples)
         self._project.conn.commit()
+
         return tag_by_zone
 
     def __initialize(self):

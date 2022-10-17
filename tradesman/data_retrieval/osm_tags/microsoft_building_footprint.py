@@ -1,12 +1,12 @@
-from genericpath import isfile
+import gzip
+from os.path import isfile, join
 from tempfile import gettempdir
 from urllib.request import urlretrieve
-from zipfile import ZipFile
+
+import geopandas as gpd
 import numpy as np
 import pandas as pd
-import geopandas as gpd
-import pycountry
-from os.path import join, dirname
+import requests
 from aequilibrae.project import Project
 
 from tradesman.data.load_zones import load_zones
@@ -17,31 +17,41 @@ class ImportMicrosoftBuildingData:
         self.__model_place = model_place
         self._project = project
         self.__zones = load_zones(project)
-        self.__country_code = pycountry.countries.search_fuzzy(model_place)[0].alpha_3
-        self.__dest_path = join(gettempdir(), f"{self.__country_code}_bing.zip")
-        self.__country_list = pd.read_csv(join(dirname(__file__), "data/microsoft_countries_and_territories.csv"))
+        self.__country_list = pd.read_csv(
+            "https://raw.githubusercontent.com/microsoft/GlobalMLBuildingFootprints/main/dataset-links.csv"
+        )
+
+        self.__country_name = self.__nominatim_get_name()
 
         self.__initialize()
 
+    def __nominatim_get_name(self):
+        nom_url = f"https://nominatim.openstreetmap.org/search?q={self.__model_place}&format=json&polygon_geojson=1&addressdetails=1&accept-language=en"
+
+        r = requests.get(nom_url)
+
+        return r.json()[0]["address"]["country"]
+
     def __initialize(self):
-        if self.__country_code not in self.__country_list.iso_code.values:
+        if self.__country_name not in self.__country_list.Location.values:
             raise FileNotFoundError("Microsoft Bing does not provide information about this region.")
-
-    def __downloaded_file(self):
-        url = self.__country_list[self.__country_list.iso_code == self.__country_code].url.values[0]
-
-        if not isfile(self.__dest_path):
-            urlretrieve(url, self.__dest_path)
-
-        zf = ZipFile(self.__dest_path)
-
-        zf.extractall(gettempdir())
 
     def microsoft_buildings(self):
 
-        self.__downloaded_file()
+        url = self.__country_list[self.__country_list.Location == self.__country_name].Url.values
 
-        model_gdf = gpd.read_file(join(gettempdir(), f"{self.__model_place}.geojsonl"))
+        frame_list = []
+
+        for i in range(len(url)):
+            dest_path = join(gettempdir(), f"{self.__country_name}_{i}_bing.gz")
+
+            if not isfile(dest_path):
+                urlretrieve(url[i], dest_path)
+
+            with gzip.open(dest_path, "rb") as file:
+                frame_list.append(gpd.read_file(file))
+
+        model_gdf = pd.concat(frame_list)
 
         model_gdf["area"] = model_gdf.to_crs(3857).geometry.area
 

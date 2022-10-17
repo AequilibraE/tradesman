@@ -1,18 +1,27 @@
+import unittest
 from os.path import join
 from tempfile import gettempdir
-import unittest
+from unittest import mock
 from uuid import uuid4
-from aequilibrae.utils.create_example import create_example
+
+from tests.create_nauru_test import create_nauru_test
 from tradesman.data_retrieval.osm_tags.osm_load_data import load_osm_data
-from tradesman.model_creation.add_country_borders import add_country_borders_to_model
-from tradesman.model_creation.create_new_tables import add_new_tables
 
 
 class TestLoadOsmData(unittest.TestCase):
     def setUp(self) -> None:
-        self.project = create_example(join(gettempdir(), uuid4().hex), "nauru")
-        add_new_tables(self.project.conn)
-        add_country_borders_to_model("Nauru", self.project)
+        self.project = create_nauru_test(join(gettempdir(), uuid4().hex))
+
+        self.mock_bbox = mock.patch("tradesman.data_retrieval.osm_tags.osm_load_data.bounding_boxes")
+        self.mock_requests = mock.patch("tradesman.data_retrieval.osm_tags.osm_load_data.requests")
+
+        self.mock_bbox.start()
+        self.mock_requests.start()
+
+    def tearDown(self) -> None:
+        self.project.close()
+        self.mock_bbox.stop()
+        self.mock_requests.stop()
 
     def test_load_osm_data_amenity(self):
         tag = "amenity"

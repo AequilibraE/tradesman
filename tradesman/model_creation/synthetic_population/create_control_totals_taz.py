@@ -1,8 +1,7 @@
-import csv
-from os.path import join, dirname
-from os import pardir
-import pandas as pd
+from os.path import dirname, join
+
 import geopandas as gpd
+import pandas as pd
 import pycountry
 from aequilibrae.project import Project
 

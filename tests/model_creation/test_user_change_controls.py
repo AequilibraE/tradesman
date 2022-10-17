@@ -1,20 +1,20 @@
-from os import remove, rename
-from os.path import join, exists, abspath, dirname
+import unittest
+from os import rename
+from os.path import abspath, dirname, exists, join
 from shutil import copy, rmtree
 from tempfile import gettempdir, mkdtemp
-import unittest
-from webbrowser import get
 
-from tradesman.model_creation.synthetic_population.user_control_import import user_change_controls
+from tradesman.model_creation.synthetic_population.user_control_import import \
+    user_change_controls
 
 
 class TestUserChangeControls(unittest.TestCase):
     def setUp(self) -> None:
-        temp_src = mkdtemp()
+        temp_src = mkdtemp(dir=gettempdir())
         self.src = join(gettempdir(), "configs")
         rename(temp_src, self.src)
 
-        temp_dest = mkdtemp()
+        temp_dest = mkdtemp(dir=gettempdir())
         self.dest = join(gettempdir(), "destination")
         rename(temp_dest, self.dest)
 
@@ -27,14 +27,12 @@ class TestUserChangeControls(unittest.TestCase):
         rmtree(join(gettempdir(), "configs"))
         rmtree(join(gettempdir(), "destination"))
 
-    @unittest.skip
     def test_user_change_controls_false(self):
         user_change_controls(overwrite=False)
 
         self.assertTrue(exists(join(self.src, "controls.csv")))
         self.assertFalse(exists(join(self.dest, "configs/controls.csv")))
 
-    @unittest.skip
     def test_user_change_controls_true(self):
         user_change_controls(
             overwrite=True,

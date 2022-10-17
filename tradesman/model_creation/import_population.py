@@ -1,5 +1,6 @@
-from aequilibrae import Project, Parameters
 import sqlite3
+
+from aequilibrae import Parameters, Project
 
 from tradesman.data.population_file_address import link_source
 from tradesman.data.population_raster import population_raster

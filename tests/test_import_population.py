@@ -20,14 +20,12 @@ class TestImportPopulation(unittest.TestCase):
     def tearDown(self) -> None:
         self.project.close()
 
-    @unittest.skip
     def test_import_population_exception(self):
         with self.assertRaises(ValueError) as exception_context:
             import_population(project=self.project, model_place=self.model_place, source="OurLand", overwrite=False)
 
         self.assertEqual(str(exception_context.exception), "No population source found.")
 
-    @unittest.skip
     def test_import_population_meta(self):
         import_population(project=self.project, model_place=self.model_place, source="Meta", overwrite=False)
 
@@ -35,7 +33,6 @@ class TestImportPopulation(unittest.TestCase):
 
         self.assertGreater(population, 0)
 
-    @unittest.skip
     def test_import_population_meta_exception(self):
 
         with self.assertRaises(ValueError) as exception_context:
@@ -43,7 +40,6 @@ class TestImportPopulation(unittest.TestCase):
 
         self.assertEqual(str(exception_context.exception), "Could not find a population file to import")
 
-    @unittest.skip
     def test_import_population_worldpop(self):
         import_population(project=self.project, model_place=self.model_place, source="WorldPop", overwrite=False)
 

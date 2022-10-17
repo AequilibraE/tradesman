@@ -43,7 +43,7 @@ def create_nauru_test(folder):
     grid = curr.fetchone()[0]
     grid = shapely.wkb.loads(grid)
 
-    grid = [p for p in grid if p.intersects(geo)]
+    grid = [p for p in grid.geoms if p.intersects(geo)]
 
     nodes = network.nodes
     for i in range(1, 301):

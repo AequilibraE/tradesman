@@ -22,7 +22,6 @@ class TestValidateNonControlledVars(unittest.TestCase):
     def tearDown(self) -> None:
         rmtree(join(gettempdir(), "population"))
 
-    @unittest.skip
     def test_non_controlled_vars(self):
 
         self.assertEqual(validate_non_controlled_vars("Nauru", self.fldr), "Non-controlled vars checked.")
