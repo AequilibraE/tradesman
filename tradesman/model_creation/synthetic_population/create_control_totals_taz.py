@@ -60,11 +60,12 @@ def create_control_totals_taz(project: Project, model_place: str, dest_folder: s
     zones.set_geometry(col="centroid", drop=True, inplace=True)
 
     zones_and_subdivisions = (
-        gpd.sjoin_nearest(zones, subdivisions, distance_col="dist")
+        zones.to_crs(3857)
+        .sjoin_nearest(subdivisions.to_crs(3857), distance_col="dist")
         .sort_values(by=["zone_id", "dist"])
         .drop_duplicates(subset="zone_id", keep="last")
     )
 
-    df = df.assign(REGION=1, MAZ=df.TAZ.tolist(), xTAZ=[i + 1 for i in zones_and_subdivisions.index_right.tolist()])
+    zones_and_subdivisions = zones_and_subdivisions.to_crs(4326)
 
     df.to_csv(join(dest_folder, "data/control_totals_taz.csv"), sep=",", index=False)
