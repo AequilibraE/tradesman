@@ -5,6 +5,7 @@ from unittest import mock
 from uuid import uuid4
 
 from tests.create_nauru_test import create_nauru_test
+
 from tradesman.data_retrieval.osm_tags.osm_load_data import load_osm_data
 
 
@@ -29,7 +30,11 @@ class TestLoadOsmData(unittest.TestCase):
             f'[out:json][timeout:180];(node["{tag}"]["area"!~"yes"]' + "({});>;);out geom;",
             f'[out:json][timeout:180];(way["{tag}"]["area"!~"yes"]' + "({});>;);out geom;",
         ]
-        self.assertIsNone(load_osm_data(tag="amenity", osm_data={}, queries=query, project=self.project, tile_size=25))
+
+        self.assertEqual(
+            load_osm_data(tag="amenity", osm_data={}, queries=query, project=self.project, tile_size=25),
+            {"amenity": []},
+        )
 
     def test_load_osm_data_building(self):
         tag = "building"
@@ -38,7 +43,10 @@ class TestLoadOsmData(unittest.TestCase):
             f'[out:json][timeout:180];(way["{tag}"]["area"!~"yes"]' + "({});>;);out geom;",
         ]
 
-        self.assertIsNone(load_osm_data(tag="building", osm_data={}, queries=query, project=self.project, tile_size=25))
+        self.assertEqual(
+            load_osm_data(tag="building", osm_data={}, queries=query, project=self.project, tile_size=25),
+            {"building": []},
+        )
 
 
 if __name__ == "__name__":

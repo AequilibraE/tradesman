@@ -1,12 +1,12 @@
 import urllib.request
-from os.path import join, isfile
+from os.path import isfile, join
 from tempfile import gettempdir
 
 import numpy as np
 import pandas as pd
 import rasterio
-from scipy.sparse import coo_matrix
 from aequilibrae import Project
+from scipy.sparse import coo_matrix
 
 from tradesman.data_retrieval.country_main_area import country_border_from_model
 

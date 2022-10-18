@@ -1,7 +1,7 @@
 import geopandas as gpd
 import pandas as pd
-from aequilibrae import Project
 import pycountry
+from aequilibrae import Project
 
 from tradesman.data.load_zones import load_zones
 from tradesman.data.population_raster import population_raster
