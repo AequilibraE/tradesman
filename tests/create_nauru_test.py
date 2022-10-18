@@ -1,12 +1,13 @@
+from math import sqrt
+from os.path import dirname, join
+
+import geopandas as gpd
+import shapely.wkb
 from aequilibrae.utils.create_example import create_example
 from shapely.geometry import Point
-import shapely.wkb
-from math import sqrt
-import geopandas as gpd
-from os.path import dirname, join
-from tradesman.model_creation.create_new_tables import add_new_tables
-from tradesman.model_creation.import_population import import_population
+
 from tradesman.model_creation.add_country_borders import add_country_borders_to_model
+from tradesman.model_creation.create_new_tables import add_new_tables
 
 
 def create_nauru_test(folder):
@@ -20,8 +21,6 @@ def create_nauru_test(folder):
 
     add_new_tables(project.conn)
     add_country_borders_to_model("Nauru", project)
-    import_population(project, model_place="Nauru", source="WorldPop", overwrite=False)
-
     zones = 12
 
     network = project.network
@@ -60,22 +59,9 @@ def create_nauru_test(folder):
         "SELECT zone_id,  Hex(ST_AsBinary(geometry)) as geom FROM zones;", project.conn, geom_col="geom", crs=4326
     )
 
-    sql = "SELECT population, Hex(ST_AsBinary(GEOMETRY)) as geom FROM raw_population;"
-    pop_data = gpd.GeoDataFrame.from_postgis(sql, project.conn, geom_col="geom", crs=4326)
+    population = [358, 686, 541, 966, 474, 158, 1088, 214, 1178, 473, 59, 1004, 186, 499, 331, 199, 763, 447, 222]
 
-    pop_to_zone = gpd.sjoin(pop_data, zones_from_location, how="left")
-    pop_to_zone = pop_to_zone[["zone_id", "population"]]
-
-    pop_per_zone = pop_to_zone.groupby(["zone_id"]).sum()[["population"]].reset_index()
-    pop_per_zone.loc[:, "zone_id"] = pop_per_zone.zone_id.astype(int)
-    pop_per_zone.sort_values(["zone_id"], inplace=True)
-
-    zones_with_pop = zones_from_location.merge(pop_per_zone, on="zone_id", how="left")
-    zones_with_pop.population.fillna(0, inplace=True)
-
-    zones_with_pop = zones_with_pop.drop_duplicates(subset=["geom"])
-
-    qry_values = list(zones_with_pop[["population", "zone_id"]].itertuples(index=False, name=None))
+    qry_values = list(zip(population, zones_from_location.zone_id.values))
 
     project.conn.executemany("UPDATE zones SET population=? WHERE zone_id=?;", qry_values)
     project.conn.commit()

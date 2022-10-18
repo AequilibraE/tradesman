@@ -87,7 +87,7 @@ class ImportOsmData:
         if self.__tag == "building":
             tag_by_zone["area"] = tag_by_zone.to_crs(3857).area
 
-            area_table = tag_by_zone.groupby("zone_id").sum()[["area"]].fillna(0)
+            area_table = tag_by_zone.groupby("zone_id").sum(numeric_only=True)[["area"]].fillna(0)
             area_table["zone_id"] = [i for i in area_table.index]
 
             self._project.conn.execute("ALTER TABLE zones ADD osm_building_area FLOAT;")

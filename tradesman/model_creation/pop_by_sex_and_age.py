@@ -29,7 +29,7 @@ def get_pop_by_sex_age(project: Project, model_place: str):
 
             gdf_pop = gpd.GeoDataFrame(df, geometry=gpd.points_from_xy(df.longitude, df.latitude), crs=4326)
 
-            pop_per_zone = zones.sjoin(gdf_pop).groupby("zone_id").sum().astype(int)
+            pop_per_zone = zones.sjoin(gdf_pop).groupby("zone_id").sum(numeric_only=True).astype(int)
 
             pop_per_zone.reset_index(inplace=True)
 

@@ -26,7 +26,9 @@ class ImportMicrosoftBuildingData:
         self.__initialize()
 
     def __nominatim_get_name(self):
-        nom_url = f"https://nominatim.openstreetmap.org/search?q={self.__model_place}&format=json&polygon_geojson=1&addressdetails=1&accept-language=en"
+
+        search_place = self.__model_place.lower().replace(" ", "+")
+        nom_url = f"https://nominatim.openstreetmap.org/search?q={search_place}&format=json&polygon_geojson=1&addressdetails=1&accept-language=en"
 
         r = requests.get(nom_url)
 
@@ -79,7 +81,7 @@ class ImportMicrosoftBuildingData:
         list_of_tuples = list(
             zip(
                 buildings_by_zone.groupby("zone_id").count().id.values,
-                buildings_by_zone.groupby("zone_id").sum().area.values,
+                buildings_by_zone.groupby("zone_id").sum(numeric_only=True).area.values,
                 np.arange(1, max(buildings_by_zone.zone_id) + 1),
             )
         )

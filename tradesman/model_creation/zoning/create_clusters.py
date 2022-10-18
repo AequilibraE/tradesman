@@ -31,7 +31,7 @@ def create_clusters(hexbins, max_zone_pop=10000, min_zone_pop=500):
         data_store.append(df[result_col_df])
 
     for cnt, df in enumerate(data_store):
-        t = df.groupby(["zone_id"]).sum()
+        t = df.groupby(["zone_id"]).sum(numeric_only=True)
         t = t.loc[t.population > max_zone_pop]
         zone_sizes = t["population"].to_dict()
         zones_to_break = len(zone_sizes)
@@ -72,7 +72,7 @@ def create_clusters(hexbins, max_zone_pop=10000, min_zone_pop=500):
     df = gpd.GeoDataFrame(df[result_col_df], geometry=df["geometry"])
 
     zoning = df.dissolve(by="zone_id")[["division_name", "geometry"]]
-    pop_total = df[["zone_id", "population"]].groupby(["zone_id"]).sum()["population"]
+    pop_total = df[["zone_id", "population"]].groupby(["zone_id"]).sum(numeric_only=True)["population"]
     zoning = zoning.join(pop_total)
 
     exceptions = 0
@@ -125,7 +125,7 @@ def create_clusters(hexbins, max_zone_pop=10000, min_zone_pop=500):
             exceptions += failed
 
         zoning = df.dissolve(by="zone_id")[["division_name", "geometry"]]
-        pop_total = df[["zone_id", "population"]].groupby(["zone_id"]).sum()["population"]
+        pop_total = df[["zone_id", "population"]].groupby(["zone_id"]).sum(numeric_only=True)["population"]
         zoning = zoning.join(pop_total)
 
     zoning = df.dissolve(by="zone_id")[["division_name", "geometry"]]

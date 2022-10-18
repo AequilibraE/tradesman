@@ -18,7 +18,7 @@ def zones_with_population(project, zones_from_locations):
     pop_to_zone = pop_to_zone[["hex_id", "population"]]
     gc.collect()
 
-    pop_per_zone = pop_to_zone.groupby(["hex_id"]).sum()[["population"]].reset_index()
+    pop_per_zone = pop_to_zone.groupby(["hex_id"]).sum(numeric_only=True)[["population"]].reset_index()
     pop_per_zone.loc[:, "hex_id"] = pop_per_zone.hex_id.astype(int)
     pop_per_zone.sort_values(["hex_id"], inplace=True)
 
