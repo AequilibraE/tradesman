@@ -1,18 +1,16 @@
-from shutil import copy
-import sqlite3
+from os.path import isfile, join
 from tempfile import gettempdir
-import warnings
-from fiona import listlayers
+from urllib.request import urlretrieve
+
 import geopandas as gpd
 import pandas as pd
-from shapely.ops import unary_union
+import pycountry
 import requests
 from aequilibrae.project import Project
-from os.path import join, isfile
-from shapely.geometry import Polygon, MultiPolygon
-import pycountry
-from urllib.request import urlretrieve
+from fiona import listlayers
 from numpy import arange
+from shapely.geometry import MultiPolygon, Polygon
+from shapely.ops import unary_union
 
 
 class ImportPoliticalSubdivisions:
@@ -60,6 +58,10 @@ class ImportPoliticalSubdivisions:
         """
 
         data = self.__get_subdivisions(self._source)[["country_name", "division_name", "level", "geom"]]
+
+        if len(data) == 1:
+            return
+
         data = data[data.level > 0]
 
         level = max(data.level) if level > max(data.level) else min(data.level) + level
@@ -181,6 +183,7 @@ class ImportPoliticalSubdivisions:
             all_data["idx"] = arange(len(all_data))
             all_data.set_index("idx", inplace=True)
             all_data.at[0, "division_name"] = "country_border"
+            all_data = all_data.drop_duplicates(subset=["division_name", "level"])
 
         all_data.to_parquet(join(gettempdir(), f"{self.__model_place}_cache_geoboundaries.parquet"))
 

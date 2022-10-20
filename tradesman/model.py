@@ -13,7 +13,7 @@ from tradesman.model_creation.create_new_tables import add_new_tables
 from tradesman.model_creation.import_network import import_network
 from tradesman.model_creation.import_population import import_population
 from tradesman.model_creation.pop_by_sex_and_age import get_pop_by_sex_age
-from tradesman.model_creation.set_source import set_source
+from tradesman.model_creation.set_source import set_political_boundaries_source, set_population_source
 
 # from tradesman.model_creation.synthetic_population.create_synthetic_population import create_syn_pop, run_populationsim
 from tradesman.model_creation.zoning.zone_building import zone_builder
@@ -21,7 +21,7 @@ from tradesman.model_creation.import_political_subdivisions import ImportPolitic
 
 
 class Tradesman:
-    def __init__(self, network_path: str, model_place: str = None):
+    def __init__(self, network_path: str, model_place: str = None, boundaries_source: str = "GADM"):
         # If the model exists, you would only tell where it is (network_path), and the software
         # would check and populate the model place.  Needs to be implemented
         self.__model_place = model_place
@@ -29,7 +29,7 @@ class Tradesman:
         self.__folder = network_path
         self._project = Project()
         self.__osm_data = {}
-        self._boundaries_source = "GADM"
+        self._boundaries_source = boundaries_source
         self.__starts_logging()
 
         self.__initialize_model()
@@ -69,7 +69,15 @@ class Tradesman:
         Args:
                *source* (:obj:`str`): Can be 'WorldPop' or 'Meta'. Defaults to WorldPop
         """
-        self.__population_source = set_source(source)
+        self.__population_source = set_population_source(source)
+
+    def set_political_boundaries_source(self, source="GADM"):
+        """
+        Sets the source for downloading political boundaries and subdivisions.
+        Args.:
+             *source*(:obj:`str`): Takes "GADM" or "GeoBoundaries". Dafaults to GADM.
+        """
+        self._boundaries_source = set_political_boundaries_source(source)
 
     def import_network(self):
         """Triggers the import of the network from OSM and adds subdivisions into the model.
