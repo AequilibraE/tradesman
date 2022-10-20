@@ -1,15 +1,15 @@
-import geopandas as gpd
-import pandas as pd
-import numpy as np
-from aequilibrae.project import Project
-import requests
-from shapely.geometry import Polygon
-from os.path import join, isfile
+import re
+from os.path import isfile, join
 from tempfile import gettempdir
 from urllib.request import urlretrieve
+
+import geopandas as gpd
+import pandas as pd
 import pycountry
-from aequilibrae.project.project_creation import remove_triggers, add_triggers
-import re
+import requests
+from aequilibrae.project import Project
+from aequilibrae.project.project_creation import add_triggers, remove_triggers
+from shapely.geometry import Polygon
 
 
 def get_maritime_boundaries(model_place: str):
@@ -34,7 +34,7 @@ def get_maritime_boundaries(model_place: str):
     return
 
 
-def is_country(model_place: str):
+def place_is_country(model_place: str):
 
     search_place = model_place.lower().replace(" ", "+")
 
@@ -59,7 +59,7 @@ def delete_links_and_nodes(model_place, project: Project):
          *project*(:obj:`aequilibrae.project.Project`): currently open project
     """
 
-    if not is_country(model_place):
+    if not place_is_country(model_place):
         return
 
     coast = get_maritime_boundaries(model_place)

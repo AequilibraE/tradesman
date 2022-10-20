@@ -1,10 +1,16 @@
-from shutil import copytree, rmtree
-from tempfile import gettempdir
 import unittest
-from os.path import join, abspath, dirname
+from os.path import abspath, dirname, join
+from shutil import copytree
+from tempfile import gettempdir
 from uuid import uuid4
+
 from aequilibrae.project import Project
-from tradesman.model_creation.delete_links_and_nodes import delete_links_and_nodes, get_maritime_boundaries
+
+from tradesman.model_creation.delete_links_and_nodes import (
+    delete_links_and_nodes,
+    get_maritime_boundaries,
+    place_is_country,
+)
 
 
 class TestDeleteLinksAndNodes(unittest.TestCase):
@@ -14,7 +20,14 @@ class TestDeleteLinksAndNodes(unittest.TestCase):
         self.assertGreater(len(get_maritime_boundaries("Nauru")), 0)
         self.assertGreater(len(get_maritime_boundaries("Brazil")), 0)
 
-    def test_remove_links_and_nodes(self):
+    def test_is_country(self):
+        self.assertTrue(place_is_country("Andorra"))
+        self.assertTrue(place_is_country("Nauru"))
+        self.assertTrue(place_is_country("Brazil"))
+        self.assertFalse(place_is_country("Vorarlberg"))
+        self.assertFalse(place_is_country("Minas Gerais"))
+
+    def test_remove_links_and_nodes_no_maritime(self):
 
         self.temp_fldr = join(gettempdir(), uuid4().hex)
 
@@ -26,10 +39,33 @@ class TestDeleteLinksAndNodes(unittest.TestCase):
         self.project = Project()
         self.project.open(join(self.temp_fldr, "tests/data/vatican city"))
 
+        before = len(self.project.conn.execute("SELECT * FROM nodes;").fetchall())
+
         delete_links_and_nodes("Vatican City", self.project)
 
         num_nodes = len(self.project.conn.execute("SELECT * FROM nodes;").fetchall())
-        self.assertEqual(num_nodes, 215)
+
+        self.assertGreater(before, num_nodes)
+
+    def test_remove_links_and_nodes_maritime(self):
+
+        self.temp_fldr = join(gettempdir(), uuid4().hex)
+
+        copytree(
+            src=join(abspath(dirname("tests")), "tests/data/monaco"),
+            dst=join(self.temp_fldr, "tests/data/monaco"),
+        )
+
+        self.project = Project()
+        self.project.open(join(self.temp_fldr, "tests/data/monaco"))
+
+        before = len(self.project.conn.execute("SELECT * FROM nodes;").fetchall())
+
+        delete_links_and_nodes("Monaco", self.project)
+
+        num_nodes = len(self.project.conn.execute("SELECT * FROM nodes;").fetchall())
+
+        self.assertGreater(before, num_nodes)
 
 
 if __name__ == "__name__":
