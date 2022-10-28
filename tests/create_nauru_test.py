@@ -1,12 +1,14 @@
+from math import sqrt
+from os.path import dirname, join
+
+import geopandas as gpd
+import shapely.wkb
 from aequilibrae.utils.create_example import create_example
 from shapely.geometry import Point
-import shapely.wkb
-from math import sqrt
-import geopandas as gpd
-from os.path import dirname, join
+
 from tradesman.model_creation.create_new_tables import add_new_tables
+from tradesman.model_creation.import_political_subdivisions import ImportPoliticalSubdivisions
 from tradesman.model_creation.import_population import import_population
-from tradesman.model_creation.add_country_borders import add_country_borders_to_model
 
 
 def create_nauru_test(folder):
@@ -17,9 +19,12 @@ def create_nauru_test(folder):
     df["geom"] = gpd.GeoSeries.to_wkb(df["geometry"])
 
     project = create_example(folder, "nauru")
-
     add_new_tables(project.conn)
-    add_country_borders_to_model("Nauru", project)
+
+    data = ImportPoliticalSubdivisions(model_place="Nauru", project=project, source="GADM")
+    data.import_model_area()
+    data.add_country_borders(overwrite=True)
+
     import_population(project, model_place="Nauru", source="WorldPop", overwrite=False)
 
     zones = 12
@@ -43,7 +48,7 @@ def create_nauru_test(folder):
     grid = curr.fetchone()[0]
     grid = shapely.wkb.loads(grid)
 
-    grid = [p for p in grid if p.intersects(geo)]
+    grid = [p for p in grid.geoms if p.intersects(geo)]
 
     nodes = network.nodes
     for i in range(1, 301):
@@ -63,7 +68,7 @@ def create_nauru_test(folder):
     sql = "SELECT population, Hex(ST_AsBinary(GEOMETRY)) as geom FROM raw_population;"
     pop_data = gpd.GeoDataFrame.from_postgis(sql, project.conn, geom_col="geom", crs=4326)
 
-    pop_to_zone = gpd.sjoin(pop_data, zones_from_location, how="left")
+    pop_to_zone = pop_data.sjoin(zones_from_location, how="left")
     pop_to_zone = pop_to_zone[["zone_id", "population"]]
 
     pop_per_zone = pop_to_zone.groupby(["zone_id"]).sum()[["population"]].reset_index()

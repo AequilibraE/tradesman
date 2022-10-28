@@ -37,7 +37,7 @@ class TestCreateSeeds(unittest.TestCase):
 
         x = len(pd.read_csv(join(gettempdir(), "data/seed_households.csv")))
 
-        self.assertEqual(x, 73)
+        self.assertEqual(x, 74)
 
 
 if __name__ == "__name__":
