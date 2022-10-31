@@ -151,11 +151,11 @@ class Tradesman:
         """
         get_pop_by_sex_age(self._project, self._boundaries.country_name)
 
-    # def import_amenities(self):
-    #     """
-    #     Triggers the import of amenities from OSM.
-    #     Data will be exported as columns in zones file and as a separate SQL file.
-    #     """
+        # def import_amenities(self):
+        #     """
+        #     Triggers the import of amenities from OSM.
+        #     Data will be exported as columns in zones file and as a separate SQL file.
+        #     """
 
         import_amenities(self._project, self.__osm_data)
 
