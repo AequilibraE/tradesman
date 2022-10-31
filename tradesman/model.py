@@ -21,7 +21,9 @@ from tradesman.model_creation.import_political_subdivisions import ImportPolitic
 
 
 class Tradesman:
-    def __init__(self, network_path: str, model_place: str = None, pbf_path: str = None, boundaries_source: str = "GADM"):
+    def __init__(
+        self, network_path: str, model_place: str = None, pbf_path: str = None, boundaries_source: str = "GADM"
+    ):
         # If the model exists, you would only tell where it is (network_path), and the software
         # would check and populate the model place.  Needs to be implemented
         self.__model_place = model_place
@@ -34,7 +36,7 @@ class Tradesman:
 
         self.__initialize_model()
         self._network = ImportNetwork(self._project, self.__model_place, self.__pbf_path)
-        
+
         self._boundaries_source = boundaries_source
         self._boundaries = ImportPoliticalSubdivisions(self.__model_place, self._boundaries_source, self._project)
 
