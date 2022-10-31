@@ -3,11 +3,10 @@ from os.path import dirname, join
 
 import geopandas as gpd
 import shapely.wkb
-import shapely.wkb
 from aequilibrae.utils.create_example import create_example
 from shapely.geometry import Point
-
 from tradesman.model_creation.add_country_borders import add_country_borders_to_model
+
 from tradesman.model_creation.create_new_tables import add_new_tables
 
 
