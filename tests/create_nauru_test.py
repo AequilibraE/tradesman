@@ -5,7 +5,7 @@ import geopandas as gpd
 import shapely.wkb
 from aequilibrae.utils.create_example import create_example
 from shapely.geometry import Point
-from tradesman.model_creation.add_country_borders import add_country_borders_to_model
+from tradesman.model_creation.import_political_subdivisions import ImportPoliticalSubdivisions
 
 from tradesman.model_creation.create_new_tables import add_new_tables
 
@@ -17,9 +17,12 @@ def create_nauru_test(folder):
     df["geom"] = gpd.GeoSeries.to_wkb(df["geometry"])
 
     project = create_example(folder, "nauru")
-
     add_new_tables(project.conn)
-    add_country_borders_to_model("Nauru", project)
+
+    data = ImportPoliticalSubdivisions(model_place="Nauru", project=project, source="GADM")
+    data.import_model_area()
+    data.add_country_borders(overwrite=True)
+
     zones = 12
 
     network = project.network

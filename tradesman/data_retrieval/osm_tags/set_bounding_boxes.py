@@ -1,3 +1,4 @@
+from aequilibrae.project import Project
 from math import ceil, sqrt
 
 import geopandas as gpd
@@ -7,8 +8,8 @@ import pandas as pd
 from tradesman.data_retrieval.country_main_area import model_borders
 
 
-def bounding_boxes(model_place: str, km_side=25):
-    country = model_borders(model_place)
+def bounding_boxes(project: Project, km_side=25):
+    country = model_borders(project)
 
     geo_country = gpd.GeoDataFrame(
         pd.DataFrame(

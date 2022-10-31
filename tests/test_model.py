@@ -15,7 +15,7 @@ class TestModel(unittest.TestCase):
         self.proj = Tradesman(dir, "San Marino")
         # add_new_tables(self.proj.conn)
 
-    @unittest.skip
+    # @unittest.skip
     def test_create(self):
         self.proj.create()
 
