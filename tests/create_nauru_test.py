@@ -3,6 +3,7 @@ from os.path import dirname, join
 
 import geopandas as gpd
 import shapely.wkb
+import shapely.wkb
 from aequilibrae.utils.create_example import create_example
 from shapely.geometry import Point
 
@@ -11,7 +12,6 @@ from tradesman.model_creation.create_new_tables import add_new_tables
 
 
 def create_nauru_test(folder):
-
     df = gpd.read_file(join(dirname(__file__), "data/nauru/subdivisions.geojson"))
     df.rename(columns={"name": "division_name", "country": "country_name"}, inplace=True)
     df.insert(2, "level", 1)

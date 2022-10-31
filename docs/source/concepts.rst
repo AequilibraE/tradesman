@@ -62,23 +62,8 @@ available.
 
 With respect to the kind of road, OSM classification distinguish them by function
 and importance rather by their physical characteristics or legal classification. More
-information on the `kind of road webpage <https://wiki.openstreetmap.org/wiki/Key:highway>`.
+information on the `kind of road webpage <https://wiki.openstreetmap.org/wiki/Key:highway>`_.
 
 Regarding surface, OSM values provide additional information about the physical surface of
 roads, and some other features, such as material composition and/or structure. All data
-values for road surface can be found in `their OSM webpage <https://wiki.openstreetmap.org/wiki/Key:surface>`.
-
-
-Rural Access Index
-------------------
-
-The Rural Access Index (RAI) is a transportation indicator endorsed by the World
-Bank, and it measures the number of rural people who live within two kilometers
-of an "all-seasoned road" as a porpotion of the total rural population. The two
-kilometers distance is equivalent to a 20-25 minute walk, and an "all-seasoned road"
-is a road that is motobrable all year round by vehicles that are not
-four-wheel-drive, which can accept occasional interruptions of short duration
-during inclement weather (e.g. heavy rainfall), especially in lightly trafficked
-roads. For more informations with respect to RAI, we suggest the `World Bank webpage
-<https://openknowledge.worldbank.org/handle/10986/17414>`.
-
+values for road surface can be found in `their OSM webpage <https://wiki.openstreetmap.org/wiki/Key:surface>`_.
