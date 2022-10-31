@@ -8,3 +8,4 @@ pyarrow
 pycountry
 populationsim
 tabulate
+osm2gmns
