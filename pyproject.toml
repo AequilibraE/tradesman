@@ -26,6 +26,7 @@ pyarrow = "*"
 pycountry = "*"
 populationsim = "^0.5.1"
 tabulate = "^0.8.10"
+osm2gmns = "^0.6.8"
 
 
 [tool.poetry.dev-dependencies]
