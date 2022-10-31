@@ -1,5 +1,7 @@
-from aequilibrae import Project, Parameters
 import sqlite3
+
+import geopandas as gpd
+from aequilibrae import Parameters, Project
 
 from tradesman.data.population_file_address import link_source
 from tradesman.data.population_raster import population_raster
@@ -17,7 +19,14 @@ def import_population(project: Project, model_place: str, source: str, overwrite
         raise ValueError("Could not find a population file to import")
 
     df = population_raster(url, f"pop_{model_place}", project)
+    gdf = gpd.GeoDataFrame(df, geometry=gpd.points_from_xy(df.longitude, df.latitude), crs=4326)
 
-    df.to_sql("raw_population", project.conn, if_exists="append", index=False)
+    model_area = gpd.read_postgis(
+        "SELECT ST_AsBinary(geometry) as geom FROM political_subdivisions WHERE level=-1", con=project.conn, crs=4326
+    )
+
+    select_pop = gdf.sjoin(model_area)[["longitude", "latitude", "population"]]
+
+    select_pop.to_sql("raw_population", project.conn, if_exists="append", index=False)
     project.conn.execute("UPDATE raw_population SET Geometry=MakePoint(longitude, latitude, 4326)")
     project.conn.commit()

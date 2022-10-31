@@ -18,7 +18,7 @@ from tradesman.model_creation.synthetic_population.unzip_seed_files import unzip
 from tradesman.model_creation.synthetic_population.user_control_import import user_change_validation_parameters
 
 
-def create_syn_pop(project: Project, model_place: str, cwd: str):
+def create_syn_pop(project: Project, model_place: str, cwd: str, thread_number=None, sample_size=0.02):
     """
     Creates files to build synthetic population.
     Parameters:
@@ -31,7 +31,9 @@ def create_syn_pop(project: Project, model_place: str, cwd: str):
 
     pop_fldr = join(cwd, "population")
 
-    create_buckets(model_place, project, folder=pop_fldr, sample=0.02)
+    update_thread_number(pop_fldr, thread_number)
+
+    create_buckets(model_place, project, folder=pop_fldr, sample=sample_size)
 
     create_geo_cross_walk(project, pop_fldr)
 
@@ -86,16 +88,9 @@ def run_populationsim(multithread: bool, project: Project, folder: str, thread_n
     if multithread:
         update_thread_number(pop_fldr, thread_number)
 
-        subprocess.run(
-            [sys.executable, "run_populationsim.py", "-c", "configs_mp", "-c", "configs"],
-            cwd=pop_fldr,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.STDOUT,
-        )
-    else:
-        subprocess.run(
-            [sys.executable, "run_populationsim.py"], cwd=pop_fldr, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT
-        )
+    subprocess.run(
+        [sys.executable, "run_populationsim.py"], cwd=pop_fldr, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT
+    )
 
     pd.read_csv(join(pop_fldr, "output/synthetic_persons.csv")).to_sql(
         "synthetic_persons", con=project.conn, if_exists="replace"

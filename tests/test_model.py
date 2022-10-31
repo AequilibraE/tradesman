@@ -1,8 +1,6 @@
 import unittest
 import uuid
-
 from os.path import join
-
 from tempfile import gettempdir
 
 from tradesman.model import Tradesman
