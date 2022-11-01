@@ -22,7 +22,7 @@ def import_network(project: Project, model_place: str):
     #                                                WHERE ST_Intersects(a.geometry, ST_Buffer(b.geometry, 0.1)) = 1)"""
     #     """DELETE * FROM Links
     #             WHERE link_id NOT IN (SELECT a.link_id
-    #                                    FROM links AS a, (SELECT st_subdivide(ST_Buffer(geometry, 0.1)) geometry
+    #                                    FROM links AS a, (SELECT ST_Buffer(geometry, 0.1) geometry
     #                                                             FROM political_subdivisions
     #                                                             WHERE level=0) as b
     #                                    WHERE ST_Intersects(a.geometry, b.geometry) = 1)"""

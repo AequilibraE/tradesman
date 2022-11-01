@@ -1,3 +1,4 @@
+from math import floor
 import multiprocessing as mp
 import subprocess
 import yaml
@@ -18,7 +19,7 @@ from tradesman.model_creation.synthetic_population.unzip_seed_files import unzip
 from tradesman.model_creation.synthetic_population.user_control_import import user_change_validation_parameters
 
 
-def create_syn_pop(project: Project, model_place: str, cwd: str, thread_number=None, sample_size=0.02):
+def create_syn_pop(project: Project, model_place: str, cwd: str, thread_number=None, sample_size=0.01):
     """
     Creates files to build synthetic population.
     Parameters:
@@ -42,7 +43,7 @@ def create_syn_pop(project: Project, model_place: str, cwd: str, thread_number=N
     create_control_totals_meta(pop_fldr)
 
 
-def update_thread_number(folder: str, number):
+def update_thread_number(folder: str, number: int):
     """
     Set the number of threads to generate the synthetic population.
     If no number of threads is provided, the program considers it as the number of threads available in your computer.
@@ -51,10 +52,16 @@ def update_thread_number(folder: str, number):
          *number*(:obj:`int`): number of threads used. By default uses the greatest number of threads available.
     """
     count_cpu = mp.cpu_count()
-    if int(number) > count_cpu or int(number) == 0:
+    if number is not None:
+        floor_num = floor(number)
+    pass
+
+    if number is None:
+        number = mp.cpu_count()
+    elif floor_num > count_cpu or floor_num == 0:
         number = mp.cpu_count()
     else:
-        number = int(number)
+        number = floor_num
 
     with open(join(folder, "configs/settings.yaml"), encoding="utf-8") as file:
         doc = yaml.full_load(file)

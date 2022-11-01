@@ -1,12 +1,16 @@
 from tradesman.data_retrieval.osm_tags.osm_load_data import load_osm_data
+from aequilibrae.project import Project
 
 
-def generic_tag(tag: str, osm_data: dict, model_place: str, tile_size=25):
+def generic_tag(tag: str, osm_data: dict, project: Project, tile_size=25):
     """
-    Finds all [amenities] (<https://wiki.openstreetmap.org/wiki/Key:amenity>)  or [building] (<https://wiki.openstreetmap.org/wiki/Key:building>) with a certain type for the model area.
+    Finds all [amenities] (<https://wiki.openstreetmap.org/wiki/Key:amenity>)  or [building] (<https://wiki.openstreetmap.org/wiki/Key:building>) for the model area.
 
-    Args:
-        *tile_size* (:obj:`float`): The size of the tile we want to split our area in. Defaults to 25km side
+    Parameters:
+         *tag*(:obj:`str`): download objects from Open Street Maps. Takes amenity or buildings.
+         *osm_data*(:obj:`dict`): stores downloaded data.
+         *project*(:obj:`aequilibrae.project): current project.
+         *tile_size*(:obj:`float`): The size of the tile we want to split our area in. Defaults to 25km side.
     """
     queries = [
         f'[out:json][timeout:180];(node["{tag}"]["area"!~"yes"]' + "({});>;);out geom;",
@@ -17,7 +21,7 @@ def generic_tag(tag: str, osm_data: dict, model_place: str, tile_size=25):
         tag=tag,
         tile_size=tile_size,
         queries=queries,
-        model_place=model_place,
+        project=project,
         osm_data=osm_data,
     )
 

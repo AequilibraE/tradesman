@@ -142,13 +142,13 @@ def validate_controlled_vars(fldr):
     for summary_file in summary_files:
         filepath = os.path.join(fldr, summary_file)  # mudar popsimdir para fldr
         df = pd.read_csv(filepath)
-        summary_df = summary_df.append(df)
+        summary_df = pd.concat([summary_df, df])
 
     # summary_df.head()
 
     for geog in use_geographies:
         if geog not in summary_df.geography.unique():
-            summary_df = summary_df.append(meta_geog_df(summary_df, geog, fldr, geography_file, use_geographies))
+            summary_df = pd.concat([summary_df, meta_geog_df(summary_df, geog, fldr, geography_file, use_geographies)])
 
     # summary_df.tail()
 
