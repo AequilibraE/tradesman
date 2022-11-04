@@ -8,7 +8,7 @@ name = "tradesman"
 version = "0.1"
 description = "A Python package for building complete AequilibraE models from open data"
 authors = [
-    "Renata Akemii",
+    "Renata Akemi",
      "Pedro Camargo <c@margo.co>",
 ]
 maintainers = ["Pedro Camargo <c@margo.co>",]
@@ -21,7 +21,7 @@ pysal = "*"
 openmatrix = "*"
 rasterio = "*"
 matplotlib = "*"
-aequilibrae = "0.7.4"
+aequilibrae = "0.7.5"
 pyarrow = "*"
 pycountry = "*"
 populationsim = "^0.5.1"

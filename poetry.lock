@@ -2657,7 +2657,7 @@ testing = ["func-timeout", "jaraco.itertools", "pytest (>=6)", "pytest-black (>=
 [metadata]
 lock-version = "1.1"
 python-versions = "~3.9.0"
-content-hash = "6cddfe891873b967a8e3e0d5a0a1e5eb900a73485f3b73dc27d6868571b89a90"
+content-hash = "e17066b86b9a267bccfea47d345a4bbb1804fcc471663dacaee9940d5543436a"
 
 [metadata.files]
 absl-py = [
@@ -2672,18 +2672,17 @@ activitysim = [
     {file = "activitysim-1.0.1.tar.gz", hash = "sha256:2b6b696195fc841f1cc1530836a05cf8f18f03e4715857e636677068fdb012e2"},
 ]
 aequilibrae = [
-    {file = "aequilibrae-0.7.4-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:6845a89746506fb9bc3e1e516d853e9fe9f480b47fd468178ce6cae5eb58b9b4"},
-    {file = "aequilibrae-0.7.4-cp310-cp310-win_amd64.whl", hash = "sha256:227e18159d901a102250bcace26a1ad6521d42e50ea176c6ea0d978cbca1b674"},
-    {file = "aequilibrae-0.7.4-cp37-cp37m-macosx_10_15_x86_64.whl", hash = "sha256:c71fb34e05645e949949d2072842e1468cd6c9dbf8bb016ed99ce01d4fe4ecd4"},
-    {file = "aequilibrae-0.7.4-cp37-cp37m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:fcd5b572f0624f13e49674845e98faf29f992bd9b373f0d402b77337f388a32e"},
-    {file = "aequilibrae-0.7.4-cp37-cp37m-win_amd64.whl", hash = "sha256:706850269e448537050f9246a3875f5a679fb0006c5abdeae254f284f4938294"},
-    {file = "aequilibrae-0.7.4-cp38-cp38-macosx_10_15_x86_64.whl", hash = "sha256:cc4ae01d03b3b80034b606373709f8cb55dc0d43674b504286c2e0b0605a1d6e"},
-    {file = "aequilibrae-0.7.4-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:e1643468ec18dd6e1e111862ade1773e5ebd70455a75b60ac76021cb1d2bc4e4"},
-    {file = "aequilibrae-0.7.4-cp38-cp38-win_amd64.whl", hash = "sha256:db08d188c80389abdc03c95488c65eec9773d52514bafd3017e805c09d2b76d3"},
-    {file = "aequilibrae-0.7.4-cp39-cp39-macosx_10_15_x86_64.whl", hash = "sha256:d3fa756ab97c27b69913ace6731a4997b02cb55ffd4449ccaf64f50fb700349a"},
-    {file = "aequilibrae-0.7.4-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:1a37e925de575cad5b0a3ab82366ce3947053ca7d1733702cba481d1ce45b7eb"},
-    {file = "aequilibrae-0.7.4-cp39-cp39-win_amd64.whl", hash = "sha256:175bfb5fc1aa9299c08addcb0f33407beb03d106dfcab6ebbfdb0574d536fb20"},
-    {file = "aequilibrae-0.7.4.tar.gz", hash = "sha256:345afc83c78f6967646898db923d544239a2d08ea3fb6ce8451c5a80c8f4c606"},
+    {file = "aequilibrae-0.7.5-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:26f1b3e795bac502ea725c152f1fc40bd7ff7425b69eb22ae1543e6904982804"},
+    {file = "aequilibrae-0.7.5-cp310-cp310-win_amd64.whl", hash = "sha256:e22980fcf3c906abb1c4173d64188cad7ae93cbe318ce1c817c6840dabab5870"},
+    {file = "aequilibrae-0.7.5-cp37-cp37m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:28f65875c71be3955b4027e118472298bb0d9f7f2b2f44922e6342a24e9da7bd"},
+    {file = "aequilibrae-0.7.5-cp37-cp37m-win_amd64.whl", hash = "sha256:c8a615d020c0f8df8a3e87b024f02587db5bdb2868131365cba490c69dab36eb"},
+    {file = "aequilibrae-0.7.5-cp38-cp38-macosx_10_15_x86_64.whl", hash = "sha256:d3f4e19d4ef553646d7af7a53fe112f8cf73ec2bf90fb4676ad19328728a923e"},
+    {file = "aequilibrae-0.7.5-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:eea963562b50cb7535457aec308c89d4dd2625b2434ebdb559369922a4606eb9"},
+    {file = "aequilibrae-0.7.5-cp38-cp38-win_amd64.whl", hash = "sha256:39cb12f17f1b54cbc07cbfb51232655b842e2cc848db65d9f66873ac13ce3a80"},
+    {file = "aequilibrae-0.7.5-cp39-cp39-macosx_10_15_x86_64.whl", hash = "sha256:656a0aea5aae417e78a22567e9ea1a6e427e50819efc55b405637ee531ed88db"},
+    {file = "aequilibrae-0.7.5-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:8f86bd401062fdbb1b143a5346a7d8e16ec56346216887b62633876ef4949604"},
+    {file = "aequilibrae-0.7.5-cp39-cp39-win_amd64.whl", hash = "sha256:70857570f626c56d4edd2bdfb57cd54cfd6ec2a79831bbf1672de9aee816ea84"},
+    {file = "aequilibrae-0.7.5.tar.gz", hash = "sha256:703cba4f4c3288f1143f7667a66c6518a2222efb064dafded614d8103a9ded05"},
 ]
 affine = [
     {file = "affine-2.3.1-py2.py3-none-any.whl", hash = "sha256:de17839ff05e965580870c3b15e14cefd7992fa05dba9202a0879bbed0c171e4"},
