@@ -1,11 +1,12 @@
-from shutil import rmtree
+import multiprocessing as mp
 import tempfile
 import unittest
-import yaml
-from os.path import join
 from os import rename
+from os.path import join
+from shutil import rmtree
 from tempfile import gettempdir
-import multiprocessing as mp
+
+import yaml
 
 from tradesman.model_creation.synthetic_population.create_synthetic_population import update_thread_number
 
@@ -41,7 +42,7 @@ class TestSetThreadNumber(unittest.TestCase):
         rmtree(join(tempfile.gettempdir(), "configs"))
         rmtree(join(tempfile.gettempdir(), "configs_mp"))
 
-    def test_update_thread_number_integer(self):
+    def test_set_thread_number_integer(self):
 
         update_thread_number(gettempdir(), number=2)
 
@@ -51,9 +52,9 @@ class TestSetThreadNumber(unittest.TestCase):
         self.assertEqual(doc["num_processes"], 2)
         self.assertEqual(doc["multiprocess_steps"][1]["num_processes"], 2)
 
-    def test_update_thread_number_float(self):
+    def test_set_thread_number_float(self):
 
-        update_thread_number(gettempdir(), number=2.7)
+        update_thread_number(gettempdir(), number=2.5)
 
         doc = get_layout_from_path(join(self.mp_fldr, "settings.yaml"))
 
@@ -61,18 +62,15 @@ class TestSetThreadNumber(unittest.TestCase):
         self.assertEqual(doc["num_processes"], 2)
         self.assertEqual(doc["multiprocess_steps"][1]["num_processes"], 2)
 
-    def test_update_thread_number_greater(self):
+    def test_set_thread_number_greater(self):
 
         num = mp.cpu_count() + 2
+
         update_thread_number(gettempdir(), number=num)
 
-        doc = get_layout_from_path(join(self.mp_fldr, "settings.yaml"))
-
         self.assertEqual(get_layout_from_path(join(self.fldr, "settings.yaml")), {"num_processes": mp.cpu_count()})
-        self.assertEqual(doc["num_processes"], mp.cpu_count())
-        self.assertEqual(doc["multiprocess_steps"][1]["num_processes"], mp.cpu_count())
 
-    def test_update_thread_number_zero(self):
+    def test_set_thread_number_zero(self):
 
         update_thread_number(gettempdir(), number=0)
 

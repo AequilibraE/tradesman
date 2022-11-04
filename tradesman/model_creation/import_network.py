@@ -36,10 +36,6 @@ class ImportNetwork:
             *pbf_path*(:obj:`str`): path to osm or pbf file. Optional.
 
         """
-        self.par.parameters["osm"][
-            "overpass_endpoint"
-        ] = "https://lz4.overpass-api.de/api/interpreter"  # This one should be removed later on due to changes in AequilibraE
-        self.par.write_back()
 
         if self.pbf_path:
             print("Convert to GMNS ...")
@@ -111,7 +107,7 @@ class ImportNetwork:
         df["allowed_uses"] = rename_list
 
         df.to_csv(
-            join(gettempdir(), f"{model_place}-link.csv"),
+            join(gettempdir(), f"{model_place}-gmns-link.csv"),
             sep=",",
             encoding="utf-8",
             index=False,
@@ -129,7 +125,7 @@ class ImportNetwork:
         url = "http://overpass-api.de/api/interpreter"
 
         # We won't download any area bigger than 25km by 25km
-        bboxes = bounding_boxes(model_place, tile_size)
+        bboxes = bounding_boxes(self.project, tile_size)
 
         http_headers = requests.utils.default_headers()
         http_headers.update({"Accept-Language": "en", "format": "json"})

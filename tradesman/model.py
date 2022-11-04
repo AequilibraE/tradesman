@@ -6,18 +6,16 @@ import geopandas as gpd
 from aequilibrae import Project
 
 from tradesman.data_retrieval import subdivisions
-
-# from tradesman.data_retrieval.import_amenities import import_amenities
-# from tradesman.data_retrieval.import_building import building_import
+from tradesman.data_retrieval.import_amenities import import_amenities
+from tradesman.data_retrieval.import_building import building_import
 from tradesman.model_creation.create_new_tables import add_new_tables
 from tradesman.model_creation.import_network import ImportNetwork
+from tradesman.model_creation.import_political_subdivisions import ImportPoliticalSubdivisions
 from tradesman.model_creation.import_population import import_population
 from tradesman.model_creation.pop_by_sex_and_age import get_pop_by_sex_age
 from tradesman.model_creation.set_source import set_political_boundaries_source, set_population_source
-
-# from tradesman.model_creation.synthetic_population.create_synthetic_population import create_syn_pop, run_populationsim
+from tradesman.model_creation.synthetic_population.create_synthetic_population import create_syn_pop, run_populationsim
 from tradesman.model_creation.zoning.zone_building import zone_builder
-from tradesman.model_creation.import_political_subdivisions import ImportPoliticalSubdivisions
 
 
 class Tradesman:
@@ -50,10 +48,10 @@ class Tradesman:
         self.import_population()
         self.build_zoning()
         self.import_pop_by_sex_and_age()
-        # self.import_amenities()
-        # self.import_buildings()
-        # self.build_population_synthesizer_data()
-        # self.synthesize_population()
+        self.import_amenities()
+        self.import_buildings(True)
+        self.build_population_synthesizer_data()
+        self.synthesize_population()
 
     def import_model_area(self):
         """
@@ -151,35 +149,35 @@ class Tradesman:
         """
         get_pop_by_sex_age(self._project, self._boundaries.country_name)
 
-    # def import_amenities(self):
-    #     """
-    #     Triggers the import of amenities from OSM.
-    #     Data will be exported as columns in zones file and as a separate SQL file.
-    #     """
+    def import_amenities(self):
+        """
+        Triggers the import of amenities from OSM.
+        Data will be exported as columns in zones file and as a separate SQL file.
+        """
 
-    #     import_amenities(self.__model_place, self._project, self.__osm_data)
+        import_amenities(self._project, self.__osm_data)
 
-    # def import_buildings(self):
-    #     """
-    #     Triggers the import of buildings from both OSM and Microsoft Bing.
-    #     Data will be exported as columns in zones file and as a separate SQL file.
-    #     """
+    def import_buildings(self, download_from_bing=True):
+        """
+        Triggers the import of buildings from both OSM and Microsoft Bing.
+        Data will be exported as columns in zones file and as a separate SQL file.
+        """
 
-    #     building_import(self.__model_place, self._project, self.__osm_data)
+        building_import(self.__model_place, self._project, self.__osm_data, download_from_bing)
 
-    # def build_population_synthesizer_data(self, threads: None, sample=0.01):
-    #     """
-    #     Triggers the import of data to create the synthetic population.
-    #     """
+    def build_population_synthesizer_data(self):
+        """
+        Triggers the import of data to create the synthetic population.
+        """
 
-    #     create_syn_pop(self._project, self.__model_place, self.__folder, threads, sample)
+        create_syn_pop(self._project, self.__model_place, self.__folder)
 
-    # def synthesize_population(self):
-    #     """
-    #     Triggers the creation of synthetic population.
-    #     """
+    def synthesize_population(self, multithread=False, thread_number=2):
+        """
+        Triggers the creation of synthetic population.
+        """
 
-    #     run_populationsim(self._project, self.__model_place, self.__folder)
+        run_populationsim(multithread, self._project, self.__folder, thread_number)
 
     def __initialize_model(self):
         if isdir(self.__folder):

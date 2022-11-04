@@ -1,9 +1,9 @@
 import unittest
-import pandas as pd
-from os.path import join, abspath, dirname
+from os.path import abspath, dirname, join
 from tempfile import gettempdir
 from uuid import uuid4
 
+import pandas as pd
 from aequilibrae.utils.create_example import create_example
 
 

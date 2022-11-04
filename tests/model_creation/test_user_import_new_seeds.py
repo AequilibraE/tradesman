@@ -1,21 +1,22 @@
+import unittest
 from os import rename
-from os.path import join, exists, abspath, dirname
+from os.path import abspath, dirname, exists, join
 from shutil import copy, rmtree
 from tempfile import gettempdir, mkdtemp
-import unittest
 
 from tradesman.model_creation.synthetic_population.user_control_import import user_import_new_seeds
 
 
 class TestUserImportNewSeeds(unittest.TestCase):
     def setUp(self) -> None:
-        temp_src = mkdtemp()
+        temp_src = mkdtemp(dir=gettempdir())
         self.src = join(gettempdir(), "data")
         rename(temp_src, self.src)
 
-        temp_dest = mkdtemp()
+        temp_dest = mkdtemp(dir=gettempdir())
         self.dest = join(gettempdir(), "destination")
         rename(temp_dest, self.dest)
+
         data_fldr = mkdtemp(dir=self.dest)
         rename(data_fldr, join(self.dest, "data"))
 
