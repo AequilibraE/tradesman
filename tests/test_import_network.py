@@ -1,6 +1,7 @@
 from os.path import join, abspath, dirname
 from tempfile import gettempdir
 import unittest
+from unittest import mock
 from uuid import uuid4
 from aequilibrae.project import Project
 
@@ -33,8 +34,8 @@ class TestImportNetwork(unittest.TestCase):
         self.assertIn("toll", links.columns)
         self.assertIn("tunnel", links.columns)
 
-    @unittest.skip
-    def test_import_from_gmns(self):
+    @mock.patch("tradesman.model_creation.import_network.bounding_boxes")
+    def test_import_from_gmns(self, patch_box):
         network = ImportNetwork(self.project, self.model_place, self.pbf_path)
         network.import_network()
 
