@@ -37,7 +37,14 @@ class ImportNetwork:
 
         """
 
-        if self.pbf_path:
+        if not self.pbf_path:
+            self.par.parameters["network"]["links"]["fields"]["one-way"].extend(extra_fields)
+            self.par.write_back()
+            self.project.network.create_from_osm(place_name=self.model_place)
+            return
+
+        else:
+
             print("Convert to GMNS ...")
             print(" ")
             net = og.getNetFromFile(self.pbf_path, network_types=("auto"))  # Fix it later
@@ -73,12 +80,6 @@ class ImportNetwork:
             print("Update links ...")
             print(" ")
             self.__update_links()
-
-        else:
-            self.par.parameters["network"]["links"]["fields"]["one-way"].extend(extra_fields)
-            self.par.write_back()
-
-            self.project.network.create_from_osm(place_name=self.model_place)
 
     def __adjust_link_file(self, file_path: str, model_place: str):
         """
