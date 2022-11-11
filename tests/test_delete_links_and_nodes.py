@@ -32,7 +32,7 @@ class TestDeleteLinksAndNodes(unittest.TestCase):
         self.temp_fldr = join(gettempdir(), uuid4().hex)
 
         copytree(
-            src=join(abspath(dirname("tests")), "tests/data/vatican city"),
+            src=join(abspath(dirname("tests")), "tests/data/vatican city/project"),
             dst=join(self.temp_fldr, "tests/data/vatican city"),
         )
 
@@ -52,7 +52,7 @@ class TestDeleteLinksAndNodes(unittest.TestCase):
         self.temp_fldr = join(gettempdir(), uuid4().hex)
 
         copytree(
-            src=join(abspath(dirname("tests")), "tests/data/monaco"),
+            src=join(abspath(dirname("tests")), "tests/data/monaco/project"),
             dst=join(self.temp_fldr, "tests/data/monaco"),
         )
 

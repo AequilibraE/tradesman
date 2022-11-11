@@ -226,6 +226,6 @@ system:
   cpus: 0
   default_directory: C:\
   logging: true
-  logging_directory: C:\Users\renat\AppData\Local\Temp\225b9ff98b194cdb977b599c3f2e0c67
+  logging_directory: Vatican City
   spatialite_path: C:\mod_spatialite-NG-win-amd64
   temp directory: /temp

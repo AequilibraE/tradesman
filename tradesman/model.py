@@ -9,7 +9,7 @@ from tradesman.data_retrieval import subdivisions
 from tradesman.data_retrieval.import_amenities import import_amenities
 from tradesman.data_retrieval.import_building import building_import
 from tradesman.model_creation.create_new_tables import add_new_tables
-from tradesman.model_creation.import_network import import_network
+from tradesman.model_creation.import_network import ImportNetwork
 from tradesman.model_creation.import_political_subdivisions import ImportPoliticalSubdivisions
 from tradesman.model_creation.import_population import import_population
 from tradesman.model_creation.pop_by_sex_and_age import get_pop_by_sex_age
@@ -19,7 +19,9 @@ from tradesman.model_creation.zoning.zone_building import zone_builder
 
 
 class Tradesman:
-    def __init__(self, network_path: str, model_place: str = None, boundaries_source: str = "GADM"):
+    def __init__(
+        self, network_path: str, model_place: str = None, pbf_path: str = None, boundaries_source: str = "GADM"
+    ):
         # If the model exists, you would only tell where it is (network_path), and the software
         # would check and populate the model place.  Needs to be implemented
         self.__model_place = model_place
@@ -27,10 +29,13 @@ class Tradesman:
         self.__folder = network_path
         self._project = Project()
         self.__osm_data = {}
-        self._boundaries_source = boundaries_source
+        self.__pbf_path = pbf_path
         self.__starts_logging()
 
         self.__initialize_model()
+        self._network = ImportNetwork(self._project, self.__model_place, self.__pbf_path)
+
+        self._boundaries_source = boundaries_source
         self._boundaries = ImportPoliticalSubdivisions(self.__model_place, self._boundaries_source, self._project)
 
     def create(self):
@@ -80,7 +85,8 @@ class Tradesman:
     def import_network(self):
         """Triggers the import of the network from OSM and adds subdivisions into the model.
         If the network already exists in the folder, it will be loaded, otherwise it will be created."""
-        import_network(self._project, self.__model_place)
+
+        self._network.import_network(self._project, self.__model_place, self.__pbf_path)
 
     def import_subdivisions(self, subdivision_levels=2, overwrite=False):
         """Imports political subdivisions.
