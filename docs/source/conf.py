@@ -19,7 +19,7 @@ import sys
 # -- Project information -----------------------------------------------------
 
 
-project = "RoadAnalytics"
+project = "Tradesman"
 copyright = "2022, Pedro Camargo"
 author = "Pedro Camargo, Ph.D."
 
@@ -102,7 +102,7 @@ html_static_path = ["_static"]
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = "RoadAnalytics"
+htmlhelp_basename = "Tradesman"
 
 # -- Options for LaTeX output ------------------------------------------------
 
@@ -114,20 +114,20 @@ latex_elements = {}
 latex_documents = [
     (
         master_doc,
-        "RoadAnalytics.tex",
-        "RoadAnalytics Documentation",
+        "Tradesman.tex",
+        "Tradesman Documentation",
         "Pedro Camargo",
         "manual",
     )
 ]
 
-pdf_documents = [(master_doc, "RoadAnalytics.pdf", "RoadAnalytics Documentation", "Pedro Camargo")]
+pdf_documents = [(master_doc, "Tradesman.pdf", "Tradesman Documentation", "Pedro Camargo")]
 
 # -- Options for manual page output ------------------------------------------
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [(master_doc, "RoadAnalytics", "RoadAnalytics Documentation", [author], 1)]
+man_pages = [(master_doc, "Tradesman", "Tradesman Documentation", [author], 1)]
 
 # -- Options for Texinfo output ----------------------------------------------
 
@@ -155,11 +155,11 @@ autosummary_generate = True
 texinfo_documents = [
     (
         master_doc,
-        "RoadAnalytics",
-        "RoadAnalytics Documentation",
+        "Tradesman",
+        "Tradesman Documentation",
         author,
-        "RoadAnalytics",
-        "RoadAnalytics.",
+        "Tradesman",
+        "Tradesman.",
         "Miscellaneous",
     )
 ]
