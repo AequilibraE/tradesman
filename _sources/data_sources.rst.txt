@@ -28,7 +28,10 @@ its `website <https://www.openstreetmap.org/about>`_.
 Political Subdivisions
 ----------------------
 
-Political Subdivisions can be downloaded from either `GADM <https://gadm.org/data.html>`_  or `geoBoundaries <https://www.geoboundaries.org/>`_. Both databases are open source, and provide information with respect to countries and territories, and the existing political subdivisions that might exists.
+Political Subdivisions can be downloaded from either `GADM <https://gadm.org/data.html>`_
+or `geoBoundaries <https://www.geoboundaries.org/>`_. Both databases are open source, and
+provide information with respect to countries and territories, and the existing political
+subdivisions that might exists.
 
 Point-of-Interest
 -----------------

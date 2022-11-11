@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>5. Synthetic Populations &#8212; RoadAnalytics TBD documentation</title>
+    <title>5. Synthetic Populations &#8212; Tradesman TBD documentation</title>
   <script>
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
@@ -41,7 +41,6 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'synthetic_population';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="10. Using this software" href="use_instructions.html" />
     <link rel="prev" title="4. General concepts" href="concepts.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="docsearch:language" content="en">
@@ -94,7 +93,7 @@
 
   
   
-    <p class="title logo__title">RoadAnalytics TBD documentation</p>
+    <p class="title logo__title">Tradesman TBD documentation</p>
   
 </a>
     
@@ -145,21 +144,6 @@
                     </a>
                 </li>
                 
-            <div class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    More
-                </button>
-                <div class="dropdown-menu">
-                    
-                <li class="nav-item">
-                    <a class="nav-link" href="use_instructions.html">
-                        Using this software
-                    </a>
-                </li>
-                
-                </div>
-            </div>
-            
     </ul>
 </nav>
       </div>
@@ -260,21 +244,6 @@
                     </a>
                 </li>
                 
-            <div class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    More
-                </button>
-                <div class="dropdown-menu">
-                    
-                <li class="nav-item">
-                    <a class="nav-link" href="use_instructions.html">
-                        Using this software
-                    </a>
-                </li>
-                
-                </div>
-            </div>
-            
     </ul>
 </nav>
       </div>
@@ -327,11 +296,12 @@
               
   <section id="synthetic-populations">
 <span id="synthetic-population"></span><h1><span class="section-number">5. </span>Synthetic Populations<a class="headerlink" href="#synthetic-populations" title="Permalink to this heading">#</a></h1>
-<p>Synthetic populations are the primary input to activity-based travel demand models (ABMs), and are used as an alternative to the collection of microdata that is usually inacessible <a class="reference internal" href="#rmk2007" id="id1"><span>[RMK2007]</span></a>.</p>
-<p>Tradesman uses <a class="reference external" href="https://activitysim.github.io/populationsim/index.html">PopulationSim</a>, a Python native library to create its synthetic population and households.</p>
-</section>
+<p>Synthetic populations are the primary input to activity-based travel demand models (ABMs),
+and are used as an alternative to the collection of microdata that is usually inacessible <a class="reference internal" href="#rmk2007" id="id1"><span>[RMK2007]</span></a>.</p>
+<p>Tradesman uses <a class="reference external" href="https://activitysim.github.io/populationsim/index.html">PopulationSim</a>,
+a Python native library to create its synthetic population and households.</p>
 <section id="populationsim-controls">
-<h1><span class="section-number">6. </span>PopulationSim Controls<a class="headerlink" href="#populationsim-controls" title="Permalink to this heading">#</a></h1>
+<h2><span class="section-number">5.1. </span>PopulationSim Controls<a class="headerlink" href="#populationsim-controls" title="Permalink to this heading">#</a></h2>
 <p>If necessary one can change the controls. In Tradesman, by default, we consider the following controls:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="go">&gt;&gt;&gt;</span>
 <span class="go">target,geography,seed_table,importance,control_field,expression</span>
@@ -378,18 +348,51 @@
 <span class="go">female_18,TAZ,persons,100000,POPF18,(persons.AGEP &gt;= 80) &amp; (persons.SEX == 2)</span>
 </pre></div>
 </div>
-<p>For each sex and age bracket, we create a control variable, considering the geography level of TAZ. For both women and men, we have 18 variables, named POPF and POPM, for female and male residents. For TAZs we also consider the expected number of households.</p>
-<p>In the following section, we discuss the premisses of the model and explain how the expected number of households was calculated. Finally, we have the controls by REGION, an upper level. For regional control, we consider the expected number of households of different sizes.</p>
+<p>For each sex and age bracket, we create a control variable, considering the geography level of TAZ.
+For both women and men, we have 18 variables, named POPF and POPM, for female and male residents. For
+TAZs we also consider the expected number of households.</p>
+<p>In the following section, we discuss the premisses of the model and explain how the expected number
+of households was calculated. Finally, we have the controls by REGION, an upper level. For regional
+control, we consider the expected number of households of different sizes.</p>
 </section>
 <section id="tradesman-model-premises">
-<h1><span class="section-number">7. </span>Tradesman model premises<a class="headerlink" href="#tradesman-model-premises" title="Permalink to this heading">#</a></h1>
-<p>To create a population sample for each country, we will use PUMS data for the state of Texas. Public Use of Microdata Sampe (aka PUMS) allow data users to create estimates for user defined characteristics. More information can be found in its <a class="reference external" href="https://www.census.gov/programs-surveys/acs/data/experimental-data/2020-1-year-pums.html">webpage</a>. We cleaned up the data, removing households with no inhabitants (NP = 0), institutional and non-institutional types of household (TYPEHUGQ &gt; 1), and created a hhnum column to represent the household number, given that SERIALNO column has different types of data.</p>
-<p>Since the population of some countries is smaller than the sample and presents a populational distribution different than the sample, we split the Texas sample population into 4 different buckets, each one containing different size households. The number of buckets is related to the information on household size provided by the United Nations <a class="reference external" href="https://www.un.org/development/desa/pd/data/household-size-and-composition">Population Division</a> studies. To build our sample, we draw a number between 0 and 1, until the number of draws equals 0.02% of the population. Each number drawn is then associated with one of the buckets, and at the end, the total numbers associated with each bucket are added up. This number represents the total number of households of each size that must be drawn from each bucket. The sample is then drawn and we proceed to build the models with synthetic population.</p>
-<p>The PopulationSim library requires a control file to run. In the control file, one can specify and check the requirements for the synthetic population. The only mandatory requirement for generating a synthetic population, is to provide the right number of households in each geography, and this specification is made at the lowest level. The lowest level in an AequilibraE model is the TAZs (Traffic Analysis Zones), however, the data necessary to estimate the total households is available only in the upper level. Once again, we will use the UN Population Division household composition to fulfill this requirement, with the underlying hypothesis that the family size distribution would be equal for all TAZs in the country.</p>
-<p>As there is no data available for all countries or autonomous regions, for countries that are not present in the sample, we considered their household information to be similar to their closest (and most similar) neighbors. As there are many data sources available in the Population Division sheet, we kept the most recent data for each country, as long as it had information about the total number of households.</p>
-<p>The total number of households in each TAZ is a sum of all households with different sizes. To match the information provided by the UN, we consider households with 1 person (HHBASE1), 2 to 3 persons (HHBASE2), 4 to 5 persons (HHBASE4), and with more than 6 persons (HHBASE6). Hence, we sum all population by sex and age in the zone, divide by the average number of persons in the household, and multiply by the percentage of households of each size expected for the country. Finally, we sum the integer expected values for each household size to obtain the mandatory expected number of households in the TAZ (HHBASE).</p>
+<h2><span class="section-number">5.2. </span>Tradesman model premises<a class="headerlink" href="#tradesman-model-premises" title="Permalink to this heading">#</a></h2>
+<p>To create a population sample for each country, we will use PUMS data for the state of Texas. Public
+Use of Microdata Sampe (aka PUMS) allow data users to create estimates for user defined characteristics.
+More information can be found in its
+<a class="reference external" href="https://www.census.gov/programs-surveys/acs/data/experimental-data/2020-1-year-pums.html">webpage</a>.
+We cleaned up the data, removing households with no inhabitants (NP = 0), institutional and
+non-institutional types of household (TYPEHUGQ &gt; 1), and created a hhnum column to represent the
+household number, given that SERIALNO column has different types of data.</p>
+<p>Since the population of some countries is smaller than the sample and presents a populational distribution
+different than the sample, we split the Texas sample population into 4 different buckets, each one containing
+different size households. The number of buckets is related to the information on household size provided
+by the United Nations
+<a class="reference external" href="https://www.un.org/development/desa/pd/data/household-size-and-composition">Population Division</a> studies.
+To build our sample, we draw a number between 0 and 1, until the number of draws equals 0.02% of the population.
+Each number drawn is then associated with one of the buckets, and at the end, the total numbers associated
+with each bucket are added up. This number represents the total number of households of each size that must be
+drawn from each bucket. The sample is then drawn and we proceed to build the models with synthetic population.</p>
+<p>The PopulationSim library requires a control file to run. In the control file, one can specify and check the
+requirements for the synthetic population. The only mandatory requirement for generating a synthetic population,
+is to provide the right number of households in each geography, and this specification is made at the lowest
+level. The lowest level in an AequilibraE model is the TAZs (Traffic Analysis Zones), however, the data necessary
+to estimate the total households is available only in the upper level. Once again, we will use the UN Population
+Division household composition to fulfill this requirement, with the underlying hypothesis that the family size
+distribution would be equal for all TAZs in the country.</p>
+<p>As there is no data available for all countries or autonomous regions, for countries that are not present in
+the sample, we considered their household information to be similar to their closest (and most similar) neighbors.
+As there are many data sources available in the Population Division sheet, we kept the most recent data for
+each country, as long as it had information about the total number of households.</p>
+<p>The total number of households in each TAZ is a sum of all households with different sizes. To match the
+information provided by the UN, we consider households with 1 person (HHBASE1), 2 to 3 persons (HHBASE2),
+4 to 5 persons (HHBASE4), and with more than 6 persons (HHBASE6). Hence, we sum all population by sex and
+age in the zone, divide by the average number of persons in the household, and multiply by the percentage
+of households of each size expected for the country. Finally, we sum the integer expected values for each
+household size to obtain the mandatory expected number of households in the TAZ (HHBASE).</p>
 <a class="reference internal image-reference" href="_images/hh_example.png"><img alt="_images/hh_example.png" class="align-center" src="_images/hh_example.png" style="width: 116.4px; height: 12.0px;" /></a>
-<p>As we currently do not have validation data to assess the quality of the synthetic populations created, we use the following variables from the UN Population Division file to validate the population:</p>
+<p>As we currently do not have validation data to assess the quality of the synthetic populations created,
+we use the following variables from the UN Population Division file to validate the population:</p>
 <ul class="simple">
 <li><p>Percentage of households with at least one person under 15 years old;</p></li>
 <li><p>Percentage of households with at least one person under 18 years old;</p></li>
@@ -403,23 +406,30 @@
 <li><p>Percentage of households with at least one person under 20 and one person over 60;</p></li>
 <li><p>Percentage of households with at least one person under 20 and one person over 65.</p></li>
 </ul>
-<p>As part of the validation process, we also run the validation process presented by the development team of PopulationSim, available <a class="reference external" href="https://github.com/activitysim/populationSim/tree/master/scripts">here</a>.</p>
+<p>As part of the validation process, we also run the validation process presented by the development team
+of PopulationSim, available <a class="reference external" href="https://github.com/activitysim/populationSim/tree/master/scripts">here</a>.</p>
 </section>
 <section id="example">
-<h1><span class="section-number">8. </span>Example<a class="headerlink" href="#example" title="Permalink to this heading">#</a></h1>
-<p>San Marino is one of the smallest countries in the world. As it has no data in the UN Population Division sheet, we consider its informations to be like the nearest or most similar country, in this case, Italy. The average household size and household composition are:</p>
+<h2><span class="section-number">5.3. </span>Example<a class="headerlink" href="#example" title="Permalink to this heading">#</a></h2>
+<p>San Marino is one of the smallest countries in the world. As it has no data in the UN Population Division
+sheet, we consider its informations to be like the nearest or most similar country, in this case, Italy.
+The average household size and household composition are:</p>
 <a class="reference internal image-reference" href="_images/hh_descriptive.png"><img alt="_images/hh_descriptive.png" class="align-center" src="_images/hh_descriptive.png" style="width: 120.80000000000001px; height: 43.400000000000006px;" /></a>
-<p>A zone in San Marino with 4,718 inhabitants would have 611 households with 1 member (HHBASE1), 915 households with 2-3 members (HHBASE2), 419 houeholds with 4-5 members (HHBASE4), and 21 households with 6 or more members (HHBASE6). Hence we would expect 1,966 houeholds within the TAZ.</p>
-<p>As for the number od households types by region, we sum the values of HHBASE1, HHBASE2, HHBASE4, and HHBASE6 across all TAZs.</p>
+<p>A zone in San Marino with 4,718 inhabitants would have 611 households with 1 member (HHBASE1), 915
+households with 2-3 members (HHBASE2), 419 houeholds with 4-5 members (HHBASE4), and 21 households with
+6 or more members (HHBASE6). Hence we would expect 1,966 houeholds within the TAZ.</p>
+<p>As for the number od households types by region, we sum the values of HHBASE1, HHBASE2, HHBASE4, and
+HHBASE6 across all TAZs.</p>
 </section>
 <section id="references">
-<h1><span class="section-number">9. </span>References<a class="headerlink" href="#references" title="Permalink to this heading">#</a></h1>
+<h2><span class="section-number">5.4. </span>References<a class="headerlink" href="#references" title="Permalink to this heading">#</a></h2>
 <div role="list" class="citation-list">
 <div class="citation" id="rmk2007" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">RMK2007</a><span class="fn-bracket">]</span></span>
 <p><a class="reference external" href="https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1538-4632.2009.00750.x">https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1538-4632.2009.00750.x</a></p>
 </div>
 </div>
+</section>
 </section>
 
 
@@ -437,13 +447,6 @@
           <p class="prev-next-title"><span class="section-number">4. </span>General concepts</p>
       </div>
   </a>
-  <a class='right-next' id="next-link" href="use_instructions.html" title="next page">
-  <div class="prev-next-info">
-      <p class="prev-next-subtitle">next</p>
-      <p class="prev-next-title"><span class="section-number">10. </span>Using this software</p>
-  </div>
-  <i class="fa-solid fa-angle-right"></i>
-  </a>
 </div>
             </footer>
             
@@ -460,29 +463,24 @@
 </div>
 <nav id="bd-toc-nav" class="page-toc">
     <ul class="visible nav section-nav flex-column">
- <li class="toc-h1 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#">
-   5. Synthetic Populations
-  </a>
- </li>
- <li class="toc-h1 nav-item toc-entry">
+ <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#populationsim-controls">
-   6. PopulationSim Controls
+   5.1. PopulationSim Controls
   </a>
  </li>
- <li class="toc-h1 nav-item toc-entry">
+ <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#tradesman-model-premises">
-   7. Tradesman model premises
+   5.2. Tradesman model premises
   </a>
  </li>
- <li class="toc-h1 nav-item toc-entry">
+ <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#example">
-   8. Example
+   5.3. Example
   </a>
  </li>
- <li class="toc-h1 nav-item toc-entry">
+ <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#references">
-   9. References
+   5.4. References
   </a>
  </li>
 </ul>
