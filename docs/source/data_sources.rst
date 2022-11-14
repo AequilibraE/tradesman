@@ -42,10 +42,10 @@ be a point, but can also be other OSM elements, such as nodes or ways.
 
 It is worth reminding that the "interest" part should not be considered too 
 literaly, once a feature can be quite ordinary, such as a postbox. In this case,
-these features are usally considered ``amenity``\=*s\ .
+these features are usally considered ``amenity``.
 
 Amenities are useful and import facilities for visitiors and residents. More 
-information on amenity values on OSM, is available `in this page <https://wiki.openstreetmap.org/wiki/Key:amenity>`_.
+information on amenity values in OSM, is available `in this page <https://wiki.openstreetmap.org/wiki/Key:amenity>`_.
 
 A building can also be a POI. The OSM building tag is used to identify individual
 buildings or groups of connected buildings, and can assume several values.
