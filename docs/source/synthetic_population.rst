@@ -9,6 +9,17 @@ and are used as an alternative to the collection of microdata that is usually in
 Tradesman uses `PopulationSim <https://activitysim.github.io/populationsim/index.html>`_,
 a Python native library to create its synthetic population and households.
 
+Although a common procedure, generating the input data for synthetic populations can be
+tedious and time-consuming, so we have automated the process within Tradesman.
+
+The creation of synthetic populations is divided in two steps within Tradesman:
+
+1. Creation of input data (control totals and household samples)
+2. Running of PopulationSim
+
+This division allows the user to replace the sample households used by default with a more
+appropriate sample of households should that be available. The discussion on the source of
+the household sample used as default and how to replace it is done below.
 
 PopulationSim Controls
 ----------------------
@@ -74,7 +85,7 @@ To create a population sample for each country, we will use PUMS data for the st
 Use of Microdata Sampe (aka PUMS) allow data users to create estimates for user defined characteristics.
 More information can be found in its
 `webpage <https://www.census.gov/programs-surveys/acs/data/experimental-data/2020-1-year-pums.html>`_.
-We cleaned up the data, removing households with no inhabitants (NP = 0), institutional and
+We cleaned up the data, removing households with no persons (NP = 0), institutional and
 non-institutional types of household (TYPEHUGQ > 1), and created a hhnum column to represent the
 household number, given that SERIALNO column has different types of data.
 
@@ -83,7 +94,7 @@ different than the sample, we split the Texas sample population into 4 different
 different size households. The number of buckets is related to the information on household size provided
 by the United Nations
 `Population Division <https://www.un.org/development/desa/pd/data/household-size-and-composition>`_ studies.
-To build our sample, we draw a number between 0 and 1, until the number of draws equals 0.02% of the population.
+To build our sample, we draw a number between 0 and 1, until the number of draws equals 2% of the population.
 Each number drawn is then associated with one of the buckets, and at the end, the total numbers associated
 with each bucket are added up. This number represents the total number of households of each size that must be
 drawn from each bucket. The sample is then drawn and we proceed to build the models with synthetic population.

@@ -4,21 +4,57 @@
         Tradesman
      </font>
 
+Tradesman is a package for building transport models from open data sources.
+You can easily download network data from OpenStreetMap, import population, and
+build zones. It downloads population pyramid data and amenities and building
+information from OpenStreetMap and Microsoft, and builds synthetic populations
+matching the target population pyramids.
 
-
-
-Tradesman is a package for building transport models from open data sources. You can easily download network data from OpenStreetMap, import population, and build zones. It is also possible to download information related to female and male population per age bracket, as well as import amenities and building information from OpenStreetMap. An modulo for building synthetic population from the model data is also provided.
-
-This analytics pipeline is organized in sections for ease of use, and some
-expertise in transportation planning/modelling/forecasting may be useful when
-utilizing some of the more advanced analysis.
-
-It is also noteworthy that this pipeline was designed to handle both whole-of-country
-data, but smaller areas, such as states or cities, for example.
-
-Finally, the pipeline has been tightly integrated with a few data sources, and
+Tradesman has been tightly integrated with a few data sources, and
 while that allows for fast deployment for any region on Earth, it also makes it
-somewhat complex to incorporate bespoke data sources.
+somewhat complex to incorporate bespoke data sources. It is open-source though!
+
+This is how easy one can build a model for Vietnam:
+
+::
+
+    from tradesman.model import Tradesman
+
+    model_path
+    project = Tradesman(model_path, "Vietnam")
+    project.create()
+
+
+Do you want to choose which steps to do?:
+
+::
+
+    from tradesman.model import Tradesman
+
+    model_path
+    project = Tradesman(model_path, "Detroit")
+
+    project.import_model_area()
+    project.add_country_borders()
+
+    project.import_subdivisions(2) # imports 2 levels of political subdivisions below country (e.g. State & County)
+    project.import_network()
+    project.import_population()
+
+    # The hexbin mesh to be created will have units with roughly 200m of side
+    # And they will be clustered in zones with population between 500 and 10,000 people (tentatively)
+    project.build_zoning(hexbin_size=200, max_zone_pop=10000, min_zone_pop=500, save_hexbins=False, overwrite=False)
+
+    # We import the population pyramid for the modeled area into our zoning system
+    project.import_pop_by_sex_and_age()
+
+    project.build_population_synthesizer_data() # And create the synthetic population
+    project.synthesize_population()
+
+    # And we will not import amenities or building
+    # project.import_amenities()
+    # project.import_buildings(True)
+
 
 .. raw:: html
 
@@ -34,6 +70,5 @@ somewhat complex to incorporate bespoke data sources.
 
    build_analytics_model
    data_sources
-   travel_modelling
-   concepts
+   zoning
    synthetic_population
