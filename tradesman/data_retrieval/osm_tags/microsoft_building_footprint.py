@@ -18,7 +18,7 @@ class ImportMicrosoftBuildingData:
         self._project = project
         self.__zones = load_zones(project)
         self.__country_list = pd.read_csv(
-            "https://raw.githubusercontent.com/microsoft/GlobalMLBuildingFootprints/main/dataset-links.csv"
+            "https://minedbuildings.blob.core.windows.net/global-buildings/dataset-links.csv"
         )
 
         self.__country_name = self.__nominatim_get_name()
