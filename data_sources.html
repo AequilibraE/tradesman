@@ -42,7 +42,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'data_sources';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="3. Travel model" href="travel_modelling.html" />
+    <link rel="next" title="3. Building Zones" href="zoning.html" />
     <link rel="prev" title="1. Analytics models" href="build_analytics_model.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="docsearch:language" content="en">
@@ -131,15 +131,8 @@
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="travel_modelling.html">
-                        Travel model
-                      </a>
-                    </li>
-                
-
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="concepts.html">
-                        General concepts
+                      <a class="nav-link nav-internal" href="zoning.html">
+                        Building Zones
                       </a>
                     </li>
                 
@@ -235,15 +228,8 @@
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="travel_modelling.html">
-                        Travel model
-                      </a>
-                    </li>
-                
-
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="concepts.html">
-                        General concepts
+                      <a class="nav-link nav-internal" href="zoning.html">
+                        Building Zones
                       </a>
                     </li>
                 
@@ -309,13 +295,11 @@
               
   <section id="data-sources">
 <span id="id1"></span><h1><span class="section-number">2. </span>Data sources<a class="headerlink" href="#data-sources" title="Permalink to this heading">#</a></h1>
-<p>To be included in the main portions of this analytics pipeline, all data sources
+<p>To be part of the backbone of a model build, all data sources
 have to fulfill the following requirements:</p>
 <ul class="simple">
-<li><p>Coverage: Since this pipeline is designed to be deployable for any country in
-the world, the data source must be available for the vast majority of
-countries on Earth.</p></li>
-<li><p>Openess: The data must be free, open and cannot impose excessive red-tape for
+<li><p>Coverage: Must be available for most if not all countries in the world.</p></li>
+<li><p>Openness: The data must be free, open and cannot impose excessive red-tape for
 its use.</p></li>
 <li><p>Trustworthiness: The science and/or practices behind the development of
 data source must be technically transparent and robust, and have documented
@@ -330,7 +314,7 @@ its <a class="reference external" href="https://www.openstreetmap.org/about">web
 <section id="political-subdivisions">
 <h2><span class="section-number">2.2. </span>Political Subdivisions<a class="headerlink" href="#political-subdivisions" title="Permalink to this heading">#</a></h2>
 <p>Political Subdivisions can be downloaded from either <a class="reference external" href="https://gadm.org/data.html">GADM</a>
-or <a class="reference external" href="https://www.geoboundaries.org/">geoBoundaries</a>. Both databases are open source, and
+or <a class="reference external" href="https://www.geoboundaries.org/">geoBoundaries</a>. Both databases are open, and
 provide information with respect to countries and territories, and the existing political
 subdivisions that might exists.</p>
 </section>
@@ -340,16 +324,21 @@ subdivisions that might exists.</p>
 churches, schools, pubs, or tourist attractions. It does not necessarily have to
 be a point, but can also be other OSM elements, such as nodes or ways.</p>
 <p>It is worth reminding that the “interest” part should not be considered too
-literaly, once a feature can be quite ordinary, such as a postbox. In this case,
-these features are usally considered <code class="docutils literal notranslate"><span class="pre">amenity</span></code>.</p>
-<p>Amenities are useful and import facilities for visitiors and residents. More
+literally, once a feature can be quite ordinary, such as a postbox. In this case,
+these features are usually considered <code class="docutils literal notranslate"><span class="pre">amenity</span></code>.</p>
+<p>Amenities are useful and import facilities for visitors and residents. More
 information on amenity values in OSM, is available <a class="reference external" href="https://wiki.openstreetmap.org/wiki/Key:amenity">in this page</a>.</p>
 <p>A building can also be a POI. The OSM building tag is used to identify individual
 buildings or groups of connected buildings, and can assume several values.
 More information on building values can be found in <a class="reference external" href="https://wiki.openstreetmap.org/wiki/Buildings">this page</a>.</p>
 </section>
+<section id="building-footprints">
+<h2><span class="section-number">2.4. </span>Building footprints<a class="headerlink" href="#building-footprints" title="Permalink to this heading">#</a></h2>
+<p>Building footprints can also be downloaded from OSM or from data generated through
+image recognition by <a class="reference external" href="https://github.com/microsoft/GlobalMLBuildingFootprints">Microsoft</a>.</p>
+</section>
 <section id="population">
-<h2><span class="section-number">2.4. </span>Population<a class="headerlink" href="#population" title="Permalink to this heading">#</a></h2>
+<h2><span class="section-number">2.5. </span>Population<a class="headerlink" href="#population" title="Permalink to this heading">#</a></h2>
 <p>There are currently two data sources of spatialized population that are suitable
 for use in this project.</p>
 <ol class="arabic simple">
@@ -359,7 +348,7 @@ for use in this project.</p>
 <p>Both data sources provide population estimates at a very high resolution (down
 to a grid of 100x100m) and are based on extensive research and offer similar
 results at more aggregate levels (small cities or neighborhoods within a large
-city), so they are equivalent for the purposes of this analytics pipeline.</p>
+city), so they are equivalent for the purposes of building models for large areas.</p>
 <p>However, the World Pop data includes estimates with finer detail with respect
 to population per age bracket, which can be crucial when analyzing access to
 hospital infrastructure, schools and the labor market, so we have decided
@@ -369,14 +358,6 @@ while the data for the total population is listed on a
 <a class="reference external" href="https://www.github/pedrocamargo/road_analytics/blob/main/model/population/all_raster_pop_source.csv">separate file</a>.</p>
 <p>All the data is downloaded from the <a class="reference external" href="https://data.humdata.org/">Humanitarian Data Exchange</a>, which provides a convenient interface for data
 download.</p>
-</section>
-<section id="commuting-zones">
-<h2><span class="section-number">2.5. </span>Commuting Zones<a class="headerlink" href="#commuting-zones" title="Permalink to this heading">#</a></h2>
-<p>The Commuting zones dataset provided by Meta consists of identifying areas
-within which people live and work, which is extremely relevant for providing
-reference values for our transportation demand model, as discussed in the
-corresponding section.</p>
-<p>Data documentation can be found on <a class="reference external" href="https://dataforgood.facebook.com/dfg/tools/commuting-zones">Meta Commuting Zones website</a>.</p>
 </section>
 </section>
 
@@ -395,10 +376,10 @@ corresponding section.</p>
           <p class="prev-next-title"><span class="section-number">1. </span>Analytics models</p>
       </div>
   </a>
-  <a class='right-next' id="next-link" href="travel_modelling.html" title="next page">
+  <a class='right-next' id="next-link" href="zoning.html" title="next page">
   <div class="prev-next-info">
       <p class="prev-next-subtitle">next</p>
-      <p class="prev-next-title"><span class="section-number">3. </span>Travel model</p>
+      <p class="prev-next-title"><span class="section-number">3. </span>Building Zones</p>
   </div>
   <i class="fa-solid fa-angle-right"></i>
   </a>
@@ -434,13 +415,13 @@ corresponding section.</p>
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#population">
-   2.4. Population
+  <a class="reference internal nav-link" href="#building-footprints">
+   2.4. Building footprints
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#commuting-zones">
-   2.5. Commuting Zones
+  <a class="reference internal nav-link" href="#population">
+   2.5. Population
   </a>
  </li>
 </ul>

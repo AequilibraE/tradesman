@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>5. Synthetic Populations &#8212; Tradesman TBD documentation</title>
+    <title>4. Synthetic Populations &#8212; Tradesman TBD documentation</title>
   
   
   
@@ -42,7 +42,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'synthetic_population';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="4. General concepts" href="concepts.html" />
+    <link rel="prev" title="3. Building Zones" href="zoning.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="docsearch:language" content="en">
   </head>
@@ -130,15 +130,8 @@
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="travel_modelling.html">
-                        Travel model
-                      </a>
-                    </li>
-                
-
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="concepts.html">
-                        General concepts
+                      <a class="nav-link nav-internal" href="zoning.html">
+                        Building Zones
                       </a>
                     </li>
                 
@@ -234,15 +227,8 @@
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="travel_modelling.html">
-                        Travel model
-                      </a>
-                    </li>
-                
-
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="concepts.html">
-                        General concepts
+                      <a class="nav-link nav-internal" href="zoning.html">
+                        Building Zones
                       </a>
                     </li>
                 
@@ -307,13 +293,23 @@
             <article class="bd-article" role="main">
               
   <section id="synthetic-populations">
-<span id="synthetic-population"></span><h1><span class="section-number">5. </span>Synthetic Populations<a class="headerlink" href="#synthetic-populations" title="Permalink to this heading">#</a></h1>
+<span id="synthetic-population"></span><h1><span class="section-number">4. </span>Synthetic Populations<a class="headerlink" href="#synthetic-populations" title="Permalink to this heading">#</a></h1>
 <p>Synthetic populations are the primary input to activity-based travel demand models (ABMs),
 and are used as an alternative to the collection of microdata that is usually inacessible <a class="reference internal" href="#rmk2007" id="id1"><span>[RMK2007]</span></a>.</p>
 <p>Tradesman uses <a class="reference external" href="https://activitysim.github.io/populationsim/index.html">PopulationSim</a>,
 a Python native library to create its synthetic population and households.</p>
+<p>Although a common procedure, generating the input data for synthetic populations can be
+tedious and time-consuming, so we have automated the process within Tradesman.</p>
+<p>The creation of synthetic populations is divided in two steps within Tradesman:</p>
+<ol class="arabic simple">
+<li><p>Creation of input data (control totals and household samples)</p></li>
+<li><p>Running of PopulationSim</p></li>
+</ol>
+<p>This division allows the user to replace the sample households used by default with a more
+appropriate sample of households should that be available. The discussion on the source of
+the household sample used as default and how to replace it is done below.</p>
 <section id="populationsim-controls">
-<h2><span class="section-number">5.1. </span>PopulationSim Controls<a class="headerlink" href="#populationsim-controls" title="Permalink to this heading">#</a></h2>
+<h2><span class="section-number">4.1. </span>PopulationSim Controls<a class="headerlink" href="#populationsim-controls" title="Permalink to this heading">#</a></h2>
 <p>If necessary one can change the controls. In Tradesman, by default, we consider the following controls:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="go">&gt;&gt;&gt;</span>
 <span class="go">target,geography,seed_table,importance,control_field,expression</span>
@@ -368,12 +364,12 @@ of households was calculated. Finally, we have the controls by REGION, an upper 
 control, we consider the expected number of households of different sizes.</p>
 </section>
 <section id="tradesman-model-premises">
-<h2><span class="section-number">5.2. </span>Tradesman model premises<a class="headerlink" href="#tradesman-model-premises" title="Permalink to this heading">#</a></h2>
+<h2><span class="section-number">4.2. </span>Tradesman model premises<a class="headerlink" href="#tradesman-model-premises" title="Permalink to this heading">#</a></h2>
 <p>To create a population sample for each country, we will use PUMS data for the state of Texas. Public
 Use of Microdata Sampe (aka PUMS) allow data users to create estimates for user defined characteristics.
 More information can be found in its
 <a class="reference external" href="https://www.census.gov/programs-surveys/acs/data/experimental-data/2020-1-year-pums.html">webpage</a>.
-We cleaned up the data, removing households with no inhabitants (NP = 0), institutional and
+We cleaned up the data, removing households with no persons (NP = 0), institutional and
 non-institutional types of household (TYPEHUGQ &gt; 1), and created a hhnum column to represent the
 household number, given that SERIALNO column has different types of data.</p>
 <p>Since the population of some countries is smaller than the sample and presents a populational distribution
@@ -381,7 +377,7 @@ different than the sample, we split the Texas sample population into 4 different
 different size households. The number of buckets is related to the information on household size provided
 by the United Nations
 <a class="reference external" href="https://www.un.org/development/desa/pd/data/household-size-and-composition">Population Division</a> studies.
-To build our sample, we draw a number between 0 and 1, until the number of draws equals 0.02% of the population.
+To build our sample, we draw a number between 0 and 1, until the number of draws equals 2% of the population.
 Each number drawn is then associated with one of the buckets, and at the end, the total numbers associated
 with each bucket are added up. This number represents the total number of households of each size that must be
 drawn from each bucket. The sample is then drawn and we proceed to build the models with synthetic population.</p>
@@ -422,7 +418,7 @@ we use the following variables from the UN Population Division file to validate 
 of PopulationSim, available <a class="reference external" href="https://github.com/activitysim/populationSim/tree/master/scripts">here</a>.</p>
 </section>
 <section id="example">
-<h2><span class="section-number">5.3. </span>Example<a class="headerlink" href="#example" title="Permalink to this heading">#</a></h2>
+<h2><span class="section-number">4.3. </span>Example<a class="headerlink" href="#example" title="Permalink to this heading">#</a></h2>
 <p>San Marino is one of the smallest countries in the world. As it has no data in the UN Population Division
 sheet, we consider its informations to be like the nearest or most similar country, in this case, Italy.
 The average household size and household composition are:</p>
@@ -434,7 +430,7 @@ households with 2-3 members (HHBASE2), 419 houeholds with 4-5 members (HHBASE4),
 HHBASE6 across all TAZs.</p>
 </section>
 <section id="references">
-<h2><span class="section-number">5.4. </span>References<a class="headerlink" href="#references" title="Permalink to this heading">#</a></h2>
+<h2><span class="section-number">4.4. </span>References<a class="headerlink" href="#references" title="Permalink to this heading">#</a></h2>
 <div role="list" class="citation-list">
 <div class="citation" id="rmk2007" role="doc-biblioentry">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">RMK2007</a><span class="fn-bracket">]</span></span>
@@ -452,11 +448,11 @@ HHBASE6 across all TAZs.</p>
             <footer class="bd-footer-article">
                 <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-  <a class='left-prev' id="prev-link" href="concepts.html" title="previous page">
+  <a class='left-prev' id="prev-link" href="zoning.html" title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
           <p class="prev-next-subtitle">previous</p>
-          <p class="prev-next-title"><span class="section-number">4. </span>General concepts</p>
+          <p class="prev-next-title"><span class="section-number">3. </span>Building Zones</p>
       </div>
   </a>
 </div>
@@ -477,22 +473,22 @@ HHBASE6 across all TAZs.</p>
     <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#populationsim-controls">
-   5.1. PopulationSim Controls
+   4.1. PopulationSim Controls
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#tradesman-model-premises">
-   5.2. Tradesman model premises
+   4.2. Tradesman model premises
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#example">
-   5.3. Example
+   4.3. Example
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#references">
-   5.4. References
+   4.4. References
   </a>
  </li>
 </ul>

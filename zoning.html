@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Travel model &#8212; Tradesman TBD documentation</title>
+    <title>3. Building Zones &#8212; Tradesman TBD documentation</title>
   
   
   
@@ -39,9 +39,11 @@
     <script src="_static/doctools.js"></script>
     <script src="_static/sphinx_highlight.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'travel_modelling';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'zoning';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="4. Synthetic Populations" href="synthetic_population.html" />
+    <link rel="prev" title="2. Data sources" href="data_sources.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="docsearch:language" content="en">
   </head>
@@ -128,8 +130,8 @@
                     </li>
                 
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="zoning.html">
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="#">
                         Building Zones
                       </a>
                     </li>
@@ -225,8 +227,8 @@
                     </li>
                 
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="zoning.html">
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="#">
                         Building Zones
                       </a>
                     </li>
@@ -291,39 +293,48 @@
             
             <article class="bd-article" role="main">
               
-  <section id="travel-model">
-<span id="build-travel-model"></span><h1>Travel model<a class="headerlink" href="#travel-model" title="Permalink to this heading">#</a></h1>
-<ul class="simple">
-<li><p>Congestion / interaction between demand and supply</p></li>
-</ul>
-<section id="augmenting-the-road-network-model">
-<h2>Augmenting the road network model<a class="headerlink" href="#augmenting-the-road-network-model" title="Permalink to this heading">#</a></h2>
-<p>Despite all the information contained in Open-Street maps, there are some pieces
-of information that are incomplete and others that are simply missing and need
-to augmented.</p>
-<p>The often incomplete information regards the number of lanes and speed limits for
-each one of the streets, while the information on actual link capacity is missing
-from OSM, as it is an abstraction particular to the transport modelling world.</p>
-<p>For this purpose, we augment the network with asserted values, which we list in
-the <a class="reference internal" href="model_parameters.html#road-capacities"><span class="std std-ref">Road capacities</span></a> table.</p>
-<p>Finally, we also take the type of road surface in consideration, as a paved street
-will always have higher speed and capacity to a similar unpaved road, according
-to the multiplying constants listed on the <a class="reference internal" href="model_parameters.html#pavement-constraints"><span class="std std-ref">Pavement Limitations</span></a> table.</p>
-<section id="building-the-travel-demand-model">
-<h3>Building the travel demand model<a class="headerlink" href="#building-the-travel-demand-model" title="Permalink to this heading">#</a></h3>
-<ul class="simple">
-<li><p>personal auto-travel only</p></li>
-</ul>
-<section id="trip-generation">
-<h4>Trip generation<a class="headerlink" href="#trip-generation" title="Permalink to this heading">#</a></h4>
-</section>
-<section id="trip-distribution">
-<h4>Trip distribution<a class="headerlink" href="#trip-distribution" title="Permalink to this heading">#</a></h4>
-</section>
-<section id="customizing-model-parameters">
-<h4>Customizing model parameters<a class="headerlink" href="#customizing-model-parameters" title="Permalink to this heading">#</a></h4>
-</section>
-</section>
+  <section id="building-zones">
+<span id="zoning-system"></span><h1><span class="section-number">3. </span>Building Zones<a class="headerlink" href="#building-zones" title="Permalink to this heading">#</a></h1>
+<p><em>The definition of a zone system is, traditionally, a somewhat manual exercise of</em>
+<em>aggregating adjacent geographical subdivisions such as census tracts into zones</em>
+<em>such that the level of detail is compatible with the network density and desired</em>
+<em>precision.</em> <a class="reference internal" href="#pvc2022" id="id1"><span>[PVC2022]</span></a>
+Very small land subdivisions cannot be expected to be available, or even exist,
+for the vast majority of the countries on Earth, and since a laborious manual
+exercise is exactly one of the activities that this package aims to eliminate,
+the traditional process was not considered as an alternative, but rather
+Tradesman adopts the methodology developed in <a class="reference internal" href="#pvc2021" id="id2"><span>[PVC2021]</span></a> and further developed in
+<a class="reference internal" href="#pvc2022" id="id3"><span>[PVC2022]</span></a> to design zoning systems.</p>
+<p>As described in <a class="reference internal" href="#pvc2022" id="id4"><span>[PVC2022]</span></a> (with some modifications to suit this documentation):</p>
+<p><em>In a nutshell, this methodology consists in building a mesh of small hexagonal</em>
+<em>polygons covering the area of interest and computing the estimated population</em>
+<em>of each polygon from raster data (Open Spatial Demographic Data and Research -</em>
+<em>WorldPop n.d.). With these “micro-zones” in hand, we can recursively apply</em>
+<em>spatial clustering algorithms to create bigger zones with a maximum population</em>
+<em>per zone.</em></p>
+<p><em>When applying the spatial clustering procedures, we limited the clustering to</em>
+<em>base hexagons that were (mostly) in the same district/county (or equivalent political</em>
+<em>subdivision) and prevent disconnect zones from existing. As a result, many zones</em>
+<em>with much smaller populations than the original target, can also created, but zone *
+*aggregations do a remarkable job in matching the political subdivisions.</em></p>
+<p><em>This population-based criteria, we obtain a zoning system that is more</em>
+<em>detailed in heavily populated areas and much coarser in unpopulated regions of</em>
+<em>the country.</em></p>
+<p>Tradesman utilizes as default a hexbin mesh with 200m of sides and zone size targets
+of a minimum of 500 people and a maximum of 10,000.</p>
+<section id="references">
+<h2><span class="section-number">3.1. </span>References<a class="headerlink" href="#references" title="Permalink to this heading">#</a></h2>
+<div role="list" class="citation-list">
+<div class="citation" id="pvc2021" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">PVC2021</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://trb-planningapp.secure-platform.com/a/solicitations/53/sessiongallery/726/">https://trb-planningapp.secure-platform.com/a/solicitations/53/sessiongallery/726/</a></p>
+</div>
+<div class="citation" id="pvc2022" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>PVC2022<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id1">1</a>,<a role="doc-backlink" href="#id3">2</a>,<a role="doc-backlink" href="#id4">3</a>)</span>
+<p><a class="reference external" href="https://australasiantransportresearchforum.org.au/network-resilience-analysis-with-large-streams-of-mobility-data-and-open-source-software/">https://australasiantransportresearchforum.org.au/network-resilience-analysis-with-large-streams-of-mobility-data-and-open-source-software/</a></p>
+</div>
+</div>
 </section>
 </section>
 
@@ -335,6 +346,20 @@ to the multiplying constants listed on the <a class="reference internal" href="m
             <footer class="bd-footer-article">
                 <!-- Previous / next buttons -->
 <div class='prev-next-area'>
+  <a class='left-prev' id="prev-link" href="data_sources.html" title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+          <p class="prev-next-subtitle">previous</p>
+          <p class="prev-next-title"><span class="section-number">2. </span>Data sources</p>
+      </div>
+  </a>
+  <a class='right-next' id="next-link" href="synthetic_population.html" title="next page">
+  <div class="prev-next-info">
+      <p class="prev-next-subtitle">next</p>
+      <p class="prev-next-title"><span class="section-number">4. </span>Synthetic Populations</p>
+  </div>
+  <i class="fa-solid fa-angle-right"></i>
+  </a>
 </div>
             </footer>
             
@@ -352,33 +377,9 @@ to the multiplying constants listed on the <a class="reference internal" href="m
 <nav id="bd-toc-nav" class="page-toc">
     <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#augmenting-the-road-network-model">
-   Augmenting the road network model
+  <a class="reference internal nav-link" href="#references">
+   3.1. References
   </a>
-  <ul class="nav section-nav flex-column">
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#building-the-travel-demand-model">
-     Building the travel demand model
-    </a>
-    <ul class="nav section-nav flex-column">
-     <li class="toc-h4 nav-item toc-entry">
-      <a class="reference internal nav-link" href="#trip-generation">
-       Trip generation
-      </a>
-     </li>
-     <li class="toc-h4 nav-item toc-entry">
-      <a class="reference internal nav-link" href="#trip-distribution">
-       Trip distribution
-      </a>
-     </li>
-     <li class="toc-h4 nav-item toc-entry">
-      <a class="reference internal nav-link" href="#customizing-model-parameters">
-       Customizing model parameters
-      </a>
-     </li>
-    </ul>
-   </li>
-  </ul>
  </li>
 </ul>
 
@@ -397,7 +398,7 @@ to the multiplying constants listed on the <a class="reference internal" href="m
 <div class="toc-item">
   
 <div class="tocsection sourcelink">
-    <a href="_sources/travel_modelling.rst.txt">
+    <a href="_sources/zoning.rst.txt">
         <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
 </div>

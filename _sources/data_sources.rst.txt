@@ -3,14 +3,12 @@
 Data sources
 ============
 
-To be included in the main portions of this analytics pipeline, all data sources
+To be part of the backbone of a model build, all data sources
 have to fulfill the following requirements:
 
-- Coverage: Since this pipeline is designed to be deployable for any country in
-  the world, the data source must be available for the vast majority of
-  countries on Earth.
+- Coverage: Must be available for most if not all countries in the world.
 
-- Openess: The data must be free, open and cannot impose excessive red-tape for
+- Openness: The data must be free, open and cannot impose excessive red-tape for
   its use.
 
 - Trustworthiness: The science and/or practices behind the development of
@@ -29,7 +27,7 @@ Political Subdivisions
 ----------------------
 
 Political Subdivisions can be downloaded from either `GADM <https://gadm.org/data.html>`_
-or `geoBoundaries <https://www.geoboundaries.org/>`_. Both databases are open source, and
+or `geoBoundaries <https://www.geoboundaries.org/>`_. Both databases are open, and
 provide information with respect to countries and territories, and the existing political
 subdivisions that might exists.
 
@@ -41,15 +39,20 @@ churches, schools, pubs, or tourist attractions. It does not necessarily have to
 be a point, but can also be other OSM elements, such as nodes or ways. 
 
 It is worth reminding that the "interest" part should not be considered too 
-literaly, once a feature can be quite ordinary, such as a postbox. In this case,
-these features are usally considered ``amenity``.
+literally, once a feature can be quite ordinary, such as a postbox. In this case,
+these features are usually considered ``amenity``.
 
-Amenities are useful and import facilities for visitiors and residents. More 
+Amenities are useful and import facilities for visitors and residents. More
 information on amenity values in OSM, is available `in this page <https://wiki.openstreetmap.org/wiki/Key:amenity>`_.
 
 A building can also be a POI. The OSM building tag is used to identify individual
 buildings or groups of connected buildings, and can assume several values.
 More information on building values can be found in `this page <https://wiki.openstreetmap.org/wiki/Buildings>`_.
+
+Building footprints
+-------------------
+Building footprints can also be downloaded from OSM or from data generated through
+image recognition by `Microsoft <https://github.com/microsoft/GlobalMLBuildingFootprints>`_.
 
 Population
 ----------
@@ -65,7 +68,7 @@ for use in this project.
 Both data sources provide population estimates at a very high resolution (down
 to a grid of 100x100m) and are based on extensive research and offer similar
 results at more aggregate levels (small cities or neighborhoods within a large
-city), so they are equivalent for the purposes of this analytics pipeline.
+city), so they are equivalent for the purposes of building models for large areas.
 
 However, the World Pop data includes estimates with finer detail with respect
 to population per age bracket, which can be crucial when analyzing access to
@@ -81,15 +84,3 @@ while the data for the total population is listed on a
 All the data is downloaded from the `Humanitarian Data Exchange
 <https://data.humdata.org/>`_, which provides a convenient interface for data
 download.
-
-Commuting Zones
----------------
-
-The Commuting zones dataset provided by Meta consists of identifying areas
-within which people live and work, which is extremely relevant for providing
-reference values for our transportation demand model, as discussed in the
-corresponding section.
-
-Data documentation can be found on `Meta Commuting Zones website
-<https://dataforgood.facebook.com/dfg/tools/commuting-zones>`_.
-

@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>4. General concepts &#8212; Tradesman TBD documentation</title>
+    <title>General concepts &#8212; Tradesman TBD documentation</title>
   
   
   
@@ -42,8 +42,6 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'concepts';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="5. Synthetic Populations" href="synthetic_population.html" />
-    <link rel="prev" title="3. Travel model" href="travel_modelling.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="docsearch:language" content="en">
   </head>
@@ -131,15 +129,8 @@
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="travel_modelling.html">
-                        Travel model
-                      </a>
-                    </li>
-                
-
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="#">
-                        General concepts
+                      <a class="nav-link nav-internal" href="zoning.html">
+                        Building Zones
                       </a>
                     </li>
                 
@@ -235,15 +226,8 @@
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="travel_modelling.html">
-                        Travel model
-                      </a>
-                    </li>
-                
-
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="#">
-                        General concepts
+                      <a class="nav-link nav-internal" href="zoning.html">
+                        Building Zones
                       </a>
                     </li>
                 
@@ -308,9 +292,9 @@
             <article class="bd-article" role="main">
               
   <section id="general-concepts">
-<span id="concepts"></span><h1><span class="section-number">4. </span>General concepts<a class="headerlink" href="#general-concepts" title="Permalink to this heading">#</a></h1>
+<span id="concepts"></span><h1>General concepts<a class="headerlink" href="#general-concepts" title="Permalink to this heading">#</a></h1>
 <section id="step-models">
-<h2><span class="section-number">4.1. </span>4-step models<a class="headerlink" href="#step-models" title="Permalink to this heading">#</a></h2>
+<h2>4-step models<a class="headerlink" href="#step-models" title="Permalink to this heading">#</a></h2>
 <p>The 4-step model is a classical transportation model. In a very simplistic way,
 it consists in input populational, economical, and network data into a model,
 that can generate, estimate, split, and allocate the existing demand.</p>
@@ -339,7 +323,7 @@ network. In the demand assignment, an interaction between demand for transportat
 happens. It aims to assign people and vehicles to road and public transport networks,
 so it turns out to be both a route choice and a demand distribution problem.</p>
 <section id="aequilibrae">
-<span id="id1"></span><h3><span class="section-number">4.1.1. </span>AequilibraE<a class="headerlink" href="#aequilibrae" title="Permalink to this heading">#</a></h3>
+<span id="id1"></span><h3>AequilibraE<a class="headerlink" href="#aequilibrae" title="Permalink to this heading">#</a></h3>
 <p>AequilibraE is the first comprehensive Python package for transportation
 modeling, and it aims to provide all the resources not easily available from
 other open-source packages in the Python (NumPy, really) ecosystem.</p>
@@ -347,7 +331,7 @@ other open-source packages in the Python (NumPy, really) ecosystem.</p>
 </section>
 </section>
 <section id="road-networks-model">
-<h2><span class="section-number">4.2. </span>Road Networks model<a class="headerlink" href="#road-networks-model" title="Permalink to this heading">#</a></h2>
+<h2>Road Networks model<a class="headerlink" href="#road-networks-model" title="Permalink to this heading">#</a></h2>
 <p>Road network model is based on data imported directly from OSM. The road network
 information provides information on the kind of road, and its surface, whenever
 available.</p>
@@ -368,20 +352,6 @@ values for road surface can be found in <a class="reference external" href="http
             <footer class="bd-footer-article">
                 <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-  <a class='left-prev' id="prev-link" href="travel_modelling.html" title="previous page">
-      <i class="fa-solid fa-angle-left"></i>
-      <div class="prev-next-info">
-          <p class="prev-next-subtitle">previous</p>
-          <p class="prev-next-title"><span class="section-number">3. </span>Travel model</p>
-      </div>
-  </a>
-  <a class='right-next' id="next-link" href="synthetic_population.html" title="next page">
-  <div class="prev-next-info">
-      <p class="prev-next-subtitle">next</p>
-      <p class="prev-next-title"><span class="section-number">5. </span>Synthetic Populations</p>
-  </div>
-  <i class="fa-solid fa-angle-right"></i>
-  </a>
 </div>
             </footer>
             
@@ -400,19 +370,19 @@ values for road surface can be found in <a class="reference external" href="http
     <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#step-models">
-   4.1. 4-step models
+   4-step models
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#aequilibrae">
-     4.1.1. AequilibraE
+     AequilibraE
     </a>
    </li>
   </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#road-networks-model">
-   4.2. Road Networks model
+   Road Networks model
   </a>
  </li>
 </ul>

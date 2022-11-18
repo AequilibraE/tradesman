@@ -130,15 +130,8 @@
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="travel_modelling.html">
-                        Travel model
-                      </a>
-                    </li>
-                
-
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="concepts.html">
-                        General concepts
+                      <a class="nav-link nav-internal" href="zoning.html">
+                        Building Zones
                       </a>
                     </li>
                 
@@ -234,15 +227,8 @@
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="travel_modelling.html">
-                        Travel model
-                      </a>
-                    </li>
-                
-
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="concepts.html">
-                        General concepts
+                      <a class="nav-link nav-internal" href="zoning.html">
+                        Building Zones
                       </a>
                     </li>
                 
@@ -308,15 +294,50 @@
               
   <font size="18">
    Tradesman
-</font><p>Tradesman is a package for building transport models from open data sources. You can easily download network data from OpenStreetMap, import population, and build zones. It is also possible to download information related to female and male population per age bracket, as well as import amenities and building information from OpenStreetMap. An modulo for building synthetic population from the model data is also provided.</p>
-<p>This analytics pipeline is organized in sections for ease of use, and some
-expertise in transportation planning/modelling/forecasting may be useful when
-utilizing some of the more advanced analysis.</p>
-<p>It is also noteworthy that this pipeline was designed to handle both whole-of-country
-data, but smaller areas, such as states or cities, for example.</p>
-<p>Finally, the pipeline has been tightly integrated with a few data sources, and
+</font><p>Tradesman is a package for building transport models from open data sources.
+You can easily download network data from OpenStreetMap, import population, and
+build zones. It downloads population pyramid data and amenities and building
+information from OpenStreetMap and Microsoft, and builds synthetic populations
+matching the target population pyramids.</p>
+<p>Tradesman has been tightly integrated with a few data sources, and
 while that allows for fast deployment for any region on Earth, it also makes it
-somewhat complex to incorporate bespoke data sources.</p>
+somewhat complex to incorporate bespoke data sources. It is open-source though!</p>
+<p>This is how easy one can build a model for Vietnam:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tradesman.model</span> <span class="kn">import</span> <span class="n">Tradesman</span>
+
+<span class="n">model_path</span>
+<span class="n">project</span> <span class="o">=</span> <span class="n">Tradesman</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="s2">&quot;Vietnam&quot;</span><span class="p">)</span>
+<span class="n">project</span><span class="o">.</span><span class="n">create</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Do you want to choose which steps to do?:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tradesman.model</span> <span class="kn">import</span> <span class="n">Tradesman</span>
+
+<span class="n">model_path</span>
+<span class="n">project</span> <span class="o">=</span> <span class="n">Tradesman</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="s2">&quot;Detroit&quot;</span><span class="p">)</span>
+
+<span class="n">project</span><span class="o">.</span><span class="n">import_model_area</span><span class="p">()</span>
+<span class="n">project</span><span class="o">.</span><span class="n">add_country_borders</span><span class="p">()</span>
+
+<span class="n">project</span><span class="o">.</span><span class="n">import_subdivisions</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="c1"># imports 2 levels of political subdivisions below country (e.g. State &amp; County)</span>
+<span class="n">project</span><span class="o">.</span><span class="n">import_network</span><span class="p">()</span>
+<span class="n">project</span><span class="o">.</span><span class="n">import_population</span><span class="p">()</span>
+
+<span class="c1"># The hexbin mesh to be created will have units with roughly 200m of side</span>
+<span class="c1"># And they will be clustered in zones with population between 500 and 10,000 people (tentatively)</span>
+<span class="n">project</span><span class="o">.</span><span class="n">build_zoning</span><span class="p">(</span><span class="n">hexbin_size</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">max_zone_pop</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">min_zone_pop</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">save_hexbins</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="c1"># We import the population pyramid for the modeled area into our zoning system</span>
+<span class="n">project</span><span class="o">.</span><span class="n">import_pop_by_sex_and_age</span><span class="p">()</span>
+
+<span class="n">project</span><span class="o">.</span><span class="n">build_population_synthesizer_data</span><span class="p">()</span> <span class="c1"># And create the synthetic population</span>
+<span class="n">project</span><span class="o">.</span><span class="n">synthesize_population</span><span class="p">()</span>
+
+<span class="c1"># And we will not import amenities or building</span>
+<span class="c1"># project.import_amenities()</span>
+<span class="c1"># project.import_buildings(True)</span>
+</pre></div>
+</div>
 <font size="12">
    Contents
 </font><div class="toctree-wrapper compound">
@@ -332,24 +353,19 @@ somewhat complex to incorporate bespoke data sources.</p>
 <li class="toctree-l2"><a class="reference internal" href="data_sources.html#road-network">2.1. Road network</a></li>
 <li class="toctree-l2"><a class="reference internal" href="data_sources.html#political-subdivisions">2.2. Political Subdivisions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="data_sources.html#point-of-interest">2.3. Point-of-Interest</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_sources.html#population">2.4. Population</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_sources.html#commuting-zones">2.5. Commuting Zones</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_sources.html#building-footprints">2.4. Building footprints</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_sources.html#population">2.5. Population</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="travel_modelling.html">3. Travel model</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="travel_modelling.html#augmenting-the-road-network-model">3.1. Augmenting the road network model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="zoning.html">3. Building Zones</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="zoning.html#references">3.1. References</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="concepts.html">4. General concepts</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="concepts.html#step-models">4.1. 4-step models</a></li>
-<li class="toctree-l2"><a class="reference internal" href="concepts.html#road-networks-model">4.2. Road Networks model</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="synthetic_population.html">5. Synthetic Populations</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="synthetic_population.html#populationsim-controls">5.1. PopulationSim Controls</a></li>
-<li class="toctree-l2"><a class="reference internal" href="synthetic_population.html#tradesman-model-premises">5.2. Tradesman model premises</a></li>
-<li class="toctree-l2"><a class="reference internal" href="synthetic_population.html#example">5.3. Example</a></li>
-<li class="toctree-l2"><a class="reference internal" href="synthetic_population.html#references">5.4. References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="synthetic_population.html">4. Synthetic Populations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="synthetic_population.html#populationsim-controls">4.1. PopulationSim Controls</a></li>
+<li class="toctree-l2"><a class="reference internal" href="synthetic_population.html#tradesman-model-premises">4.2. Tradesman model premises</a></li>
+<li class="toctree-l2"><a class="reference internal" href="synthetic_population.html#example">4.3. Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="synthetic_population.html#references">4.4. References</a></li>
 </ul>
 </li>
 </ul>
