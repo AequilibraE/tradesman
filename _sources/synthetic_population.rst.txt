@@ -110,7 +110,7 @@ household size to obtain the mandatory expected number of households in the TAZ 
 
 .. image:: ../images/hh_example.png
     :align: center
-    :scale: 20 %
+    :scale: 200 %
 
 As we currently do not have validation data to assess the quality of the synthetic populations created,
 we use the following variables from the UN Population Division file to validate the population:
@@ -139,7 +139,7 @@ The average household size and household composition are:
 
 .. image:: ../images/hh_descriptive.png
     :align: center
-    :scale: 20 %
+    :scale: 200 %
 
 A zone in San Marino with 4,718 inhabitants would have 611 households with 1 member (HHBASE1), 915
 households with 2-3 members (HHBASE2), 419 houeholds with 4-5 members (HHBASE4), and 21 households with

@@ -4,7 +4,7 @@ Analytics models
 ================
 
 The backbone of the analytics pipeline consists in building road network models 
-from `Open-Street Maps (OSM)<https://www.openstreetmap.org/>`_ data and incorporates population information
+from `Open-Street Maps (OSM) <https://www.openstreetmap.org/>`_ data and incorporates population information
 from the raster layers available at the  `Humanitarian Data Exchange
 <https://data.humdata.org/>`_.
 
