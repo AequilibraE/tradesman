@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 from geopandas.tools import sjoin
 from shapely.geometry import Polygon
+from tqdm import tqdm
 
 
 def hex_builder(coverage_area, hex_height, epsg=3857):
@@ -17,6 +18,8 @@ def hex_builder(coverage_area, hex_height, epsg=3857):
          *epsg*(:obj:`int`): EPSG code specifying output projection. Defaults to 3857
     """
     # Function adapted from http://michaelminn.com/linux/mmqgis/
+    
+    tqdm.pandas()
 
     x_left, y_bottom, x_right, y_top = coverage_area.unary_union.bounds
 
@@ -46,7 +49,7 @@ def hex_builder(coverage_area, hex_height, epsg=3857):
 
     half_height = hex_height / 2
     vertex_diff = xvertexhi - xvertexlo
-    for column in range(tot_columns):
+    for column in tqdm(range(tot_columns)):
         # (column + 1) and (row + 1) calculation is used to maintain
         # _topology between adjacent shapes and avoid overlaps/holes
         # due to rounding errors
