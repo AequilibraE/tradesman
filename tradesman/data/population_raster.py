@@ -7,8 +7,10 @@ import pandas as pd
 import rasterio
 from aequilibrae import Project
 from scipy.sparse import coo_matrix
+from tqdm import tqdm
+from tradesman.data.mask_raster import mask_raster
 
-from tradesman.data_retrieval.country_main_area import country_border_from_model
+from tradesman.data_retrieval.country_main_area import model_borders
 
 
 def population_raster(data_link: str, field_name: str, project: Project):
@@ -16,9 +18,9 @@ def population_raster(data_link: str, field_name: str, project: Project):
     dest_path = join(gettempdir(), f"{field_name}.tif")
     if not isfile(dest_path):
         urllib.request.urlretrieve(data_link, dest_path)
-    main_area = country_border_from_model(project)
+    main_area = model_borders(project)
 
-    dataset = rasterio.open(dest_path)
+    dataset = mask_raster(dest_path, main_area)
 
     minx, miny, maxx, maxy = main_area.bounds
     width = dataset.width

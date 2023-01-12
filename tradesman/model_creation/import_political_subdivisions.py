@@ -34,7 +34,6 @@ class ImportPoliticalSubdivisions:
         Args.:
              *overwrite*(:obj:`bool`): re-write country borders if it already exists. Defaults to False.
         """
-
         data = self._gadm_search() if self._source == "gadm" else self._geoboundaries_search()
 
         data = data[data.level == 0]

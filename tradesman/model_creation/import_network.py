@@ -26,7 +26,7 @@ class ImportNetwork:
         }
         self.new_node_fields = {"osm_node_id": {"description": "osm_id", "type": "text", "required": False}}
 
-    def import_network(self):
+    def build_network(self):
         """
         Imports network from OSM or allows the user to manually import network from .osm or .pbf files.
 

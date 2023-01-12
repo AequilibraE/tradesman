@@ -86,7 +86,7 @@ class Tradesman:
         """Triggers the import of the network from OSM and adds subdivisions into the model.
         If the network already exists in the folder, it will be loaded, otherwise it will be created."""
 
-        self._network.import_network(self._project, self.__model_place, self.__pbf_path)
+        self._network.build_network()
 
     def import_subdivisions(self, subdivision_levels=2, overwrite=False):
         """Imports political subdivisions.
