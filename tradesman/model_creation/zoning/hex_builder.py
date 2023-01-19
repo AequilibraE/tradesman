@@ -18,8 +18,6 @@ def hex_builder(coverage_area, hex_height, epsg=3857):
          *epsg*(:obj:`int`): EPSG code specifying output projection. Defaults to 3857
     """
     # Function adapted from http://michaelminn.com/linux/mmqgis/
-    
-    tqdm.pandas()
 
     x_left, y_bottom, x_right, y_top = coverage_area.unary_union.bounds
 
@@ -32,7 +30,7 @@ def hex_builder(coverage_area, hex_height, epsg=3857):
 
     poly_id = 1
     t = perf_counter()
-    threshold = 5000000
+    threshold = 5_000_000
     tot_columns = int(floor(float(x_right - x_left) / x_spacing))
     tot_rows = int(floor(float(y_top - y_bottom) / hex_height))
     tot_elements = tot_columns * tot_rows
@@ -81,6 +79,4 @@ def hex_builder(coverage_area, hex_height, epsg=3857):
 
     df = pd.concat(results)
     df.loc[:, "hex_id"] = np.arange(df.shape[0]) + 1
-    df = gpd.GeoDataFrame(df[["hex_id"]], geometry=df["geometry"], crs=f"epsg:{epsg}")
-
-    return df
+    return gpd.GeoDataFrame(df[["hex_id"]], geometry=df["geometry"], crs=f"epsg:{epsg}")

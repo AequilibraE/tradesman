@@ -7,17 +7,19 @@ import pandas as pd
 import rasterio
 from aequilibrae import Project
 from scipy.sparse import coo_matrix
-from tqdm import tqdm
 from tradesman.data.mask_raster import mask_raster
 
 from tradesman.data_retrieval.country_main_area import model_borders
+from tradesman.utils.tqdm_download import TqdmUpTo
 
 
 def population_raster(data_link: str, field_name: str, project: Project):
 
     dest_path = join(gettempdir(), f"{field_name}.tif")
     if not isfile(dest_path):
-        urllib.request.urlretrieve(data_link, dest_path)
+        with TqdmUpTo(unit="B", unit_scale=True, unit_divisor=1024, miniters=1, desc=f"{field_name}.tif") as t:
+            urllib.request.urlretrieve(data_link, filename=dest_path, reporthook=t.update_to, data=None)
+            t.total = t.n
     main_area = model_borders(project)
 
     dataset = mask_raster(dest_path, main_area)

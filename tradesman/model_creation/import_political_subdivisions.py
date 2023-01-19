@@ -210,6 +210,9 @@ class ImportPoliticalSubdivisions:
         Add model area into project database.
         """
 
+        if self._project.conn.execute("SELECT COUNT(*) FROM political_subdivisions WHERE level=-1;").fetchone()[0] > 0:
+            return
+
         nom_url = f"https://nominatim.openstreetmap.org/search?q={self.__search_place}&format=json&polygon_geojson=1&addressdetails=1&accept-language=en"
 
         r = requests.get(nom_url)

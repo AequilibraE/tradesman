@@ -33,6 +33,7 @@ class Tradesman:
         self.__starts_logging()
 
         self.__initialize_model()
+        self._country_name = self.__country_identifier()
         self._network = ImportNetwork(self._project, self.__model_place, self.__pbf_path)
 
         self._boundaries_source = boundaries_source
@@ -185,6 +186,14 @@ class Tradesman:
         else:
             self._project.new(self.__folder)
             add_new_tables(self._project.conn)
+
+    def __country_identifier(self):
+
+        country = self._project.conn.execute(
+            "SELECT country_name FROM political_subdivisions WHERE level=-1;"
+        ).fetchone()[0]
+        if country:
+            return country
 
     @property
     def place(self):

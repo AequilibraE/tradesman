@@ -26,4 +26,4 @@ def zones_with_location(hexb, all_subdivisions):
 
     data_complete.drop_duplicates(subset=["hex_id"], inplace=True)
 
-    return gpd.GeoDataFrame(data_complete[["hex_id", "division_name"]], geometry=data_complete["geometry"])
+    return gpd.GeoDataFrame(data_complete[["hex_id", "division_name"]], geometry=data_complete["geometry_x"])

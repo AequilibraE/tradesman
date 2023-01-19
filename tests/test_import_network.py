@@ -25,7 +25,7 @@ class TestImportNetwork(unittest.TestCase):
 
     def test_import_from_osm(self):
         network = ImportNetwork(self.project, self.model_place)
-        network.import_network()
+        network.build_network()
 
         links = pd.read_sql("SELECT * FROM links;", con=self.project.conn)
 
@@ -37,7 +37,7 @@ class TestImportNetwork(unittest.TestCase):
     @mock.patch("tradesman.model_creation.import_network.bounding_boxes")
     def test_import_from_gmns(self, patch_box):
         network = ImportNetwork(self.project, self.model_place, self.pbf_path)
-        network.import_network()
+        network.build_network()
 
         links = pd.read_sql("SELECT * FROM links;", con=self.project.conn)
 
