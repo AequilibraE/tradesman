@@ -17,8 +17,8 @@ from the raster layers available at the  `Humanitarian Data Exchange
 
 3. Incorporating amenity and building data
 
-At the end of the creation of the analytics models, the user will have a
-all their data inside and :ref:`aequilibrae` model, which is a Python-native
+At the end of the creation of the analytics models, the user will have all their data inside an
+ `aequilibrae <https://github.com/AequilibraE/aequilibrae>`_ model, which is a Python-native
 transport modelling software. In turn, all files used in AequilibraE are
 open-format (SQLite, Spatialite) and can be used by virtually any current data
 and GIS software/platform available.
