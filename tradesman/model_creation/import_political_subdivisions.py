@@ -244,6 +244,8 @@ class ImportPoliticalSubdivisions:
         self._project.conn.executemany(qry, list_of_tuples)
         self._project.conn.commit()
 
+        self.__add_model_place_info_to_db()
+
     def __source_control(self, source):
         """Checks if the political subdivision source exists."""
         if source not in ["gadm", "geoboundaries"]:
@@ -262,11 +264,17 @@ class ImportPoliticalSubdivisions:
             return gpd.read_parquet(join(gettempdir(), f"{self.__model_place}_cache_geoboundaries.parquet"))
 
     @property
-    def country_name(self):
-        """Returns the name of the country/territory for which this model area is."""
-        return self._country_name
-
-    @property
     def model_place(self):
         """Returns the name of the place for which this model was made."""
         return self.__model_place
+
+    def __add_model_place_info_to_db(self):
+        about = self._project.about
+        about.add_info_field("country_name")
+        about.add_info_field("country_code")
+
+        about.model_name = self.__model_place
+        about.country_name = self._country_name
+        about.country_code = self._country_code
+
+        about.write_back()

@@ -6,7 +6,7 @@ import pycountry
 from aequilibrae.project import Project
 
 
-def create_control_totals_taz(project: Project, model_place: str, dest_folder: str):
+def create_control_totals_taz(project: Project, dest_folder: str):
     """
     Create the file containing control totals for each TAZ in the project.
     Parameters:
@@ -15,7 +15,7 @@ def create_control_totals_taz(project: Project, model_place: str, dest_folder: s
          *dest_folder*(:obj:`str`): folder containing PopulationSim population files
     """
 
-    country_code = pycountry.countries.search_fuzzy(model_place)[0].alpha_3
+    country_code = project.about.country_code
 
     pth = dirname(__file__)
 

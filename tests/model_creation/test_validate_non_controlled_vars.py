@@ -24,7 +24,7 @@ class TestValidateNonControlledVars(unittest.TestCase):
 
     def test_non_controlled_vars(self):
 
-        self.assertEqual(validate_non_controlled_vars("Nauru", self.fldr), "Non-controlled vars checked.")
+        self.assertEqual(validate_non_controlled_vars("NRU", self.fldr), "Non-controlled vars checked.")
 
 
 if __name__ == "__name__":

@@ -9,7 +9,7 @@ import pycountry
 from os.path import dirname, join
 
 
-def validate_non_controlled_vars(model_place: str, folder: str):
+def validate_non_controlled_vars(country_code: str, folder: str):
     """
     Validates the synthetic pooulation previously created, using non-controlled variables.
 
@@ -18,8 +18,6 @@ def validate_non_controlled_vars(model_place: str, folder: str):
          *folder*:
 
     """
-
-    country_code = pycountry.countries.search_fuzzy(model_place)[0].alpha_3
 
     controls = pd.read_csv(join(dirname(__file__), "controls_and_validation/hh_composition_data_validation.csv"))
 
