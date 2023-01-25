@@ -23,7 +23,7 @@ def import_population(project: Project, model_place: str, source: str, overwrite
         "SELECT ST_AsBinary(geometry) as geom FROM political_subdivisions WHERE level=-1", con=project.conn, crs=4326
     )
 
-    select_pop = gdf.sjoin(model_area)[["longitude", "latitude", "population"]]
+    select_pop = gdf.clip(model_area, keep_geom_type=True)[["longitude", "latitude", "population"]]
 
     select_pop.to_sql("raw_population", project.conn, if_exists="append", index=False)
     project.conn.execute("UPDATE raw_population SET Geometry=MakePoint(longitude, latitude, 4326)")
