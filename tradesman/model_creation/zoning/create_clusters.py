@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 from sklearn.cluster import KMeans
 from shapely.geometry import box
+from tqdm import tqdm
 
 
 def create_clusters(hexbins, max_zone_pop=10000, min_zone_pop=500):
@@ -30,7 +31,7 @@ def create_clusters(hexbins, max_zone_pop=10000, min_zone_pop=500):
         df.loc[:, "zone_id"] = master_zone_id + i
         data_store.append(df[result_col_df])
 
-    for cnt, df in enumerate(data_store):
+    for cnt, df in tqdm(enumerate(data_store)):
         t = df.groupby(["zone_id"]).sum(numeric_only=True)
         t = t.loc[t.population > max_zone_pop]
         zone_sizes = t["population"].to_dict()

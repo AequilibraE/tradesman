@@ -70,7 +70,6 @@ class TestImportPoliticalSubvisions(unittest.TestCase):
         self.gadm_data.add_country_borders(overwrite=False)
         self.gadm_data.import_subdivisions(level=2, overwrite=False)
 
-        self.assertEqual(self.gadm_data.country_name, "Nauru")
         self.assertEqual(self.gadm_data.model_place, "Nauru")
         self.assertEqual(
             len(pd.read_sql("SELECT * FROM political_subdivisions WHERE level=-1;", con=self.project.conn)), 1
@@ -90,7 +89,6 @@ class TestImportPoliticalSubvisions(unittest.TestCase):
         self.geob_data.add_country_borders(overwrite=False)
         self.geob_data.import_subdivisions(level=2, overwrite=False)
 
-        self.assertEqual(self.geob_data.country_name, "Nauru")
         self.assertEqual(self.geob_data.model_place, "Nauru")
         self.assertEqual(
             len(pd.read_sql("SELECT * FROM political_subdivisions WHERE level=-1;", con=self.project.conn)), 1

@@ -19,7 +19,7 @@ from tradesman.model_creation.synthetic_population.unzip_seed_files import unzip
 from tradesman.model_creation.synthetic_population.user_control_import import user_change_validation_parameters
 
 
-def create_syn_pop(project: Project, model_place: str, cwd: str, thread_number=None, sample_size=0.01):
+def create_syn_pop(project: Project, cwd: str, thread_number=None, sample_size=0.01):
     """
     Creates files to build synthetic population.
     Parameters:
@@ -34,11 +34,11 @@ def create_syn_pop(project: Project, model_place: str, cwd: str, thread_number=N
 
     update_thread_number(pop_fldr, thread_number)
 
-    create_buckets(model_place, project, folder=pop_fldr, sample=sample_size)
+    create_buckets(project, folder=pop_fldr, sample=sample_size)
 
     create_geo_cross_walk(project, pop_fldr)
 
-    create_control_totals_taz(project, model_place, pop_fldr)
+    create_control_totals_taz(project, pop_fldr)
 
     create_control_totals_meta(pop_fldr)
 
@@ -107,19 +107,8 @@ def run_populationsim(multithread: bool, project: Project, folder: str, thread_n
         "synthetic_households", con=project.conn, if_exists="replace"
     )
 
+    user_change_validation_parameters(overwrite=False, model_place=project.about.model_name, dest_folder=pop_fldr)
 
-def validate_synthetic_population(model_place: str, folder: str):
-    """
-    Validates the synthetic population created.
-    Parameters:
-         *model*(:obj:`str`): current model place
-         *folder*(:obj:`str`): path to folder containing population info.
-    """
-
-    pop_fldr = join(folder, "population")
-
-    user_change_validation_parameters(overwrite=False, model_place=model_place, dest_folder=pop_fldr)
-
-    validate_non_controlled_vars(model_place, pop_fldr)
+    validate_non_controlled_vars(project.about.country_code, pop_fldr)
 
     validate_controlled_vars(pop_fldr)

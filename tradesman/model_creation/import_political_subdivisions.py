@@ -34,7 +34,6 @@ class ImportPoliticalSubdivisions:
         Args.:
              *overwrite*(:obj:`bool`): re-write country borders if it already exists. Defaults to False.
         """
-
         data = self._gadm_search() if self._source == "gadm" else self._geoboundaries_search()
 
         data = data[data.level == 0]
@@ -211,6 +210,9 @@ class ImportPoliticalSubdivisions:
         Add model area into project database.
         """
 
+        if self._project.conn.execute("SELECT COUNT(*) FROM political_subdivisions WHERE level=-1;").fetchone()[0] > 0:
+            return
+
         nom_url = f"https://nominatim.openstreetmap.org/search?q={self.__search_place}&format=json&polygon_geojson=1&addressdetails=1&accept-language=en"
 
         r = requests.get(nom_url)
@@ -242,6 +244,8 @@ class ImportPoliticalSubdivisions:
         self._project.conn.executemany(qry, list_of_tuples)
         self._project.conn.commit()
 
+        self.__add_model_place_info_to_db()
+
     def __source_control(self, source):
         """Checks if the political subdivision source exists."""
         if source not in ["gadm", "geoboundaries"]:
@@ -260,11 +264,17 @@ class ImportPoliticalSubdivisions:
             return gpd.read_parquet(join(gettempdir(), f"{self.__model_place}_cache_geoboundaries.parquet"))
 
     @property
-    def country_name(self):
-        """Returns the name of the country/territory for which this model area is."""
-        return self._country_name
-
-    @property
     def model_place(self):
         """Returns the name of the place for which this model was made."""
         return self.__model_place
+
+    def __add_model_place_info_to_db(self):
+        about = self._project.about
+        about.add_info_field("country_name")
+        about.add_info_field("country_code")
+
+        about.model_name = self.__model_place
+        about.country_name = self._country_name
+        about.country_code = self._country_code
+
+        about.write_back()

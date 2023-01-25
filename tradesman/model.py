@@ -33,6 +33,8 @@ class Tradesman:
         self.__starts_logging()
 
         self.__initialize_model()
+        self._country_name = self.__get_country_name()
+        self._country_code = self.__get_country_iso_code()
         self._network = ImportNetwork(self._project, self.__model_place, self.__pbf_path)
 
         self._boundaries_source = boundaries_source
@@ -86,7 +88,7 @@ class Tradesman:
         """Triggers the import of the network from OSM and adds subdivisions into the model.
         If the network already exists in the folder, it will be loaded, otherwise it will be created."""
 
-        self._network.import_network(self._project, self.__model_place, self.__pbf_path)
+        self._network.build_network()
 
     def import_subdivisions(self, subdivision_levels=2, overwrite=False):
         """Imports political subdivisions.
@@ -107,7 +109,7 @@ class Tradesman:
                 *overwrite* (:obj:`bool`): Deletes pre-existing population_source_import. Defaults to False
         """
 
-        import_population(self._project, self._boundaries.country_name, self.__population_source, overwrite=overwrite)
+        import_population(self._project, self._country_name, self.__population_source, overwrite=overwrite)
 
     def build_zoning(self, hexbin_size=200, max_zone_pop=10000, min_zone_pop=500, save_hexbins=True, overwrite=False):
         """Creates hexagonal bins, and then clusters it regarding the political subdivision.
@@ -147,7 +149,7 @@ class Tradesman:
         """
         Triggers the import of population pyramid from raster into the model.
         """
-        get_pop_by_sex_age(self._project, self._boundaries.country_name)
+        get_pop_by_sex_age(self._project, self._country_name)
 
     def import_amenities(self):
         """
@@ -170,7 +172,7 @@ class Tradesman:
         Triggers the import of data to create the synthetic population.
         """
 
-        create_syn_pop(self._project, self.__model_place, self.__folder)
+        create_syn_pop(self._project, self.__folder)
 
     def synthesize_population(self, multithread=False, thread_number=2):
         """
@@ -203,3 +205,13 @@ class Tradesman:
             if handler.name == "terminal":
                 return
         logger.addHandler(stdout_handler)
+
+    def __get_country_name(self):
+        if "country_name" in self._project.about.list_fields():
+            return self._project.about.country_name
+        return
+
+    def __get_country_iso_code(self):
+        if "country_code" in self._project.about.list_fields():
+            return self._project.about.country_code
+        return

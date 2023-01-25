@@ -8,7 +8,7 @@ import tabulate
 from math import floor
 
 
-def create_buckets(model_place: str, project: Project, folder: str, sample=0.02):
+def create_buckets(project: Project, folder: str, sample=0.02):
     """
     Creates buckets containg households and population info.
     This function outputs are the inputs for creating the seeds.
@@ -19,7 +19,7 @@ def create_buckets(model_place: str, project: Project, folder: str, sample=0.02)
          *sample*(:obj:`float`): percentage of population one want to compose the seed.
     """
 
-    country_code = pycountry.countries.search_fuzzy(model_place)[0].alpha_3
+    country_code = project.about.country_code
 
     pth = dirname(__file__)
 

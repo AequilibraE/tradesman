@@ -33,7 +33,7 @@ class TestCreateSeeds(unittest.TestCase):
 
     def test_create_seeds(self):
 
-        create_buckets(self.model_place, self.project, gettempdir())
+        create_buckets(self.project, gettempdir())
 
         x = len(pd.read_csv(join(gettempdir(), "data/seed_households.csv")))
 

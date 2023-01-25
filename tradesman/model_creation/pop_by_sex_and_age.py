@@ -1,5 +1,4 @@
 import geopandas as gpd
-import pandas as pd
 import pycountry
 from aequilibrae import Project
 

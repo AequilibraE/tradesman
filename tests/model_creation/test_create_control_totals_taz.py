@@ -20,7 +20,7 @@ class TestCreateTotalsTaz(unittest.TestCase):
         rmtree(join(gettempdir(), "data"))
 
     def test_create_control_totals_taz(self):
-        create_control_totals_taz(self.project, self.model_place, gettempdir())
+        create_control_totals_taz(self.project, gettempdir())
 
         self.assertTrue(exists(join(gettempdir(), "data/control_totals_taz.csv")))
 

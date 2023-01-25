@@ -14,6 +14,16 @@ from tradesman.data_retrieval.osm_tags.set_bounding_boxes import bounding_boxes
 
 
 class ImportNetwork:
+    """
+    Imports network from OSM or allows the user to manually import network from .osm or .pbf files.
+
+    Args.:
+        *project*(:obj:`aequilibrae.project.Project`):
+        *model_place*(:obj:`str`):
+        *pbf_path*(:obj:`str`): path to osm or pbf file. Optional.
+
+    """
+
     def __init__(self, project: Project, model_place: str, pbf_path: str = None):
 
         self.project = project
@@ -26,16 +36,7 @@ class ImportNetwork:
         }
         self.new_node_fields = {"osm_node_id": {"description": "osm_id", "type": "text", "required": False}}
 
-    def import_network(self):
-        """
-        Imports network from OSM or allows the user to manually import network from .osm or .pbf files.
-
-        Args.:
-            *project*(:obj:`aequilibrae.project.Project`):
-            *model_place*(:obj:`str`):
-            *pbf_path*(:obj:`str`): path to osm or pbf file. Optional.
-
-        """
+    def build_network(self):
 
         if not self.pbf_path:
             self.par.parameters["network"]["links"]["fields"]["one-way"].extend(extra_fields)

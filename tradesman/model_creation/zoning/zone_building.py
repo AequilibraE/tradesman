@@ -22,7 +22,9 @@ def zone_builder(project, hexbin_size: int, max_zone_pop: int, min_zone_pop: int
     subdivisions = gpd.GeoDataFrame.from_postgis(sql, project.conn, geom_col="geometry", crs=4326)
     subdivisions = subdivisions[subdivisions.level == subdivisions.level.max()]
 
-    sql_coverage = "SELECT Hex(ST_AsBinary(geometry)) as geometry FROM political_subdivisions where level=0;"
+    sql_coverage = (
+        "SELECT Hex(ST_AsBinary(geometry)) as geometry FROM political_subdivisions where division_name='model_area';"
+    )
     coverage_area = gpd.GeoDataFrame.from_postgis(sql_coverage, project.conn, geom_col="geometry", crs=4326)
     coverage_area = coverage_area.explode().reset_index(drop=True).to_crs("epsg:3857")
 
