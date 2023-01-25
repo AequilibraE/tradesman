@@ -73,5 +73,5 @@ XXXXXXXXXXXXXXXXXX
 .. _trip_distribution_parameters:
 
 Trip Distribution Parameters
---------------------------
+----------------------------
 XXXXXXXXXXXXXXXXXX
