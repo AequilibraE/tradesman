@@ -41,8 +41,7 @@ def hex_builder(coverage_area, hex_height, epsg=3857):
         df = gpd.GeoDataFrame(df[["hex_id", "x", "y"]], geometry=df["geometry"], crs=f"epsg:{ref_sys}")
 
         if area is not None:
-            df2 = sjoin(df, area, how="left", predicate="intersects").dropna()
-            df = df[df.index.isin(df2.index)]
+            df = df.clip(area, keep_geom_type=True)
         return df
 
     half_height = hex_height / 2
