@@ -111,14 +111,14 @@ class Tradesman:
 
         import_population(self._project, self._country_name, self.__population_source, overwrite=overwrite)
 
-    def build_zoning(self, hexbin_size=200, max_zone_pop=10000, min_zone_pop=500, save_hexbins=True, overwrite=False):
+    def build_zoning(self, hexbin_size=200, max_zone_pop=10000, min_zone_pop=500, save_hexbins=False, overwrite=False):
         """Creates hexagonal bins, and then clusters it regarding the political subdivision.
 
         Args:
              *hexbin_size*(:obj:`int`): size of the hexagonal bins to be created.
              *max_zone_pop*(:obj:`int`): max population living within a zone.
              *min_zone_pop*(:obj:`int`): min population living within a zone.
-             *save_hexbins*(:obj:`bool`): saves the hexagonal bins with population. Defaults to True.
+             *save_hexbins*(:obj:`bool`): saves the hexagonal bins with population. Defaults to False.
              *overwrite* (:obj:`bool`): Deletes pre-existing HexBins and Zones. Defaults to False
         """
 
