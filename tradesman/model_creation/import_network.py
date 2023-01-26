@@ -2,7 +2,6 @@ import gc
 import csv
 from tempfile import gettempdir
 from time import sleep
-import osm2gmns as og
 from aequilibrae import Project, Parameters
 from os.path import join
 
@@ -45,7 +44,7 @@ class ImportNetwork:
             return
 
         else:
-
+            import osm2gmns as og
             print("Convert to GMNS ...")
             print(" ")
             net = og.getNetFromFile(self.pbf_path, network_types=("auto"))  # Fix it later

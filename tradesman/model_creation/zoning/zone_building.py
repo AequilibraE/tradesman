@@ -8,6 +8,7 @@ from tradesman.model_creation.zoning.zones_with_location import zones_with_locat
 from tradesman.model_creation.zoning.zones_with_pop import zones_with_population
 
 
+
 def zone_builder(project, hexbin_size: int, max_zone_pop: int, min_zone_pop: int, save_hexbins: bool):
     """
     Build Traffic Analysis Zones.
@@ -18,6 +19,7 @@ def zone_builder(project, hexbin_size: int, max_zone_pop: int, min_zone_pop: int
          *min_zone_pop*(:obj:`int`): min population within a zone. Defaults to 500
          *save_hexbins*(:obj:`bool`): saves hexbins with population. Defaults to False
     """
+
     sql = "SELECT division_name, level, Hex(ST_AsBinary(geometry)) as geometry FROM political_subdivisions;"
     subdivisions = gpd.GeoDataFrame.from_postgis(sql, project.conn, geom_col="geometry", crs=4326)
     subdivisions = subdivisions[subdivisions.level == subdivisions.level.max()]
@@ -32,10 +34,11 @@ def zone_builder(project, hexbin_size: int, max_zone_pop: int, min_zone_pop: int
     hexb.to_crs("epsg:4326", inplace=True)
 
     zones_with_locations = zones_with_location(hexb, subdivisions)
-
+    
     zones_with_pop = zones_with_population(project, zones_with_locations)
 
-    project.conn.execute("DELETE FROM hex_pop;")
+    if sum(project.conn.execute("SELECT count(*) FROM sqlite_master WHERE type='table' AND name=' hex_pop';").fetchone()) > 0:
+        project.conn.execute("DELETE FROM hex_pop;")
     project.conn.execute("DELETE FROM zones;")
     project.conn.commit()
     if save_hexbins:

@@ -1,5 +1,4 @@
 from os.path import dirname, join
-from turtle import down
 
 import pandas as pd
 import pycountry

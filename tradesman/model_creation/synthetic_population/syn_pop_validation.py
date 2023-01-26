@@ -1,12 +1,11 @@
 import os
-import sys
-import yaml
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib import cycler
-import pycountry
 from os.path import dirname, join
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import yaml
+from matplotlib import cycler
 
 
 def validate_non_controlled_vars(country_code: str, folder: str):

@@ -1,10 +1,11 @@
 from math import floor
 from time import perf_counter
+import multiprocessing as mp
 
+import dask_geopandas
 import geopandas as gpd
 import numpy as np
 import pandas as pd
-from geopandas.tools import sjoin
 from shapely.geometry import Polygon
 from tqdm import tqdm
 
@@ -36,13 +37,9 @@ def hex_builder(coverage_area, hex_height, epsg=3857):
     tot_elements = tot_columns * tot_rows
     print(f"Expect {tot_elements:,} total hexbins for this bounding box")
 
-    def data_conversion(dt, ref_sys, area):
+    def data_conversion(dt, ref_sys):
         df = pd.DataFrame(dt, columns=["hex_id", "x", "y", "geometry"])
-        df = gpd.GeoDataFrame(df[["hex_id", "x", "y"]], geometry=df["geometry"], crs=f"epsg:{ref_sys}")
-
-        if area is not None:
-            df = df.clip(area, keep_geom_type=True)
-        return df
+        return gpd.GeoDataFrame(df[["hex_id", "x", "y"]], geometry=df["geometry"], crs=f"epsg:{ref_sys}")
 
     half_height = hex_height / 2
     vertex_diff = xvertexhi - xvertexlo
@@ -69,13 +66,18 @@ def hex_builder(coverage_area, hex_height, epsg=3857):
             if poly_id % threshold == 0:
                 print(f"{poly_id:,} --> ({round(perf_counter() - t, 1)} s)")
                 t = perf_counter()
-                results.append(data_conversion(data, epsg, coverage_area))
+                results.append(data_conversion(data, epsg))
                 data.clear()
 
     if data:
-        results.append(data_conversion(data, epsg, coverage_area))
+        results.append(data_conversion(data, epsg))
         data.clear()
 
-    df = pd.concat(results)
-    df.loc[:, "hex_id"] = np.arange(df.shape[0]) + 1
-    return gpd.GeoDataFrame(df[["hex_id"]], geometry=df["geometry"], crs=f"epsg:{epsg}")
+    hexb = pd.concat(results)
+
+    ddf = dask_geopandas.from_geopandas(hexb, npartitions=mp.cpu_count())
+    ddf = ddf.clip(coverage_area.unary_union, keep_geom_type=True)
+    hexb = gpd.GeoDataFrame(ddf)
+    hexb.columns=["hex_id", "x", "y", "geometry"]
+    hexb.hex_id = np.arange(hexb.shape[0]) + 1
+    return gpd.GeoDataFrame(hexb[["hex_id"]], geometry=hexb["geometry"], crs=f"epsg:{epsg}")

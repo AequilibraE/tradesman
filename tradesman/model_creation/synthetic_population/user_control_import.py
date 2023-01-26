@@ -1,5 +1,6 @@
-from os.path import join
 import shutil
+from os.path import join
+
 import yaml
 
 

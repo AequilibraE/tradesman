@@ -1,0 +1,2 @@
+osm2gmns >= 0.6.8
+populationsim >= 0.5.1

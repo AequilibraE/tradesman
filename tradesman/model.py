@@ -122,9 +122,8 @@ class Tradesman:
              *overwrite* (:obj:`bool`): Deletes pre-existing HexBins and Zones. Defaults to False
         """
 
-        if not overwrite:
-            if sum(self._project.conn.execute("Select count(*) from Zones").fetchone()) > 0:
-                return
+        if not overwrite and sum(self._project.conn.execute("Select count(*) from Zones").fetchone()) > 0:
+            return
         zone_builder(self._project, hexbin_size, max_zone_pop, min_zone_pop, save_hexbins)
 
     def get_political_subdivisions(self, level: int = None) -> gpd.GeoDataFrame:
