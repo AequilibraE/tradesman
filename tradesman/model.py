@@ -109,7 +109,9 @@ class Tradesman:
                 *overwrite* (:obj:`bool`): Deletes pre-existing population_source_import. Defaults to False
         """
 
-        import_population(self._project, self._country_name, self.__population_source, overwrite=overwrite)
+        import_population(
+            self._project, self._project.about.country_name, self.__population_source, overwrite=overwrite
+        )
 
     def build_zoning(self, hexbin_size=200, max_zone_pop=10000, min_zone_pop=500, save_hexbins=False, overwrite=False):
         """Creates hexagonal bins, and then clusters it regarding the political subdivision.
@@ -148,7 +150,7 @@ class Tradesman:
         """
         Triggers the import of population pyramid from raster into the model.
         """
-        get_pop_by_sex_age(self._project, self._country_name)
+        get_pop_by_sex_age(self._project, self._project.about.country_name)
 
     def import_amenities(self):
         """

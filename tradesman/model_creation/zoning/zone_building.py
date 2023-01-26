@@ -47,8 +47,8 @@ def zone_builder(project, hexbin_size: int, max_zone_pop: int, min_zone_pop: int
     zones_with_pop = zones_with_population(project, zones_with_locations)
     print("\n after zones_with_pop", strftime("%Y-%m-%d %H:%M:%S", gmtime()))
 
-    sql =  "SELECT count(*) FROM sqlite_master WHERE type='table' AND name=' hex_pop';"
-    if sum(project.conn.execute(sql).fetchone())> 0:
+    sql = "SELECT count(*) FROM sqlite_master WHERE type='table' AND name=' hex_pop';"
+    if sum(project.conn.execute(sql).fetchone()) > 0:
         project.conn.execute("DELETE FROM hex_pop;")
     project.conn.execute("DELETE FROM zones;")
     project.conn.commit()
