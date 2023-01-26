@@ -3,7 +3,7 @@ import sys
 
 from setuptools import setup, find_packages
 
-from .__version__ import version
+from tradesman.__version__ import version
 
 sys.dont_write_bytecode = True
 

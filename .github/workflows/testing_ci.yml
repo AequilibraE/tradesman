@@ -46,7 +46,9 @@ jobs:
         sudo apt-get install libsqlite3-mod-spatialite
         sudo apt-get install -y libspatialite-dev
         sudo ln -s /usr/lib/x86_64-linux-gnu/mod_spatialite.so /usr/lib/x86_64-linux-gnu/mod_spatialite
-        pip install -r tests/requirements_test.txt
+        pip install -r requirements.txt
+        pip install -r requirements_dev.txt
+        pip install -r requirements_optional.txt
 
     - name: Runs unit tests
       run: |
@@ -70,8 +72,9 @@ jobs:
         sudo apt-get install libsqlite3-mod-spatialite
         sudo apt-get install -y libspatialite-dev
         sudo ln -s /usr/lib/x86_64-linux-gnu/mod_spatialite.so /usr/lib/x86_64-linux-gnu/mod_spatialite
-        pip install -r tests/requirements_test.txt
-        pip install -r docs/requirements_docs.txt
+        pip install -r requirements.txt
+        pip install -r requirements_dev.txt
+        pip install -r requirements_optional.txt
 
     - name: Builds documentation
       run: |
@@ -105,11 +108,13 @@ jobs:
       run: |
         sudo apt-get install -y pandoc
         python -m pip install setuptools --upgrade
-        python -m pip install wheel poetry
-        poetry install
+        python -m pip install wheel 
+        pip install -r requirements.txt
+        pip install -r requirements_dev.txt
+        pip install -r requirements_optional.txt        
 
     - name: Builds package
-      run: poetry build
+      run: python setup.py sdist bdist_wheel
 
     - name: Stores artifacts along with the workflow result
       uses: actions/upload-artifact@v3
