@@ -75,9 +75,9 @@ def hex_builder(coverage_area, hex_height, epsg=3857):
 
     hexb = pd.concat(results)
 
-    ddf = dask_geopandas.from_geopandas(hexb, npartitions=mp.cpu_count())
+    ddf = dask_geopandas.from_geopandas(hexb, npartitions=5 * mp.cpu_count())
     ddf = ddf.clip(coverage_area.unary_union, keep_geom_type=True)
     hexb = gpd.GeoDataFrame(ddf)
-    hexb.columns=["hex_id", "x", "y", "geometry"]
+    hexb.columns = ["hex_id", "x", "y", "geometry"]
     hexb.hex_id = np.arange(hexb.shape[0]) + 1
     return gpd.GeoDataFrame(hexb[["hex_id"]], geometry=hexb["geometry"], crs=f"epsg:{epsg}")

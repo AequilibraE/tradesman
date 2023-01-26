@@ -6,7 +6,7 @@ from tradesman.model_creation.zoning.export_zones import export_zones
 from tradesman.model_creation.zoning.hex_builder import hex_builder
 from tradesman.model_creation.zoning.zones_with_location import zones_with_location
 from tradesman.model_creation.zoning.zones_with_pop import zones_with_population
-
+from time import gmtime, strftime
 
 
 def zone_builder(project, hexbin_size: int, max_zone_pop: int, min_zone_pop: int, save_hexbins: bool):
@@ -20,24 +20,35 @@ def zone_builder(project, hexbin_size: int, max_zone_pop: int, min_zone_pop: int
          *save_hexbins*(:obj:`bool`): saves hexbins with population. Defaults to False
     """
 
+    print("\n begin", strftime("%Y-%m-%d %H:%M:%S", gmtime()))
     sql = "SELECT division_name, level, Hex(ST_AsBinary(geometry)) as geometry FROM political_subdivisions;"
     subdivisions = gpd.GeoDataFrame.from_postgis(sql, project.conn, geom_col="geometry", crs=4326)
     subdivisions = subdivisions[subdivisions.level == subdivisions.level.max()]
+
+    sql = "SELECT division_name, level, Hex(ST_AsBinary(geometry)) as geometry FROM political_subdivisions where level = -1;"
+    model_area = gpd.GeoDataFrame.from_postgis(sql, project.conn, geom_col="geometry", crs=4326)
+    if model_area.shape[0] > 0:
+        subdivisions = subdivisions[subdivisions.intersects(model_area.geometry.unary_union)]
 
     sql_coverage = (
         "SELECT Hex(ST_AsBinary(geometry)) as geometry FROM political_subdivisions where division_name='model_area';"
     )
     coverage_area = gpd.GeoDataFrame.from_postgis(sql_coverage, project.conn, geom_col="geometry", crs=4326)
     coverage_area = coverage_area.explode().reset_index(drop=True).to_crs("epsg:3857")
+    print("\n before hex builder", strftime("%Y-%m-%d %H:%M:%S", gmtime()))
 
     hexb = hex_builder(coverage_area, hexbin_size, epsg=3857)
     hexb.to_crs("epsg:4326", inplace=True)
+    print("\n after hex builder", strftime("%Y-%m-%d %H:%M:%S", gmtime()))
 
     zones_with_locations = zones_with_location(hexb, subdivisions)
-    
-    zones_with_pop = zones_with_population(project, zones_with_locations)
+    print("\n after zones_with_locations", strftime("%Y-%m-%d %H:%M:%S", gmtime()))
 
-    if sum(project.conn.execute("SELECT count(*) FROM sqlite_master WHERE type='table' AND name=' hex_pop';").fetchone()) > 0:
+    zones_with_pop = zones_with_population(project, zones_with_locations)
+    print("\n after zones_with_pop", strftime("%Y-%m-%d %H:%M:%S", gmtime()))
+
+    sql =  "SELECT count(*) FROM sqlite_master WHERE type='table' AND name=' hex_pop';"
+    if sum(project.conn.execute(sql).fetchone())> 0:
         project.conn.execute("DELETE FROM hex_pop;")
     project.conn.execute("DELETE FROM zones;")
     project.conn.commit()
@@ -45,5 +56,7 @@ def zone_builder(project, hexbin_size: int, max_zone_pop: int, min_zone_pop: int
         saves_hex_pop_to_file(project, zones_with_pop)
 
     clusters = create_clusters(zones_with_pop, max_zone_pop, min_zone_pop)
+    print("\n after create_clusters", strftime("%Y-%m-%d %H:%M:%S", gmtime()))
 
     export_zones(clusters, project)
+    print("\n after export_zones", strftime("%Y-%m-%d %H:%M:%S", gmtime()))

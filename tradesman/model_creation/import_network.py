@@ -45,6 +45,7 @@ class ImportNetwork:
 
         else:
             import osm2gmns as og
+
             print("Convert to GMNS ...")
             print(" ")
             net = og.getNetFromFile(self.pbf_path, network_types=("auto"))  # Fix it later
