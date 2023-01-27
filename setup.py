@@ -26,7 +26,6 @@ if __name__ == "__main__":
         author="Pedro Camargo, Renata Akemi",
         author_email="c@margo.co",
         url="https://github.com/AequilibraE/tradesman",
-        license="See license.txt",
         classifiers=[
             "Programming Language :: Python",
             "Programming Language :: Python :: 3.7",
