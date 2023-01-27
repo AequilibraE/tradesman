@@ -10,4 +10,3 @@ cython
 setuptools-cythonize
 wheel
 pysal
-dask_geopandas
