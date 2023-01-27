@@ -2,12 +2,14 @@ from math import floor
 from time import perf_counter
 import multiprocessing as mp
 
-import dask_geopandas
 import geopandas as gpd
 import numpy as np
 import pandas as pd
+import importlib.util as iutil
 from shapely.geometry import Polygon
 from tqdm import tqdm
+
+has_dask_geopandas = iutil.find_spec("dask_geopandas") is not None
 
 
 def hex_builder(coverage_area, hex_height, epsg=3857):
@@ -75,9 +77,16 @@ def hex_builder(coverage_area, hex_height, epsg=3857):
 
     hexb = pd.concat(results)
 
-    ddf = dask_geopandas.from_geopandas(hexb, npartitions=5 * mp.cpu_count())
-    ddf = ddf.clip(coverage_area.unary_union, keep_geom_type=True)
-    hexb = gpd.GeoDataFrame(ddf)
-    hexb.columns = ddf.columns
+    if has_dask_geopandas:
+        import dask_geopandas
+
+        ddf = dask_geopandas.from_geopandas(hexb, npartitions=5 * mp.cpu_count())
+        ddf = ddf.clip(coverage_area.unary_union, keep_geom_type=True)
+        hexb = gpd.GeoDataFrame(ddf)
+        hexb.columns = ddf.columns
+
+    else:
+        hexb = hexb.clip(coverage_area.unary_union, keep_geom_type=True)
+
     hexb.hex_id = np.arange(hexb.shape[0]) + 1
     return gpd.GeoDataFrame(hexb[["hex_id"]], geometry=hexb["geometry"], crs=f"epsg:{epsg}")
