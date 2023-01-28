@@ -8,8 +8,10 @@ name = "tradesman"
 version = "0.2"
 description = "A Python package for building complete AequilibraE models from open data"
 authors = [
-    "Renata Akemi",
-     "Pedro Camargo <c@margo.co>",
+    {name = "Renata Akemi", email = ""},
+    {name = "Pedro Camargo", email = "c@margo.co"},
 ]
-maintainers = ["Pedro Camargo <c@margo.co>",]
+maintainers = [
+    {name = "Pedro Camargo, email = "c@margo.co},
+]
 license = {text = "MIT"}
