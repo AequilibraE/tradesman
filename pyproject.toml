@@ -12,4 +12,4 @@ authors = [
      "Pedro Camargo <c@margo.co>",
 ]
 maintainers = ["Pedro Camargo <c@margo.co>",]
-license = "MIT"
+license = {text = "MIT"}
