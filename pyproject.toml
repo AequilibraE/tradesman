@@ -12,6 +12,6 @@ authors = [
     {name = "Pedro Camargo", email = "c@margo.co"},
 ]
 maintainers = [
-    {name = "Pedro Camargo, email = "c@margo.co},
+    {name = "Pedro Camargo", email = "c@margo.co"},
 ]
 license = {text = "MIT"}
