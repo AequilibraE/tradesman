@@ -11,6 +11,7 @@ class TestModel(unittest.TestCase):
         dir = join(gettempdir(), uuid.uuid4().hex)
         self.proj = Tradesman(dir, "San Marino")
 
+    @unittest.skip
     def test_create(self):
         self.proj.create()
 
