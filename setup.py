@@ -23,7 +23,7 @@ if __name__ == "__main__":
         package_data=pkg_data,
         zip_safe=True,
         description="A friendly model builder for transportation models",
-        author="Pedro Camargo, Renata Akemi",
+        author="Pedro Camargo",
         author_email="c@margo.co",
         url="https://github.com/AequilibraE/tradesman",
         classifiers=[
