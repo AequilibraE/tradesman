@@ -46,8 +46,8 @@ jobs:
         sudo apt-get install libsqlite3-mod-spatialite
         sudo apt-get install -y libspatialite-dev
         sudo ln -s /usr/lib/x86_64-linux-gnu/mod_spatialite.so /usr/lib/x86_64-linux-gnu/mod_spatialite
-        pip install -r requirements.txt
         pip install -r requirements_dev.txt
+        pip install -r requirements.txt
         pip install -r requirements_optional.txt
 
     - name: Runs unit tests
@@ -72,8 +72,8 @@ jobs:
         sudo apt-get install libsqlite3-mod-spatialite
         sudo apt-get install -y libspatialite-dev
         sudo ln -s /usr/lib/x86_64-linux-gnu/mod_spatialite.so /usr/lib/x86_64-linux-gnu/mod_spatialite
-        pip install -r requirements.txt
         pip install -r requirements_dev.txt
+        pip install -r requirements.txt
         pip install -r requirements_optional.txt
 
     - name: Builds documentation
@@ -109,8 +109,8 @@ jobs:
         sudo apt-get install -y pandoc
         python -m pip install setuptools --upgrade
         python -m pip install wheel 
-        pip install -r requirements.txt
         pip install -r requirements_dev.txt
+        pip install -r requirements.txt
         pip install -r requirements_optional.txt        
 
     - name: Builds package

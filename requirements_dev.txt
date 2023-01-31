@@ -1,3 +1,6 @@
+cython
+setuptools-cythonize
+wheel
 pytest
 Sphinx<6.0
 pydata-sphinx-theme

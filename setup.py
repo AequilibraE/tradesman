@@ -23,8 +23,8 @@ if __name__ == "__main__":
         package_data=pkg_data,
         zip_safe=True,
         description="A friendly model builder for transportation models",
-        author="Pedro Camargo",
-        author_email="c@margo.co",
+        author="Pedro Camargo, Renata Akemii",
+        author_email="pedro@outerloop.io",
         url="https://github.com/AequilibraE/tradesman",
         classifiers=[
             "Programming Language :: Python",

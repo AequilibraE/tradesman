@@ -1,6 +1,8 @@
+import os
 import unittest
 import uuid
 from os.path import join
+import os
 from tempfile import gettempdir
 
 from tradesman.model import Tradesman
@@ -11,7 +13,7 @@ class TestModel(unittest.TestCase):
         dir = join(gettempdir(), uuid.uuid4().hex)
         self.proj = Tradesman(dir, "San Marino")
 
-    @unittest.skip
+    @unittest.skipIf(os.environ.get("CI", "false") == "true", "Running on GitHub")
     def test_create(self):
         self.proj.create()
 

@@ -20,7 +20,6 @@ def zone_builder(project, hexbin_size: int, max_zone_pop: int, min_zone_pop: int
          *save_hexbins*(:obj:`bool`): saves hexbins with population. Defaults to False
     """
 
-    print("\n begin", strftime("%Y-%m-%d %H:%M:%S", gmtime()))
     sql = "SELECT division_name, level, Hex(ST_AsBinary(geometry)) as geometry FROM political_subdivisions;"
     subdivisions = gpd.GeoDataFrame.from_postgis(sql, project.conn, geom_col="geometry", crs=4326)
     subdivisions = subdivisions[subdivisions.level == subdivisions.level.max()]
@@ -35,17 +34,13 @@ def zone_builder(project, hexbin_size: int, max_zone_pop: int, min_zone_pop: int
     )
     coverage_area = gpd.GeoDataFrame.from_postgis(sql_coverage, project.conn, geom_col="geometry", crs=4326)
     coverage_area = coverage_area.explode().reset_index(drop=True).to_crs("epsg:3857")
-    print("\n before hex builder", strftime("%Y-%m-%d %H:%M:%S", gmtime()))
 
     hexb = hex_builder(coverage_area, hexbin_size, epsg=3857)
     hexb.to_crs("epsg:4326", inplace=True)
-    print("\n after hex builder", strftime("%Y-%m-%d %H:%M:%S", gmtime()))
 
     zones_with_locations = zones_with_location(hexb, subdivisions)
-    print("\n after zones_with_locations", strftime("%Y-%m-%d %H:%M:%S", gmtime()))
 
     zones_with_pop = zones_with_population(project, zones_with_locations)
-    print("\n after zones_with_pop", strftime("%Y-%m-%d %H:%M:%S", gmtime()))
 
     sql = "SELECT count(*) FROM sqlite_master WHERE type='table' AND name=' hex_pop';"
     if sum(project.conn.execute(sql).fetchone()) > 0:
@@ -56,7 +51,5 @@ def zone_builder(project, hexbin_size: int, max_zone_pop: int, min_zone_pop: int
         saves_hex_pop_to_file(project, zones_with_pop)
 
     clusters = create_clusters(zones_with_pop, max_zone_pop, min_zone_pop)
-    print("\n after create_clusters", strftime("%Y-%m-%d %H:%M:%S", gmtime()))
 
     export_zones(clusters, project)
-    print("\n after export_zones", strftime("%Y-%m-%d %H:%M:%S", gmtime()))

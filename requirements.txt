@@ -6,7 +6,4 @@ pycountry
 aequilibrae
 tabulate
 tqdm
-cython
-setuptools-cythonize
-wheel
 pysal
