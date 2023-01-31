@@ -56,6 +56,8 @@
 		"source=C:/,target=/workspaces/drive_c,type=bind,consistency=cached",
 		"source=D:/,target=/workspaces/drive_d,type=bind,consistency=cached"
 	],
-	"postCreateCommand": "poetry install"
+	"postCreateCommand": ["pip3 install -r requirements.txt",
+						  "pip3 install -r requirements_dev.txt",
+						  "pip3 install -r requirements_optional.txt"]
 
 }

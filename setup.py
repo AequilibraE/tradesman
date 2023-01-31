@@ -3,8 +3,6 @@ import sys
 
 from setuptools import setup, find_packages
 
-from .__version__ import version
-
 sys.dont_write_bytecode = True
 
 here = os.path.dirname(os.path.realpath(__file__))
@@ -17,7 +15,7 @@ loose_modules = ["__version__"]
 if __name__ == "__main__":
     setup(
         name="tradesman",
-        version=version,
+        version="0.2",
         install_requires=["pysal", "openmatrix", "rasterio", "matplotlib", "aequilibrae"],
         packages=pkgs,
         package_dir={"": "."},
@@ -26,9 +24,8 @@ if __name__ == "__main__":
         zip_safe=True,
         description="A friendly model builder for transportation models",
         author="Pedro Camargo, Renata Akemii",
-        author_email="c@margo.co",
+        author_email="pedro@outerloop.io",
         url="https://github.com/AequilibraE/tradesman",
-        license="See license.txt",
         classifiers=[
             "Programming Language :: Python",
             "Programming Language :: Python :: 3.7",

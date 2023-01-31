@@ -1,0 +1,9 @@
+shapely>=2.0
+openmatrix
+rasterio
+matplotlib
+pycountry
+aequilibrae
+tabulate
+tqdm
+pysal

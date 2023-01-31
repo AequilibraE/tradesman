@@ -1,11 +1,10 @@
-from os.path import join, dirname
-from os import pardir
-import pycountry
-import pandas as pd
-import numpy as np
-from aequilibrae.project import Project
-import tabulate
 from math import floor
+from os.path import join, dirname
+
+import numpy as np
+import pandas as pd
+import tabulate
+from aequilibrae.project import Project
 
 
 def create_buckets(project: Project, folder: str, sample=0.02):

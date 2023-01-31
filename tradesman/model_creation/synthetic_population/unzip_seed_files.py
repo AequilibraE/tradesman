@@ -1,9 +1,8 @@
-from tempfile import gettempdir
-import requests
-from zipfile import ZipFile
-from io import BytesIO
 from os.path import isdir, join, isfile
+from tempfile import gettempdir
 from urllib.request import urlretrieve
+from zipfile import ZipFile
+
 from tradesman.model_creation.synthetic_population.seeds_url import population_url
 
 

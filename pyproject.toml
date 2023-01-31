@@ -3,43 +3,15 @@ line-length = 120
 target-version = ['py37', 'py38', 'py39', 'py310']
 include = '\.pyi?$'
 
-[tool.poetry]
+[project]
 name = "tradesman"
-version = "0.1"
+version = "0.2"
 description = "A Python package for building complete AequilibraE models from open data"
 authors = [
-    "Renata Akemi",
-     "Pedro Camargo <c@margo.co>",
+    {name = "Pedro Camargo", email = "pedro@outerloop.io"},
+    {name = "Renata Akemii", email = "renata@outerloop.io"}
 ]
-maintainers = ["Pedro Camargo <c@margo.co>",]
-license = "MIT"
-
-
-[tool.poetry.dependencies]
-python = "~3.9.0"
-pysal = "*"
-openmatrix = "*"
-rasterio = "*"
-matplotlib = "*"
-aequilibrae = "0.7.5"
-pycountry = "*"
-populationsim = "^0.5.1"
-tabulate = "^0.8.10"
-osm2gmns = "^0.6.8"
-tqdm = "^4.64.1"
-
-
-[tool.poetry.dev-dependencies]
-pytest = "*"
-jupyterlab = "*"
-Sphinx = "*"
-pydata-sphinx-theme = "*"
-sphinx_autodoc_annotation = "*"
-nbsphinx = "*"
-folium = "*"
-sphinx-gallery = "*"
-ipython_genutils = "*"
-
-
-[build-system]
-requires = ["poetry>=0.12"]
+maintainers = [
+    {name = "Pedro Camargo", email = "pedro@outerloop.io"},
+]
+license = {text = "MIT"}

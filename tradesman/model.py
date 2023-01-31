@@ -52,8 +52,6 @@ class Tradesman:
         self.import_pop_by_sex_and_age()
         self.import_amenities()
         self.import_buildings(True)
-        self.build_population_synthesizer_data()
-        self.synthesize_population()
 
     def import_model_area(self):
         """
@@ -109,22 +107,23 @@ class Tradesman:
                 *overwrite* (:obj:`bool`): Deletes pre-existing population_source_import. Defaults to False
         """
 
-        import_population(self._project, self._country_name, self.__population_source, overwrite=overwrite)
+        import_population(
+            self._project, self._project.about.country_name, self.__population_source, overwrite=overwrite
+        )
 
-    def build_zoning(self, hexbin_size=200, max_zone_pop=10000, min_zone_pop=500, save_hexbins=True, overwrite=False):
+    def build_zoning(self, hexbin_size=200, max_zone_pop=10000, min_zone_pop=500, save_hexbins=False, overwrite=False):
         """Creates hexagonal bins, and then clusters it regarding the political subdivision.
 
         Args:
              *hexbin_size*(:obj:`int`): size of the hexagonal bins to be created.
              *max_zone_pop*(:obj:`int`): max population living within a zone.
              *min_zone_pop*(:obj:`int`): min population living within a zone.
-             *save_hexbins*(:obj:`bool`): saves the hexagonal bins with population. Defaults to True.
+             *save_hexbins*(:obj:`bool`): saves the hexagonal bins with population. Defaults to False.
              *overwrite* (:obj:`bool`): Deletes pre-existing HexBins and Zones. Defaults to False
         """
 
-        if not overwrite:
-            if sum(self._project.conn.execute("Select count(*) from Zones").fetchone()) > 0:
-                return
+        if not overwrite and sum(self._project.conn.execute("Select count(*) from Zones").fetchone()) > 0:
+            return
         zone_builder(self._project, hexbin_size, max_zone_pop, min_zone_pop, save_hexbins)
 
     def get_political_subdivisions(self, level: int = None) -> gpd.GeoDataFrame:
@@ -149,7 +148,7 @@ class Tradesman:
         """
         Triggers the import of population pyramid from raster into the model.
         """
-        get_pop_by_sex_age(self._project, self._country_name)
+        get_pop_by_sex_age(self._project, self._project.about.country_name)
 
     def import_amenities(self):
         """
