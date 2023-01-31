@@ -558,14 +558,14 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>import warnings
-warnings.filterwarnings(&quot;ignore&quot;)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
 
-from tradesman.model import Tradesman
+<span class="kn">from</span> <span class="nn">tradesman.model</span> <span class="kn">import</span> <span class="n">Tradesman</span>
 
-from os.path import join
-from tempfile import gettempdir
-from uuid import uuid4
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">join</span>
+<span class="kn">from</span> <span class="nn">tempfile</span> <span class="kn">import</span> <span class="n">gettempdir</span>
+<span class="kn">from</span> <span class="nn">uuid</span> <span class="kn">import</span> <span class="n">uuid4</span>
 <br/></pre></div>
 </div>
 </div>
@@ -573,11 +573,11 @@ from uuid import uuid4
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>folder = join(gettempdir(), uuid4().hex)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">folder</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">gettempdir</span><span class="p">(),</span> <span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">)</span>
 
-model_place = &quot;San Marino&quot;
+<span class="n">model_place</span> <span class="o">=</span> <span class="s2">&quot;San Marino&quot;</span>
 
-project = Tradesman(network_path=folder, model_place=model_place)
+<span class="n">project</span> <span class="o">=</span> <span class="n">Tradesman</span><span class="p">(</span><span class="n">network_path</span><span class="o">=</span><span class="n">folder</span><span class="p">,</span> <span class="n">model_place</span><span class="o">=</span><span class="n">model_place</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -585,15 +585,15 @@ project = Tradesman(network_path=folder, model_place=model_place)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>project.add_country_borders()
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">project</span><span class="o">.</span><span class="n">add_country_borders</span><span class="p">()</span>
 
-project.import_subdivisions(&quot;geoboundaries&quot;, 2, True)
+<span class="n">project</span><span class="o">.</span><span class="n">import_subdivisions</span><span class="p">(</span><span class="s2">&quot;geoboundaries&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
 
-project.import_population()
+<span class="n">project</span><span class="o">.</span><span class="n">import_population</span><span class="p">()</span>
 
-project.build_zoning()
+<span class="n">project</span><span class="o">.</span><span class="n">build_zoning</span><span class="p">()</span>
 
-project.import_pop_by_sex_and_age()
+<span class="n">project</span><span class="o">.</span><span class="n">import_pop_by_sex_and_age</span><span class="p">()</span>
 <br/></pre></div>
 </div>
 </div>
@@ -613,7 +613,7 @@ Done 0/9 states
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>project.build_population_synthesizer_data()
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">project</span><span class="o">.</span><span class="n">build_population_synthesizer_data</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -651,7 +651,7 @@ Difference in calculated vs expected percentual of households in the sample
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from tradesman.model_creation.synthetic_population.user_control_import import *
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tradesman.model_creation.synthetic_population.user_control_import</span> <span class="kn">import</span> <span class="o">*</span>
 </pre></div>
 </div>
 </div>
@@ -659,9 +659,9 @@ Difference in calculated vs expected percentual of households in the sample
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>user_change_controls(overwrite=True,
-                     scr_file=&quot;../path/to/new/control/file.csv&quot;,
-                     dest_folder=join(folder, &quot;population&quot;))
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">user_change_controls</span><span class="p">(</span><span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                     <span class="n">scr_file</span><span class="o">=</span><span class="s2">&quot;../path/to/new/control/file.csv&quot;</span><span class="p">,</span>
+                     <span class="n">dest_folder</span><span class="o">=</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="s2">&quot;population&quot;</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -670,10 +670,10 @@ Difference in calculated vs expected percentual of households in the sample
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>user_change_settings(overwrite=True,
-                     household_settings=[&#39;NEW_HH_SETTING_1&#39;, &quot;NEW_HH_SETTING_2&quot;],
-                     persons_settings=[&#39;NEW_PP_SETTING_1&#39;, &quot;NEW_PP_SETTING_2&quot;, &quot;NEW_PP_SETTING_3&quot;],
-                     dest_folder=join(folder, &quot;population&quot;))
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">user_change_settings</span><span class="p">(</span><span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                     <span class="n">household_settings</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;NEW_HH_SETTING_1&#39;</span><span class="p">,</span> <span class="s2">&quot;NEW_HH_SETTING_2&quot;</span><span class="p">],</span>
+                     <span class="n">persons_settings</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;NEW_PP_SETTING_1&#39;</span><span class="p">,</span> <span class="s2">&quot;NEW_PP_SETTING_2&quot;</span><span class="p">,</span> <span class="s2">&quot;NEW_PP_SETTING_3&quot;</span><span class="p">],</span>
+                     <span class="n">dest_folder</span><span class="o">=</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="s2">&quot;population&quot;</span><span class="p">))</span>
 <br/></pre></div>
 </div>
 </div>
@@ -683,10 +683,10 @@ Difference in calculated vs expected percentual of households in the sample
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>user_change_seeds(overwrite=True,
-                  household_seed_path=&quot;../path/to/new/household/seeds.csv&quot;,
-                  persons_seed_path=&quot;../path/to/new/persons/seeds.csv&quot;,
-                  dest_folder=join(folder, &quot;population&quot;))
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">user_change_seeds</span><span class="p">(</span><span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                  <span class="n">household_seed_path</span><span class="o">=</span><span class="s2">&quot;../path/to/new/household/seeds.csv&quot;</span><span class="p">,</span>
+                  <span class="n">persons_seed_path</span><span class="o">=</span><span class="s2">&quot;../path/to/new/persons/seeds.csv&quot;</span><span class="p">,</span>
+                  <span class="n">dest_folder</span><span class="o">=</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="s2">&quot;population&quot;</span><span class="p">))</span>
 <br/></pre></div>
 </div>
 </div>
@@ -696,11 +696,11 @@ Difference in calculated vs expected percentual of households in the sample
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>user_change_geographies(overwrite=True,
-                        seed_geography=&quot;COUNTY&quot;,
-                        upper_geography=&quot;STATE&quot;,
-                        lower_geography=&quot;DISTRICT&quot;,
-                        dest_folder=join(folder, &quot;population&quot;))
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">user_change_geographies</span><span class="p">(</span><span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">seed_geography</span><span class="o">=</span><span class="s2">&quot;COUNTY&quot;</span><span class="p">,</span>
+                        <span class="n">upper_geography</span><span class="o">=</span><span class="s2">&quot;STATE&quot;</span><span class="p">,</span>
+                        <span class="n">lower_geography</span><span class="o">=</span><span class="s2">&quot;DISTRICT&quot;</span><span class="p">,</span>
+                        <span class="n">dest_folder</span><span class="o">=</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="s2">&quot;population&quot;</span><span class="p">))</span>
 <br/></pre></div>
 </div>
 </div>
@@ -709,11 +709,11 @@ Difference in calculated vs expected percentual of households in the sample
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>user_import_new_totals(overwrite=True,
-                       totals_lower_level=&quot;../path/to/new/control_totals_taz.csv&quot;,
-                       totals_upper_level=&quot;../path/to/new/control_totals_meta.csv&quot;,
-                       geographies=&quot;../path/to/new/geo_cross_walk.csv&quot;,
-                       dest_folder=join(folder, &quot;population&quot;))
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">user_import_new_totals</span><span class="p">(</span><span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                       <span class="n">totals_lower_level</span><span class="o">=</span><span class="s2">&quot;../path/to/new/control_totals_taz.csv&quot;</span><span class="p">,</span>
+                       <span class="n">totals_upper_level</span><span class="o">=</span><span class="s2">&quot;../path/to/new/control_totals_meta.csv&quot;</span><span class="p">,</span>
+                       <span class="n">geographies</span><span class="o">=</span><span class="s2">&quot;../path/to/new/geo_cross_walk.csv&quot;</span><span class="p">,</span>
+                       <span class="n">dest_folder</span><span class="o">=</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="s2">&quot;population&quot;</span><span class="p">))</span>
 <br/></pre></div>
 </div>
 </div>
@@ -722,14 +722,14 @@ Difference in calculated vs expected percentual of households in the sample
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>user_change_validation_parameters(overwrite=True,
-                                  model_place=model_place,
-                                  dest_folder=join(folder, &quot;population&quot;),
-                                  aggregate_summaries=[{&quot;name&quot;: &quot;citzenship_status&quot;,
-                                                        &quot;geography&quot;: &quot;COUNTY&quot;,
-                                                        &quot;control&quot;: &quot;citz_status_control&quot;, &quot;result&quot;: &quot;citz_status_result&quot;},
-                                                       {&quot;name&quot;: &quot;&quot;}],
-                                  geographies=[&quot;STATE&quot;, &quot;COUNTY&quot;, &quot;DISTRICT&quot;])
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">user_change_validation_parameters</span><span class="p">(</span><span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                  <span class="n">model_place</span><span class="o">=</span><span class="n">model_place</span><span class="p">,</span>
+                                  <span class="n">dest_folder</span><span class="o">=</span><span class="n">join</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="s2">&quot;population&quot;</span><span class="p">),</span>
+                                  <span class="n">aggregate_summaries</span><span class="o">=</span><span class="p">[{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;citzenship_status&quot;</span><span class="p">,</span>
+                                                        <span class="s2">&quot;geography&quot;</span><span class="p">:</span> <span class="s2">&quot;COUNTY&quot;</span><span class="p">,</span>
+                                                        <span class="s2">&quot;control&quot;</span><span class="p">:</span> <span class="s2">&quot;citz_status_control&quot;</span><span class="p">,</span> <span class="s2">&quot;result&quot;</span><span class="p">:</span> <span class="s2">&quot;citz_status_result&quot;</span><span class="p">},</span>
+                                                       <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">}],</span>
+                                  <span class="n">geographies</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;STATE&quot;</span><span class="p">,</span> <span class="s2">&quot;COUNTY&quot;</span><span class="p">,</span> <span class="s2">&quot;DISTRICT&quot;</span><span class="p">])</span>
 <br/></pre></div>
 </div>
 </div>
@@ -740,7 +740,7 @@ Difference in calculated vs expected percentual of households in the sample
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>project.synthesize_population()
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">project</span><span class="o">.</span><span class="n">synthesize_population</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -750,7 +750,7 @@ Difference in calculated vs expected percentual of households in the sample
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from tradesman.model_creation.synthetic_population.create_synthetic_population import validate_synthetic_population
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tradesman.model_creation.synthetic_population.create_synthetic_population</span> <span class="kn">import</span> <span class="n">validate_synthetic_population</span>
 <br/></pre></div>
 </div>
 </div>
@@ -758,7 +758,7 @@ Difference in calculated vs expected percentual of households in the sample
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>validate_synthetic_population(model_place=model_place, folder=folder)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">validate_synthetic_population</span><span class="p">(</span><span class="n">model_place</span><span class="o">=</span><span class="n">model_place</span><span class="p">,</span> <span class="n">folder</span><span class="o">=</span><span class="n">folder</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
