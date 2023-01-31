@@ -1,13 +1,12 @@
 from os.path import isfile, join
+import re
 from tempfile import gettempdir
-from urllib.request import urlretrieve
 
 import geopandas as gpd
 import pandas as pd
 import pycountry
 import requests
 from aequilibrae.project import Project
-from fiona import listlayers
 from numpy import arange
 from shapely.geometry import MultiPolygon, Polygon
 from shapely.ops import unary_union
@@ -25,16 +24,16 @@ class ImportPoliticalSubdivisions:
         self._project = project
         self._source = source.lower()
 
-        self.__source_control(self._source)
+        self.__source_control()
 
-    def add_country_borders(self, overwrite: bool):
+    def add_country_borders(self, overwrite: bool = False):
         """
         Add the model's country border.
 
         Args.:
              *overwrite*(:obj:`bool`): re-write country borders if it already exists. Defaults to False.
         """
-        data = self._gadm_search() if self._source == "gadm" else self._geoboundaries_search()
+        data = self.__get_subdivisions()[["country_name", "division_name", "level", "geom"]]
 
         data = data[data.level == 0]
 
@@ -45,24 +44,38 @@ class ImportPoliticalSubdivisions:
         sql = """INSERT INTO political_subdivisions(country_name, division_name, level, geometry)
                     VALUES(?, ?, ?, CastToMulti(GeomFromWKB(?, 4326)));"""
         self._project.conn.executemany(sql, list(data.itertuples(index=False, name=None)))
+
+        # If the model area is a country, we update the model area to avoid creating useless zones in the future
+        if re.search(self.__model_place, self._project.about.country_name):
+            sql = """UPDATE political_subdivisions SET geometry=CastToMulti(GeomFromWKB(?, 4326)) WHERE level=-1;"""
+            self._project.conn.execute(sql, data.geom.values)
+
         self._project.conn.commit()
 
-    def import_subdivisions(self, level: int, overwrite: bool):
+    def import_subdivisions(self, level: int, overwrite: bool = False):
         """
-        Add the model's subdivisions. If the model area is smaller than the smallest geographical subdivision from GADM or geoBoundaries, it adds the upper-level geometries to the model file. Otherwise, it adds the lower-level geometries which intersect model area.
+        Add the model's subdivisions. If the model area is smaller than the smallest geographical subdivision from
+        GADM or geoBoundaries, it adds the upper-level geometries to the model file.  Otherwise, it adds the
+        lower-level geometries which intersect model area.
 
         Args.:
              *level*(:obj:`int`): number of levels to download.
              *overwrite*(:obj:`bool`): re-write political subdivisions if it already exists. Defaults to False.
         """
-
-        data = self.__get_subdivisions(self._source)[["country_name", "division_name", "level", "geom"]]
+        data = self.__get_subdivisions()
 
         if len(data) == 1:
             return
 
-        data = data[data.level > 0]
+        divisions = data[data.level > 0]
 
+        centers = self.__get_centroids(divisions)
+        data = divisions[divisions.index.isin(centers[centers.within(self._poly)].index + 1)]
+        if len(data) == 0:
+            pos = divisions.sindex.query(geometry=self._poly, predicate="intersects")
+            data = divisions.iloc[pos]
+
+        data = data[["country_name", "division_name", "level", "geom"]]
         level = max(data.level) if level > max(data.level) else min(data.level) + level
         data = data[data.level <= level]
         data.sort_values(by="level", ascending=True, inplace=True)
@@ -78,79 +91,44 @@ class ImportPoliticalSubdivisions:
         self._project.conn.executemany(qry, list_of_tuples)
         self._project.conn.commit()
 
-    def _gadm_search(self):
+    def __boundaries_import(self):
         """
-        Download political subdivisions from GADM.
+        Imports political boundaries for an entire country. Data for all levels is stored in a parquet file.
         """
-        gadm_url = f"https://geodata.ucdavis.edu/gadm/gadm4.1/gpkg/gadm41_{self._country_code}.gpkg"
+        country_data = []
 
-        dest_path = join(gettempdir(), f"gadm_{self._country_code}.gpkg")
+        if self._source == "gadm":
+            url = "https://geodata.ucdavis.edu/gadm/gadm4.1/json/gadm41_{}_{}.json"
+        else:
+            url = "https://www.geoboundaries.org/data/geoBoundaries-3_0_0/{}/ADM{}/geoBoundaries-3_0_0-{}-ADM{}.geojson"
 
-        if not isfile(dest_path):
-            urlretrieve(gadm_url, dest_path)
-
-        layers = listlayers(dest_path)
-        layers.reverse()
-
-        levels_to_add = []
-        counter = len(layers[:-1])
-
-        for i in layers:
-            if i != "ADM_ADM_0":
-                df = gpd.read_file(dest_path, layer=i)
-                df.reset_index(inplace=True)
-                centroids = df.to_crs(3857).centroid.to_crs(4326)
-                gdf = df.iloc[centroids[centroids.within(self._poly)].index]
-                if len(gdf) == 0:
-                    pos = df.sindex.query(geometry=self._poly, predicate="intersects")
-                    gdf = df.iloc[pos]
-                gdf = gdf.assign(level=counter)
-                gdf.rename(columns={"COUNTRY": "country_name", f"NAME_{counter}": "division_name"}, inplace=True)
-                levels_to_add.append(gdf[["country_name", "division_name", "level", "geometry"]])
-
-                counter -= 1
-            else:
-                df = gpd.read_file(dest_path, layer="ADM_ADM_0")
-                df = df.assign(level=0, division_name="country_border")
-                df.rename(columns={"COUNTRY": "country_name"}, inplace=True)
-                levels_to_add.append(df[["country_name", "division_name", "level", "geometry"]])
-
-        df = pd.concat(levels_to_add)
-
-        df["geom"] = gpd.GeoSeries.to_wkb(df.geometry)
-
-        df.to_parquet(join(gettempdir(), f"{self.__model_place}_cache_gadm.parquet"))
-
-        return df[["country_name", "division_name", "level", "geom"]]
-
-    def _geoboundaries_search(self):
-        """
-        Download political geometries from geoBoundaries
-        """
-        counter = 5
-        link_list = []
-        level_list = []
-        all_data = []
-
-        while counter >= 0:
-            url = f"https://www.geoboundaries.org/gbRequest.html?ISO={self._country_code}&ADM=ADM{counter}"
-            r = requests.get(url)
-            if len(r.json()) > 0:
-                link_list.append(r.json()[0]["gjDownloadURL"])
-                level_list.append(counter)
-            counter -= 1
-
-        level_list.reverse()
-        link_list.reverse()
-
-        for lev in level_list:
-
-            geoBoundary = requests.get(link_list[lev]).json()
+        for level in range(5):  # because we have at most 4 subdivision levels
+            fmt = (
+                url.format(self._project.about.country_code, level)
+                if self._source == "gadm"
+                else url.format(self._project.about.country_code, level, self._project.about.country_code, level)
+            )
+            req = requests.get(fmt)
+            if req.status_code == 404:
+                continue
+            req = req.json()
 
             adm_level = {}
-            for boundary in geoBoundary["features"]:
+            places = {}
+            for boundary in req["features"]:
 
-                adm_name = boundary["properties"]["shapeName"]
+                if level == 0:
+                    adm_name = (
+                        boundary["properties"]["COUNTRY"]
+                        if self._source == "gadm"
+                        else boundary["properties"]["shapeName"]
+                    )
+                else:
+                    adm_name = (
+                        boundary["properties"][f"NAME_{level}"]
+                        if self._source == "gadm"
+                        else boundary["properties"]["shapeName"]
+                    )
 
                 if adm_name not in adm_level:
                     adm_level[adm_name] = []
@@ -158,39 +136,31 @@ class ImportPoliticalSubdivisions:
                 adm_level[adm_name].append(self.__geometry_type(boundary["geometry"]))
 
             for key, value in adm_level.items():
-                adm_level[key] = unary_union(value).wkb
+                for idx, val in enumerate(value):
+                    places[f"{key}_{idx}"] = val.wkb
 
-            df = pd.DataFrame.from_dict(adm_level, orient="index", columns=["geom"])
+            df = pd.DataFrame.from_dict(places, orient="index", columns=["geom"])
             df.reset_index(inplace=True)
             df.rename(columns={"index": "division_name"}, inplace=True)
-            df = df.assign(country_name=self._country_name, level=lev)
+            df = df.assign(country_name=self._project.about.country_name, level=level)
 
             gs = gpd.GeoSeries.from_wkb(df.geom)
-            gdf = gpd.GeoDataFrame(df, geometry=gs, crs=4326)
-            if lev > 0:
-                centroids = gdf.to_crs(3857).centroid.to_crs(4326)
-                aux = gdf.iloc[centroids[centroids.within(self._poly)].index]
-                if len(aux) == 0:
-                    pos = gdf.sindex.query(geometry=self._poly, predicate="intersects")
-                    gdf = gdf.iloc[pos]
-                all_data.append(aux)
+            country_data.append(gpd.GeoDataFrame(df, geometry=gs, crs=4326))
 
-            all_data.append(gdf)
+        if len(country_data):
+            country_data = pd.concat(country_data)
+            country_data["idx"] = arange(len(country_data))
+            country_data.set_index("idx", inplace=True)
+            country_data.at[0, "division_name"] = "country_border"
+            country_data = country_data.drop_duplicates(subset=["division_name", "level"])
 
-        if len(all_data):
-            all_data = pd.concat(all_data)
-            all_data["idx"] = arange(len(all_data))
-            all_data.set_index("idx", inplace=True)
-            all_data.at[0, "division_name"] = "country_border"
-            all_data = all_data.drop_duplicates(subset=["division_name", "level"])
+        country_data.to_parquet(join(gettempdir(), f"{self._project.about.country_name}_cache_{self._source}.parquet"))
 
-        all_data.to_parquet(join(gettempdir(), f"{self.__model_place}_cache_geoboundaries.parquet"))
-
-        return all_data[["country_name", "division_name", "level", "geom"]]
+        return country_data[["country_name", "division_name", "level", "geom"]]
 
     def __geometry_type(self, dct):
         """
-        Returns shalepy.Polygons or shapeply.MultiPolygons depending on the data type.
+        Returns shapely.Polygons or shapely.MultiPolygons.
 
         Args.:
              *dct*(:obj:`dict`): dictionary with coordinates.
@@ -246,29 +216,30 @@ class ImportPoliticalSubdivisions:
 
         self.__add_model_place_info_to_db()
 
-    def __source_control(self, source):
+    def __source_control(self):
         """Checks if the political subdivision source exists."""
-        if source not in ["gadm", "geoboundaries"]:
+        if self._source not in ["gadm", "geoboundaries"]:
             raise ValueError("Source not available.")
 
-    def __get_subdivisions(self, source):
+    def __get_subdivisions(self):
         """
-        Returns the temporary file with poitical subdivisions.
-
-        Args.:
-             *source*(:obj:`str`): political subdivision source. Takes GADM or geoBoundaries.
+        Returns the parquet file with political subdivisions.
         """
-        if source == "gadm":
-            return gpd.read_parquet(join(gettempdir(), f"{self.__model_place}_cache_gadm.parquet"))
+        file_name = join(gettempdir(), f"{self._project.about.country_name}_cache_{self._source}.parquet")
+        if isfile(file_name):
+            return gpd.read_parquet(file_name)
         else:
-            return gpd.read_parquet(join(gettempdir(), f"{self.__model_place}_cache_geoboundaries.parquet"))
+            return self.__boundaries_import()
 
     @property
     def model_place(self):
-        """Returns the name of the place for which this model was made."""
+        """Returns the name of the place for which the model was build."""
         return self.__model_place
 
     def __add_model_place_info_to_db(self):
+        """
+        Adds model place information into the project database.
+        """
         about = self._project.about
         about.add_info_field("country_name")
         about.add_info_field("country_code")
@@ -278,3 +249,24 @@ class ImportPoliticalSubdivisions:
         about.country_code = self._country_code
 
         about.write_back()
+
+    def __get_centroids(self, df):
+        """
+        Returns a GeoSeries with geometries centroids.
+        For geometries that are MultiPolygons, we consider the centroid of the largest shape.
+        """
+        centers = []
+        for _, row in df.iterrows():
+            place = row.geometry
+            if type(place) == MultiPolygon:
+                if len(place.geoms) == 1:
+                    centers.append(place.centroid)
+                else:
+                    areas = []
+                    for p in place.geoms:
+                        areas.append(p.area)
+                    centers.append(place.geoms[areas.index(max(areas))].centroid)
+            else:
+                centers.append(place.centroid)
+
+        return gpd.GeoSeries(centers)

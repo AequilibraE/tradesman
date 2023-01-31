@@ -33,8 +33,6 @@ class Tradesman:
         self.__starts_logging()
 
         self.__initialize_model()
-        self._country_name = self.__get_country_name()
-        self._country_code = self.__get_country_iso_code()
         self._network = ImportNetwork(self._project, self.__model_place, self.__pbf_path)
 
         self._boundaries_source = boundaries_source
@@ -204,13 +202,3 @@ class Tradesman:
             if handler.name == "terminal":
                 return
         logger.addHandler(stdout_handler)
-
-    def __get_country_name(self):
-        if "country_name" in self._project.about.list_fields():
-            return self._project.about.country_name
-        return
-
-    def __get_country_iso_code(self):
-        if "country_code" in self._project.about.list_fields():
-            return self._project.about.country_code
-        return
