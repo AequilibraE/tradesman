@@ -21,7 +21,6 @@ class TestCreateGeoCrossWalk(unittest.TestCase):
         rmtree(join(gettempdir(), "data"))
 
     def test_create_geo_cross_walk(self):
-
         create_geo_cross_walk(self.project, gettempdir())
 
         self.assertTrue(exists(join(gettempdir(), "data/geo_cross_walk.csv")))

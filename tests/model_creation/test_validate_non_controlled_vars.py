@@ -9,7 +9,6 @@ from tradesman.model_creation.synthetic_population.syn_pop_validation import val
 
 class TestValidateNonControlledVars(unittest.TestCase):
     def setUp(self) -> None:
-
         temp_fldr = mkdtemp()
         self.fldr = join(gettempdir(), "population")
         rename(temp_fldr, self.fldr)
@@ -23,7 +22,6 @@ class TestValidateNonControlledVars(unittest.TestCase):
         rmtree(join(gettempdir(), "population"))
 
     def test_non_controlled_vars(self):
-
         self.assertEqual(validate_non_controlled_vars("NRU", self.fldr), "Non-controlled vars checked.")
 
 

@@ -2,7 +2,7 @@ import geopandas as gpd
 import numpy as np
 import pandas as pd
 from aequilibrae.project import Project
-from shapely.geometry import Point, Polygon
+from shapely.geometry import Point, Polygon, box
 
 from tradesman.data.load_zones import load_zones
 from tradesman.data_retrieval.osm_tags.generic_tag import generic_tag
@@ -42,7 +42,6 @@ class ImportOsmData:
         self.__initialize()
 
     def import_osm_data(self, tile_size=25):
-
         df = pd.DataFrame.from_dict(generic_tag(self.__tag, self.__osm_data, self._project))
 
         tag_value = building_values if self.__tag == "building" else amenity_values
@@ -52,6 +51,8 @@ class ImportOsmData:
         df["tags"] = df["tags"].apply(pd.Series)[self.__tag].values
 
         df["update_tags"] = df["tags"].apply(lambda x: tag_value.get(x))
+
+        df.update_tags.fillna("undetermined", inplace=True)
 
         df.drop(columns=["tags"], inplace=True)
 
@@ -146,4 +147,7 @@ class ImportOsmData:
             return Point(np.array([row.lon, row.lat])).wkb
 
         else:
-            return Polygon([(dct["lon"], dct["lat"]) for dct in row.geometry]).wkb
+            if len(row.geometry) >= 4:
+                return Polygon([(dct["lon"], dct["lat"]) for dct in row.geometry]).wkb
+            else:
+                return box(*row.bounds.values()).wkb

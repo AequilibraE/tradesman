@@ -20,7 +20,6 @@ class TestGenericTag(unittest.TestCase):
         self.assertEqual(generic_tag(tag="amenity", project=self.mock_prj, osm_data=self.osm_data), "fooboo")
 
     def test_generic_tag_building(self):
-
         self.assertEqual(generic_tag(tag="building", osm_data=self.osm_data, project=self.mock_prj), "boofoo")
 
 

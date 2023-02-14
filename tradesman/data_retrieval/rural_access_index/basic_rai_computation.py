@@ -7,7 +7,6 @@ from tradesman.data_retrieval.rural_access_index.population_data import populati
 
 
 def basic_RAI_data(project):
-
     # print('Obtaining population data')
     pop_data = population_data(project).to_crs(3857)
 

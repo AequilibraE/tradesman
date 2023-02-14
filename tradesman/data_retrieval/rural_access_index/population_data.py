@@ -4,7 +4,6 @@ from tradesman.data_retrieval.load_vectorized_pop import load_vectorized_pop
 
 
 def population_data(project):
-
     population = load_vectorized_pop(project)
 
     urban_areas = select_urban_areas(project)
