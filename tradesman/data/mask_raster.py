@@ -24,10 +24,10 @@ def mask_raster(dest_path, main_area):
 
 def areaGeoJson(main_area):
     """
-    Adapted from the function and code created by Henrikki Tenkanen. 
+    Adapted from the function and code created by Henrikki Tenkanen.
     See: https://automating-gis-processes.github.io/CSC18/lessons/L6/clipping-raster.html
     """
     import json
 
-    geo = gpd.GeoDataFrame({'geometry': box(*main_area.bounds)}, index=[0], crs=4326)
-    return [json.loads(geo.to_json())['features'][0]['geometry']]
+    geo = gpd.GeoDataFrame({"geometry": box(*main_area.bounds)}, index=[0], crs=4326)
+    return [json.loads(geo.to_json())["features"][0]["geometry"]]
