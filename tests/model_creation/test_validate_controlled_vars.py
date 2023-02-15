@@ -10,7 +10,6 @@ from tradesman.model_creation.synthetic_population.user_control_import import us
 
 class TestValidateControlledVars(unittest.TestCase):
     def setUp(self) -> None:
-
         temp_fldr = mkdtemp()
         self.fldr = join(gettempdir(), "population")
         rename(temp_fldr, self.fldr)
@@ -36,7 +35,6 @@ class TestValidateControlledVars(unittest.TestCase):
         rmtree(join(gettempdir(), "population"))
 
     def test_validate_controlled_vars(self):
-
         validate_controlled_vars(self.fldr)
 
         self.assertTrue(exists(join(self.fldr, "validation_results")))

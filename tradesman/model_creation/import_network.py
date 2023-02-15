@@ -24,7 +24,6 @@ class ImportNetwork:
     """
 
     def __init__(self, project: Project, model_place: str, pbf_path: str = None):
-
         self.project = project
         self.model_place = model_place
         self.pbf_path = pbf_path
@@ -36,7 +35,6 @@ class ImportNetwork:
         self.new_node_fields = {"osm_node_id": {"description": "osm_id", "type": "text", "required": False}}
 
     def build_network(self):
-
         if not self.pbf_path:
             self.par.parameters["network"]["links"]["fields"]["one-way"].extend(extra_fields)
             self.par.write_back()

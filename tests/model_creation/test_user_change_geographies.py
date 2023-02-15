@@ -24,7 +24,6 @@ class TestUsarChangeGeographies(unittest.TestCase):
         rmtree(join(gettempdir(), "configs"))
 
     def test_user_change_geographies_false(self):
-
         user_change_geographies(
             overwrite=False,
             seed_geography="COUNTY",
@@ -40,7 +39,6 @@ class TestUsarChangeGeographies(unittest.TestCase):
         self.assertEqual(doc["geographies"], ["REGION", "PUMA", "TAZ"])
 
     def test_user_change_geographies_true(self):
-
         user_change_geographies(
             overwrite=True,
             seed_geography="COUNTY",

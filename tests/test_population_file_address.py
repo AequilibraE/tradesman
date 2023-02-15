@@ -5,7 +5,6 @@ from tradesman.data.population_file_address import link_source
 
 class TestPopulationFileAddress(unittest.TestCase):
     def test_link_source_world_pop(self):
-
         self.assertEqual(
             link_source(model_place="Nauru", source="WorldPop"),
             "https://data.worldpop.org/GIS/Population/Global_2000_2020/2020/NRU/nru_ppp_2020.tif",
@@ -18,7 +17,6 @@ class TestPopulationFileAddress(unittest.TestCase):
         )
 
     def test_link_source_meta_no_file(self):
-
         self.assertEqual(link_source(model_place="Namibia", source="Meta"), "no file")
 
     def test_link_source_exception(self):

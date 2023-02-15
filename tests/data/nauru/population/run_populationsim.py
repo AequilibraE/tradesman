@@ -13,7 +13,6 @@ from populationsim import steps
 
 @inject.injectable()
 def log_settings():
-
     return [
         "multiprocess",
         "num_processes",
@@ -29,7 +28,6 @@ def log_settings():
 
 
 if __name__ == "__main__":
-
     assert inject.get_injectable("preload_injectables", None)
 
     parser = argparse.ArgumentParser()

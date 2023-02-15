@@ -4,7 +4,6 @@ from tradesman.model_creation.import_political_subdivisions import ImportPolitic
 
 
 def test_import_model_exception(create_path):
-
     model = Tradesman(network_path=create_path, model_place="Charlie and the chocolate factory")
 
     with pytest.raises(ValueError):
@@ -12,7 +11,6 @@ def test_import_model_exception(create_path):
 
 
 def test_unexisting_source(create_path):
-
     with pytest.raises(ValueError):
         Tradesman(network_path=create_path, model_place="Coquimbo, Chile", boundaries_source="Cencosud")
 

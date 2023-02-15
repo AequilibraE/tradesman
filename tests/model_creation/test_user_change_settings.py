@@ -36,7 +36,6 @@ class TestUserChangeSettings(unittest.TestCase):
         self.assertNotIn("DDRS", doc["output_synthetic_population"]["persons"]["columns"])
 
     def test_user_change_settings_true(self):
-
         user_change_settings(
             overwrite=True, household_settings=["FULFP"], persons_settings=["CIT", "DDRS"], dest_folder=gettempdir()
         )

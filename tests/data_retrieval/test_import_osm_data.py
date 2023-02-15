@@ -19,7 +19,6 @@ class TestImportOsmData(unittest.TestCase):
 
     @mock.patch("tradesman.data_retrieval.osm_tags.import_osm_data.generic_tag")
     def test_import_osm_data_amenity(self, mock_tag):
-
         mock_tag.return_value = [
             {
                 "type": "node",
@@ -36,7 +35,6 @@ class TestImportOsmData(unittest.TestCase):
 
     @mock.patch("tradesman.data_retrieval.osm_tags.import_osm_data.generic_tag")
     def test_import_osm_data_building(self, mock_tag):
-
         mock_tag.return_value = [
             {
                 "type": "way",
@@ -60,7 +58,6 @@ class TestImportOsmData(unittest.TestCase):
         self.assertEqual(len(data.import_osm_data()), 1)
 
     def test_import_osm_data_exception(self):
-
         with self.assertRaises(ValueError) as exception_context:
             ImportOsmData(tag="dinossaur", project=self.project, osm_data=self.osm_data).import_osm_data()
 

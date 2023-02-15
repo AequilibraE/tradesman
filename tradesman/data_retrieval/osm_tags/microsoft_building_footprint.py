@@ -26,7 +26,6 @@ class ImportMicrosoftBuildingData:
         self.__initialize()
 
     def __nominatim_get_name(self):
-
         search_place = self.__model_place.lower().replace(" ", "+")
         nom_url = f"https://nominatim.openstreetmap.org/search?q={search_place}&format=json&polygon_geojson=1&addressdetails=1&accept-language=en"
 
@@ -39,7 +38,6 @@ class ImportMicrosoftBuildingData:
             raise FileNotFoundError("Microsoft Bing does not provide information about this region.")
 
     def microsoft_buildings(self):
-
         url = self.__country_list[self.__country_list.Location == self.__country_name].Url.values
 
         frame_list = []

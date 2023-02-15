@@ -23,7 +23,6 @@ class TestCreateTotalsMeta(unittest.TestCase):
         rmtree(join(gettempdir(), "data"))
 
     def test_create_totals_meta(self):
-
         create_control_totals_meta(gettempdir())
 
         self.assertTrue(exists(join(gettempdir(), "data/control_totals_meta.csv")))

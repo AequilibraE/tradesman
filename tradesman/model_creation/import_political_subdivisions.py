@@ -18,7 +18,6 @@ class ImportPoliticalSubdivisions:
     """
 
     def __init__(self, model_place: str, source: str, project: Project):
-
         self.__model_place = model_place
         self.__search_place = model_place.lower().replace(" ", "+")
         self._project = project
@@ -116,7 +115,6 @@ class ImportPoliticalSubdivisions:
             adm_level = {}
             places = {}
             for boundary in req["features"]:
-
                 if level == 0:
                     adm_name = (
                         boundary["properties"]["COUNTRY"]

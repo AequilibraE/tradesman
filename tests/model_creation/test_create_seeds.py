@@ -32,7 +32,6 @@ class TestCreateSeeds(unittest.TestCase):
         rmtree(join(gettempdir(), "data"))
 
     def test_create_seeds(self):
-
         create_buckets(self.project, gettempdir())
 
         x = len(pd.read_csv(join(gettempdir(), "data/seed_households.csv")))
