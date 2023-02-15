@@ -19,7 +19,6 @@ class ImportPoliticalSubdivisions:
     """
 
     def __init__(self, model_place: str, source: str, project: Project):
-
         self.__model_place = model_place
         self.__search_place = model_place.lower().replace(" ", "+")
         self._project = project
@@ -144,12 +143,10 @@ class ImportPoliticalSubdivisions:
         link_list.reverse()
 
         for lev in level_list:
-
             geoBoundary = requests.get(link_list[lev]).json()
 
             adm_level = {}
             for boundary in geoBoundary["features"]:
-
                 adm_name = boundary["properties"]["shapeName"]
 
                 if adm_name not in adm_level:

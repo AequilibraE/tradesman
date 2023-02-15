@@ -42,7 +42,6 @@ class ImportOsmData:
         self.__initialize()
 
     def import_osm_data(self, tile_size=25):
-
         df = pd.DataFrame.from_dict(generic_tag(self.__tag, self.__osm_data, self._project))
 
         tag_value = building_values if self.__tag == "building" else amenity_values

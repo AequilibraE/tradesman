@@ -107,7 +107,6 @@ def create_buckets(project: Project, folder: str, sample=0.02):
 
 
 def show_seed_stats(num_hh, sort_number, household_info):
-
     print("Calculated vs Expected percentual of households per size in the sample")
     print("")
     table_1 = [

@@ -23,7 +23,6 @@ class TestUserChangeValidationParameters(unittest.TestCase):
         remove(join(self.fldr, "verification.yaml"))
 
     def test_user_change_validation_parameters_false(self):
-
         user_change_validation_parameters(overwrite=False, model_place=self.model_place, dest_folder=self.fldr)
 
         with open(join(gettempdir(), "verification.yaml"), mode="r") as file:
@@ -34,7 +33,6 @@ class TestUserChangeValidationParameters(unittest.TestCase):
         self.assertEqual(doc["validation_dir"], "validation_results")
 
     def test_user_change_validation_parameters_true(self):
-
         user_change_validation_parameters(
             overwrite=True,
             model_place=self.model_place,

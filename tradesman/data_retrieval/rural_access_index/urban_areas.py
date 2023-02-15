@@ -7,7 +7,6 @@ from tradesman.data_retrieval.country_main_area import country_border_from_model
 
 
 def select_urban_areas(project):
-
     url = "https://github.com/pedrocamargo/road_analytics/releases/download/v0.1/global_urban_extent.gpkg"
 
     dest_path = join(gettempdir(), "global_urban_extent.gpkg")

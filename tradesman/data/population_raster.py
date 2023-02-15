@@ -14,7 +14,6 @@ from tradesman.utils.tqdm_download import TqdmUpTo
 
 
 def population_raster(data_link: str, field_name: str, project: Project):
-
     dest_path = join(gettempdir(), f"{field_name}.tif")
     if not isfile(dest_path):
         with TqdmUpTo(unit="B", unit_scale=True, unit_divisor=1024, miniters=1, desc=f"{field_name}.tif") as t:

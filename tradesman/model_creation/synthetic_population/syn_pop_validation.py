@@ -91,7 +91,6 @@ def validate_non_controlled_vars(country_code: str, folder: str):
 
 
 def validate_controlled_vars(fldr):
-
     region_yaml = join(fldr, "verification.yaml")
 
     plt.style.use("ggplot")
@@ -237,7 +236,6 @@ def validate_controlled_vars(fldr):
 
 
 def meta_geog_df(summary_df, meta_geog, folder, geography_file, use_geographies):
-
     """
     This function creates a ____ for the upper level geography.
 

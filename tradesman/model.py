@@ -65,7 +65,8 @@ class Tradesman:
     def add_country_borders(self, overwrite=False):
         """Retrieves country borders and adds to the model.
         Args:
-               *overwrite* (:obj:`bool`): User option for overwriting data that may already exist in the model. Defaults to False"""
+               *overwrite* (:obj:`bool`): User option for overwriting data that may already exist in the model. Defaults to False
+        """
 
         self._boundaries.add_country_borders(overwrite)
 

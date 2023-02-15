@@ -35,7 +35,6 @@ def get_maritime_boundaries(model_place: str):
 
 
 def place_is_country(model_place: str):
-
     search_place = model_place.lower().replace(" ", "+")
 
     nom_url = (

@@ -14,7 +14,6 @@ class TestSaveSyntheticPersons(unittest.TestCase):
         self.pop_fldr = join(abspath(dirname("tests")), "tests/data/nauru/population")
 
     def test_save_synthetic_persons(self):
-
         pd.read_csv(join(self.pop_fldr, "output/synthetic_persons.csv")).to_sql(
             "synthetic_persons", con=self.project.conn, if_exists="replace"
         )

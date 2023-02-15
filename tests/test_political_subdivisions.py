@@ -84,7 +84,6 @@ class TestImportPoliticalSubvisions(unittest.TestCase):
         # remove(join(gettempdir(), "nru_cache_gadm.parquet"))
 
     def test_add_country_borders_geoboundaries(self):
-
         self.geob_data.import_model_area()
         self.geob_data.add_country_borders(overwrite=False)
         self.geob_data.import_subdivisions(level=2, overwrite=False)

@@ -21,7 +21,6 @@ class TestImportPopulation(unittest.TestCase):
     @mock.patch("tradesman.model_creation.import_population.population_raster")
     @mock.patch("tradesman.model_creation.import_population.link_source")
     def test_import_population_meta(self, mock_link, mock_raster):
-
         mock_raster.return_value = pd.DataFrame(
             [[166.931666, -0.503333, 5.045551], [166.932499, -0.503333, 3.902642]],
             columns=["longitude", "latitude", "population"],
@@ -35,7 +34,6 @@ class TestImportPopulation(unittest.TestCase):
 
     @mock.patch("tradesman.model_creation.import_population.link_source")
     def test_import_population_meta_exception(self, mock_link):
-
         mock_link.return_value = "no file"
 
         with self.assertRaises(ValueError) as exception_context:
@@ -46,7 +44,6 @@ class TestImportPopulation(unittest.TestCase):
     @mock.patch("tradesman.model_creation.import_population.population_raster")
     @mock.patch("tradesman.model_creation.import_population.link_source")
     def test_import_population_worldpop(self, mock_link, mock_raster):
-
         mock_raster.return_value = pd.DataFrame(
             [[166.931666, -0.503333, 7.045551], [166.932499, -0.503333, 5.902642]],
             columns=["longitude", "latitude", "population"],
