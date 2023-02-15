@@ -2,7 +2,7 @@ import multiprocessing as mp
 import tempfile
 import unittest
 from os import rename
-from os.path import join
+from os.path import join, exists
 from shutil import rmtree
 from tempfile import gettempdir
 
@@ -24,6 +24,8 @@ def get_layout_from_path(path):
 
 class TestSetThreadNumber(unittest.TestCase):
     def setUp(self) -> None:
+        if exists(join(gettempdir(), "configs")):
+            rmtree(join(gettempdir(), "configs"))
         temp_fldr = tempfile.mkdtemp()
         self.fldr = join(gettempdir(), "configs")
         rename(temp_fldr, self.fldr)
@@ -31,6 +33,8 @@ class TestSetThreadNumber(unittest.TestCase):
         with open(join(self.fldr, "settings.yaml"), mode="w") as file:
             file.write("num_processes: 1")
 
+        if exists(join(gettempdir(), "configs_mp")):
+            rmtree(join(gettempdir(), "configs_mp"))
         mp_temp = tempfile.mkdtemp()
         self.mp_fldr = join(gettempdir(), "configs_mp")
         rename(mp_temp, self.mp_fldr)

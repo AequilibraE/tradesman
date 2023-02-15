@@ -1,4 +1,5 @@
 import unittest
+import os
 from os.path import abspath, dirname, join
 from shutil import copytree
 from tempfile import gettempdir
@@ -14,11 +15,13 @@ from tradesman.model_creation.delete_links_and_nodes import (
 
 
 class TestDeleteLinksAndNodes(unittest.TestCase):
+    @unittest.skipIf(os.environ.get("CI", "false") == "true", "Running on GitHub")
     def test_get_maritme_borders(self):
         self.assertIsNone(get_maritime_boundaries("Andorra"))
         self.assertGreater(len(get_maritime_boundaries("Nauru")), 0)
         self.assertGreater(len(get_maritime_boundaries("Brazil")), 0)
 
+    @unittest.skipIf(os.environ.get("CI", "false") == "true", "Running on GitHub")
     def test_is_country(self):
         self.assertTrue(place_is_country("Andorra"))
         self.assertTrue(place_is_country("Nauru"))

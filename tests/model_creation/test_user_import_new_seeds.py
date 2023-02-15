@@ -9,10 +9,14 @@ from tradesman.model_creation.synthetic_population.user_control_import import us
 
 class TestUserImportNewSeeds(unittest.TestCase):
     def setUp(self) -> None:
+        if exists(join(gettempdir(), "data")):
+            rmtree(join(gettempdir(), "data"))
         temp_src = mkdtemp(dir=gettempdir())
         self.src = join(gettempdir(), "data")
         rename(temp_src, self.src)
 
+        if exists(join(gettempdir(), "destination")):
+            rmtree(join(gettempdir(), "destination"))
         temp_dest = mkdtemp(dir=gettempdir())
         self.dest = join(gettempdir(), "destination")
         rename(temp_dest, self.dest)
