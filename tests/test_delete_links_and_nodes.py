@@ -1,4 +1,5 @@
 import unittest
+from unittest import mock
 import os
 from os.path import abspath, dirname, join
 from shutil import copytree
@@ -29,7 +30,8 @@ class TestDeleteLinksAndNodes(unittest.TestCase):
         self.assertFalse(place_is_country("Vorarlberg"))
         self.assertFalse(place_is_country("Minas Gerais"))
 
-    def test_remove_links_and_nodes_no_maritime(self):
+    @mock.patch("tradesman.model_creation.delete_links_and_nodes.urlretrieve")
+    def test_remove_links_and_nodes_no_maritime(self, mock_url):
         self.temp_fldr = join(gettempdir(), uuid4().hex)
 
         copytree(
@@ -48,7 +50,8 @@ class TestDeleteLinksAndNodes(unittest.TestCase):
 
         self.assertGreater(before, num_nodes)
 
-    def test_remove_links_and_nodes_maritime(self):
+    @mock.patch("tradesman.model_creation.delete_links_and_nodes.urlretrieve")
+    def test_remove_links_and_nodes_maritime(self, mock_url):
         self.temp_fldr = join(gettempdir(), uuid4().hex)
 
         copytree(
