@@ -30,8 +30,8 @@ class TestDeleteLinksAndNodes(unittest.TestCase):
         self.assertFalse(place_is_country("Vorarlberg"))
         self.assertFalse(place_is_country("Minas Gerais"))
 
-    @mock.patch("tradesman.model_creation.delete_links_and_nodes.urlretrieve")
-    def test_remove_links_and_nodes_no_maritime(self, mock_url):
+    @unittest.skipIf(os.environ.get("CI", "false") == "true", "Running on GitHub")
+    def test_remove_links_and_nodes_no_maritime(self):
         self.temp_fldr = join(gettempdir(), uuid4().hex)
 
         copytree(
@@ -50,8 +50,8 @@ class TestDeleteLinksAndNodes(unittest.TestCase):
 
         self.assertGreater(before, num_nodes)
 
-    @mock.patch("tradesman.model_creation.delete_links_and_nodes.urlretrieve")
-    def test_remove_links_and_nodes_maritime(self, mock_url):
+    @unittest.skipIf(os.environ.get("CI", "false") == "true", "Running on GitHub")
+    def test_remove_links_and_nodes_maritime(self):
         self.temp_fldr = join(gettempdir(), uuid4().hex)
 
         copytree(
