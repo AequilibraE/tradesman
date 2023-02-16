@@ -7,3 +7,4 @@ aequilibrae
 tabulate
 tqdm
 pysal
+fiona>=1.9
