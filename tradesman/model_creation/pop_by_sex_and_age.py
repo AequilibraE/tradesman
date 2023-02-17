@@ -7,7 +7,6 @@ from tradesman.data.population_raster import population_raster
 
 
 def get_pop_by_sex_age(project: Project, model_place: str):
-
     url = "https://data.worldpop.org/GIS/AgeSex_structures/Global_2000_2020/2020/"
     sex = ["f", "m"]
     age = [0, 1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80]
@@ -20,7 +19,6 @@ def get_pop_by_sex_age(project: Project, model_place: str):
 
     for s in sex:
         for a in range(len(age)):
-
             data_link = url + f"{country_code}/{country_code.lower()}_{s}_{age[a]}_2020.tif"
             field_name = f"POP{s.upper()}{a+1}"
 

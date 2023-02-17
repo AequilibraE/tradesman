@@ -18,11 +18,9 @@ class TestUnzipControlAndSeedFiles(unittest.TestCase):
         rmtree(join(gettempdir(), "population"))
 
     def test_unzip_seed_files_link_exists(self):
-
         self.assertTrue(urlopen(population_url).code == 200)
 
     def test_unzip_seed_files_early_exit(self):
-
         unzip_seed_files(gettempdir())
 
         self.assertTrue(exists(join(gettempdir(), "population")))

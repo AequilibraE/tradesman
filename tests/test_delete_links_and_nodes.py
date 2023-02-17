@@ -3,7 +3,7 @@ from os.path import abspath, dirname, join
 from shutil import copytree
 from tempfile import gettempdir
 from uuid import uuid4
-
+import fiona
 from aequilibrae.project import Project
 
 from tradesman.model_creation.delete_links_and_nodes import (
@@ -15,7 +15,6 @@ from tradesman.model_creation.delete_links_and_nodes import (
 
 class TestDeleteLinksAndNodes(unittest.TestCase):
     def test_get_maritme_borders(self):
-
         self.assertIsNone(get_maritime_boundaries("Andorra"))
         self.assertGreater(len(get_maritime_boundaries("Nauru")), 0)
         self.assertGreater(len(get_maritime_boundaries("Brazil")), 0)
@@ -28,7 +27,6 @@ class TestDeleteLinksAndNodes(unittest.TestCase):
         self.assertFalse(place_is_country("Minas Gerais"))
 
     def test_remove_links_and_nodes_no_maritime(self):
-
         self.temp_fldr = join(gettempdir(), uuid4().hex)
 
         copytree(
@@ -48,7 +46,6 @@ class TestDeleteLinksAndNodes(unittest.TestCase):
         self.assertGreater(before, num_nodes)
 
     def test_remove_links_and_nodes_maritime(self):
-
         self.temp_fldr = join(gettempdir(), uuid4().hex)
 
         copytree(

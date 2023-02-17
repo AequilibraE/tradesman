@@ -24,13 +24,11 @@ class TestSubprocess(unittest.TestCase):
         rmtree(self.fldr)
 
     def test_subprocess(self):
-
         run_populationsim(multithread=False, project=self.project, folder=self.project_folder, thread_number=1)
 
         self.assertTrue(exists(join(self.fldr, "output/synthetic_households.csv")))
 
     def test_subprocess_true(self):
-
         run_populationsim(multithread=True, project=self.project, folder=self.project_folder, thread_number=3)
 
         self.assertTrue(exists(join(self.fldr, "output/synthetic_households.csv")))

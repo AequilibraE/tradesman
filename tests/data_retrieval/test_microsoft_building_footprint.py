@@ -16,7 +16,6 @@ class TestMicrosoftBuildingFootprint(unittest.TestCase):
         self.project = create_nauru_test(self.fldr)
 
     def test_initialize(self):
-
         with self.assertRaises(FileNotFoundError) as exception_context:
             ImportMicrosoftBuildingData(model_place="Papua New Guinea", project=self.project)
 
@@ -27,7 +26,6 @@ class TestMicrosoftBuildingFootprint(unittest.TestCase):
     # @unittest.skip
     @mock.patch("tradesman.data_retrieval.osm_tags.microsoft_building_footprint.max")
     def test_microsoft_buildings(self, mock_max):
-
         buildings = ImportMicrosoftBuildingData(model_place="Vatican City", project=self.project)
 
         buildings.microsoft_buildings()
