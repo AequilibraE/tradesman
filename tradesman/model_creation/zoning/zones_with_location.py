@@ -36,10 +36,12 @@ def zones_with_location(hexb, states):
         not_found_merged = not_found_merged[["hex_id", "division_name"]]
         with_data = pd.concat([not_found_merged, found_centroid])
         data_complete = hexb.merge(with_data, on="hex_id", how="outer")
+        geom_colum = "geometry"
     else:
         data = gpd.sjoin_nearest(centroids, states, how="left")
         data = data[["hex_id", "division_name", "geometry"]]
         data_complete = hexb.merge(data, on="hex_id", how="outer")
         data_complete.drop_duplicates(subset=["hex_id"], inplace=True)
+        geom_colum = "geometry_x"
 
-    return gpd.GeoDataFrame(data_complete[["hex_id", "division_name"]], geometry=data_complete["geometry"])
+    return gpd.GeoDataFrame(data_complete[["hex_id", "division_name"]], geometry=data_complete[geom_colum])
