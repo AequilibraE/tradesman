@@ -3,8 +3,11 @@ import shutil
 from uuid import uuid4
 import pytest
 from aequilibrae.project import Project
+import geopandas as gpd
 
 from aequilibrae.utils.create_example import create_example
+from tradesman.data.population_file_address import link_source
+from tradesman.data.population_raster import population_raster
 from tradesman.model_creation.create_new_tables import add_new_tables
 from tradesman.model_creation.import_political_subdivisions import ImportPoliticalSubdivisions
 
@@ -46,3 +49,28 @@ def nauru_test(create_path):
 
     yield prj
     prj.close()
+
+
+@pytest.fixture
+def nauru_pop_test(nauru_test, create_path):
+    shutil.copy(
+        os.path.join(os.path.dirname(__file__), "data/nauru/pop_Nauru.tif"),
+        os.path.join(create_path, "pop_Nauru.tif"),
+    )
+
+    url = link_source("Nauru", "WorldPop")
+
+    df = population_raster(url, "pop_Nauru", nauru_test)
+    gdf = gpd.GeoDataFrame(df, geometry=gpd.points_from_xy(df.longitude, df.latitude), crs=4326)
+
+    model_area = gpd.read_postgis(
+        "SELECT ST_AsBinary(geometry) as geom FROM political_subdivisions WHERE level=-1", con=nauru_test.conn, crs=4326
+    )
+
+    select_pop = gdf.clip(model_area, keep_geom_type=True)[["longitude", "latitude", "population"]]
+
+    select_pop.to_sql("raw_population", nauru_test.conn, if_exists="append", index=False)
+    nauru_test.conn.execute("UPDATE raw_population SET Geometry=MakePoint(longitude, latitude, 4326)")
+    nauru_test.conn.commit()
+
+    yield nauru_test

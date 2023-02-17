@@ -19,6 +19,11 @@ def create_clusters(hexbins, max_zone_pop=10000, min_zone_pop=500):
          *min_zone_pop*(:obj:`int`): min population within a zone. Defaults to 500
     """
 
+    if hexbins.population.max() > max_zone_pop:
+        raise ValueError(
+            """There is at least one hexbin with population greater than max_zone_pop.
+        Plase change the parameter value."""
+        )
     hexbins["zone_id"] = -1
     centroids = hexbins.geometry.centroid
     hexbins = hexbins.assign(x=centroids.x.values, y=centroids.y.values)
@@ -77,7 +82,8 @@ def create_clusters(hexbins, max_zone_pop=10000, min_zone_pop=500):
     zoning = zoning.join(pop_total)
 
     exceptions = 0
-    while zoning[zoning.geometry.type == "MultiPolygon"].shape[0] > exceptions:
+    counter = zoning[zoning.geometry.type == "MultiPolygon"].shape[0]
+    while counter > exceptions:
         print(1)
         for zid, record in zoning[zoning.geometry.type == "MultiPolygon"].iterrows():
             zone_df = df[df.zone_id == zid]
@@ -87,7 +93,10 @@ def create_clusters(hexbins, max_zone_pop=10000, min_zone_pop=500):
             island_pop = {isl: zone_df[adj_mtx.component_labels == isl].population.sum() for isl in islands}
             max_island = max(island_pop.values())
             remove_islands = [k for k, v in island_pop.items() if v < max_island]
-            failed = 0
+            # failed = 0
+            if len(remove_islands) == 0:
+                counter -= 1
+                continue
             for rmv in remove_islands:
                 island_hexbins = zone_df[adj_mtx.component_labels == rmv].hex_id
                 if zone_df[df.hex_id.isin(island_hexbins)].population.sum() > min_zone_pop:
@@ -97,15 +106,15 @@ def create_clusters(hexbins, max_zone_pop=10000, min_zone_pop=500):
 
                 closeby = []
                 for island_geo in zone_df[adj_mtx.component_labels == rmv].geometry.values:
-                    closeby.extend([x for x in df.sindex.nearest(box(*island_geo.bounds), 6)[1]])
+                    closeby.extend([x for x in df.sindex.nearest(box(*island_geo.bounds))[1]])
                 closeby = list(set(list(closeby)))
                 if not closeby:
-                    failed = 1
+                    # failed = 1
                     continue
                 adjacent = df.loc[df.index.isin(closeby), :]
                 available = [x for x in adjacent.zone_id.unique() if x != zid]
                 if not available:
-                    failed = 1
+                    # failed = 1
                     continue
 
                 same_area = [
@@ -123,7 +132,8 @@ def create_clusters(hexbins, max_zone_pop=10000, min_zone_pop=500):
                         adjacent.zone_id == counts, "division_name"
                     ].values[0]
                     df.loc[df.hex_id.isin(island_hexbins), "zone_id"] = counts
-            exceptions += failed
+            # exceptions += failed
+            counter -= 1
 
         zoning = df.dissolve(by="zone_id")[["division_name", "geometry"]]
         pop_total = df[["zone_id", "population"]].groupby(["zone_id"]).sum(numeric_only=True)["population"]
