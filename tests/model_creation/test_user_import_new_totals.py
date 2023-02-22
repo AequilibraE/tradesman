@@ -39,7 +39,7 @@ class TestUserImportNewTotals(unittest.TestCase):
     def test_user_import_new_totals_false(self):
         user_import_new_totals(
             overwrite=False,
-            potals_lower_level=join(self.src, "control_totals_taz.csv"),
+            totals_lower_level=join(self.src, "control_totals_taz.csv"),
             totals_upper_level=join(self.src, "control_totals_meta.csv"),
             geographies=join(self.src, "geo_cross_walk.csv"),
             dest_folder=self.dest,
