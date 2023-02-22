@@ -86,7 +86,7 @@ def run_populationsim(multithread: bool, project: Project, folder: str, thread_n
     Runs PopulationSim and exports the results to the project database.
     Parameters:
          *multithread*(:obj:`bool`): run PopulationSim with multi-threads. Defaults to False
-         *project*(:obj:`aequilibrae.project`): currenty open project
+         *project*(:obj:`aequilibrae.project`): currently open project
          *folder*(:obj:`str`): path to folder containing population info.
          *thread_number*(:obj:`int`): number of threads one wants to use.
     """
@@ -99,13 +99,38 @@ def run_populationsim(multithread: bool, project: Project, folder: str, thread_n
         [sys.executable, "run_populationsim.py"], cwd=pop_fldr, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT
     )
 
-    pd.read_csv(join(pop_fldr, "output/synthetic_persons.csv")).to_sql(
+    pd.read_csv(join(pop_fldr, "output/synthetic_persons.csv"))[["hh_id", "TAZ", "AGEP", "SEX"]].to_sql(
         "synthetic_persons", con=project.conn, if_exists="replace"
     )
 
-    pd.read_csv(join(pop_fldr, "output/synthetic_households.csv")).to_sql(
+    project.conn.execute(
+        "INSERT INTO 'attributes_documentation' (name_table, attribute, description) VALUES ('synthetic_persons', 'hh_id', 'household id');"
+    )
+    project.conn.execute(
+        "INSERT INTO 'attributes_documentation' (name_table, attribute, description) VALUES ('synthetic_persons', 'TAZ', 'Unique Traffic Analysis Zones id');"
+    )
+    project.conn.execute(
+        "INSERT INTO 'attributes_documentation' (name_table, attribute, description) VALUES ('synthetic_persons', 'AGEP', 'synthetic person age');"
+    )
+    project.conn.execute(
+        "INSERT INTO 'attributes_documentation' (name_table, attribute, description) VALUES ('synthetic_persons', 'SEX', 'synthetic person sex');"
+    )
+    project.conn.commit()
+
+    pd.read_csv(join(pop_fldr, "output/synthetic_households.csv"))[["hh_id", "TAZ", "NP"]].to_sql(
         "synthetic_households", con=project.conn, if_exists="replace"
     )
+
+    project.conn.execute(
+        "INSERT INTO 'attributes_documentation' (name_table, attribute, description) VALUES ('synthetic_households', 'hh_id', 'household id');"
+    )
+    project.conn.execute(
+        "INSERT INTO 'attributes_documentation' (name_table, attribute, description) VALUES ('synthetic_households', 'TAZ', 'Unique Traffic Analysis Zones id');"
+    )
+    project.conn.execute(
+        "INSERT INTO 'attributes_documentation' (name_table, attribute, description) VALUES ('synthetic_households', 'NP', 'number of persons in the household');"
+    )
+    project.conn.commit()
 
     user_change_validation_parameters(overwrite=False, model_place=project.about.model_name, dest_folder=pop_fldr)
 
