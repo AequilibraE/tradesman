@@ -28,10 +28,38 @@ class TestSubprocess(unittest.TestCase):
 
         self.assertTrue(exists(join(self.fldr, "output/synthetic_households.csv")))
 
+        self.assertEqual(
+            self.project.conn.execute(
+                "SELECT COUNT(*) FROM attributes_documentation WHERE name_table='synthetic_households';"
+            ).fetchone()[0],
+            3,
+        )
+
+        self.assertEqual(
+            self.project.conn.execute(
+                "SELECT COUNT(*) FROM attributes_documentation WHERE name_table='synthetic_persons';"
+            ).fetchone()[0],
+            4,
+        )
+
     def test_subprocess_true(self):
         run_populationsim(multithread=True, project=self.project, folder=self.project_folder, thread_number=3)
 
         self.assertTrue(exists(join(self.fldr, "output/synthetic_households.csv")))
+
+        self.assertEqual(
+            self.project.conn.execute(
+                "SELECT COUNT(*) FROM attributes_documentation WHERE name_table='synthetic_households';"
+            ).fetchone()[0],
+            3,
+        )
+
+        self.assertEqual(
+            self.project.conn.execute(
+                "SELECT COUNT(*) FROM attributes_documentation WHERE name_table='synthetic_persons';"
+            ).fetchone()[0],
+            4,
+        )
 
 
 if __name__ == "__name__":
