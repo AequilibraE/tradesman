@@ -9,6 +9,10 @@ from sklearn.cluster import KMeans
 from shapely.geometry import box
 from tqdm import tqdm
 
+import os
+
+os.environ["OMP_NUM_THREADS"] = "1"
+
 
 def create_clusters(hexbins, max_zone_pop=10000, min_zone_pop=500):
     """
@@ -58,11 +62,11 @@ def create_clusters(hexbins, max_zone_pop=10000, min_zone_pop=500):
             if prov_pop.shape[0] < 2:
                 continue
 
-            kmeans = KMeans(n_clusters=segments, random_state=0)
+            kmeans = KMeans(n_clusters=segments, random_state=0, n_init="auto")
             centr_results = kmeans.fit_predict(X=prov_pop[["x", "y"]].values, sample_weight=prov_pop.population.values)
             df.loc[fltr, "zone_id"] = centr_results[:] + master_zone_id
 
-            t = df.groupby(["zone_id"]).sum()
+            t = df.groupby(["zone_id"]).sum(numeric_only=True)
             ready = t.loc[t.population <= max_zone_pop].shape[0]
             avg = int(np.nansum(t.loc[t.population <= max_zone_pop, "population"]) / max(1, ready))
             t = t.loc[t.population > max_zone_pop]
@@ -84,7 +88,6 @@ def create_clusters(hexbins, max_zone_pop=10000, min_zone_pop=500):
     exceptions = 0
     counter = zoning[zoning.geometry.type == "MultiPolygon"].shape[0]
     while counter > exceptions:
-        print(1)
         for zid, record in zoning[zoning.geometry.type == "MultiPolygon"].iterrows():
             zone_df = df[df.zone_id == zid]
             with warnings.catch_warnings():
@@ -140,7 +143,7 @@ def create_clusters(hexbins, max_zone_pop=10000, min_zone_pop=500):
         zoning = zoning.join(pop_total)
 
     zoning = df.dissolve(by="zone_id")[["division_name", "geometry"]]
-    pop_total = df[["zone_id", "population"]].groupby(["zone_id"]).sum()["population"]
+    pop_total = df[["zone_id", "population"]].groupby(["zone_id"]).sum(numeric_only=True)["population"]
     zoning = zoning.join(pop_total)
 
     zoning = zoning.reset_index(drop=True)
