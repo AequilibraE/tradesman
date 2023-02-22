@@ -15,7 +15,7 @@ def test_zone_builder(save_bins: bool, nauru_pop_test):
     subdivisions = gpd.GeoDataFrame.from_postgis(sql, nauru_pop_test.conn, geom_col="geometry", crs=4326)
     subdivisions = subdivisions[subdivisions.level == subdivisions.level.max()]
 
-    assert len(subdivisions) == 13
+    assert len(subdivisions) == 14
 
     sql = "SELECT division_name, level, Hex(ST_AsBinary(geometry)) as geometry FROM political_subdivisions where level = -1;"
     model_area = gpd.GeoDataFrame.from_postgis(sql, nauru_pop_test.conn, geom_col="geometry", crs=4326)
