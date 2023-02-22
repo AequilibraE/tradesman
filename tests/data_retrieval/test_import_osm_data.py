@@ -1,6 +1,5 @@
 import unittest
-from os.path import abspath, dirname, join
-from shutil import copytree, rmtree
+from os.path import join
 from tempfile import gettempdir
 from unittest import mock
 from uuid import uuid4

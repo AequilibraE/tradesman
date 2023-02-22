@@ -1,7 +1,6 @@
 from os.path import join
 from tempfile import gettempdir
 import unittest
-from unittest import mock
 from uuid import uuid4
 
 from tests.create_nauru_test import create_nauru_test
