@@ -103,32 +103,22 @@ def run_populationsim(multithread: bool, project: Project, folder: str, thread_n
         "synthetic_persons", con=project.conn, if_exists="replace"
     )
 
-    project.conn.execute(
-        "INSERT INTO 'attributes_documentation' (name_table, attribute, description) VALUES ('synthetic_persons', 'hh_id', 'household id');"
-    )
-    project.conn.execute(
-        "INSERT INTO 'attributes_documentation' (name_table, attribute, description) VALUES ('synthetic_persons', 'TAZ', 'Unique Traffic Analysis Zones id');"
-    )
-    project.conn.execute(
-        "INSERT INTO 'attributes_documentation' (name_table, attribute, description) VALUES ('synthetic_persons', 'AGEP', 'synthetic person age');"
-    )
-    project.conn.execute(
-        "INSERT INTO 'attributes_documentation' (name_table, attribute, description) VALUES ('synthetic_persons', 'SEX', 'synthetic person sex');"
-    )
-    project.conn.commit()
-
     pd.read_csv(join(pop_fldr, "output/synthetic_households.csv"))[["hh_id", "TAZ", "NP"]].to_sql(
         "synthetic_households", con=project.conn, if_exists="replace"
     )
 
-    project.conn.execute(
-        "INSERT INTO 'attributes_documentation' (name_table, attribute, description) VALUES ('synthetic_households', 'hh_id', 'household id');"
-    )
-    project.conn.execute(
-        "INSERT INTO 'attributes_documentation' (name_table, attribute, description) VALUES ('synthetic_households', 'TAZ', 'Unique Traffic Analysis Zones id');"
-    )
-    project.conn.execute(
-        "INSERT INTO 'attributes_documentation' (name_table, attribute, description) VALUES ('synthetic_households', 'NP', 'number of persons in the household');"
+    fields = [
+        ("synthetic_persons", "hh_id", "household id"),
+        ("synthetic_persons", "TAZ", "Unique Traffic Analysis Zones id"),
+        ("synthetic_persons", "AGEP", "synthetic person age"),
+        ("synthetic_persons", "SEX", "synthetic person sex"),
+        ("synthetic_households", "hh_id", "household id"),
+        ("synthetic_households", "TAZ", "Unique Traffic Analysis Zones id"),
+        ("synthetic_households", "NP", "number of persons in the household"),
+    ]
+
+    project.conn.executemany(
+        "INSERT INTO 'attributes_documentation' (name_table, attribute, description) VALUES (?, ?, ?);", fields
     )
     project.conn.commit()
 
