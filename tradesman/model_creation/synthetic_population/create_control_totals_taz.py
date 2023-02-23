@@ -11,8 +11,7 @@ def create_control_totals_taz(project: Project, dest_folder: str):
     Create the file containing control totals for each TAZ in the project.
 
     Parameters:
-         *project*(:obj:`aequilibrae.project): current project
-         *model_place*(:obj:`str`): current model place
+         *project*(:obj:`aequilibrae.project): currently open project
          *dest_folder*(:obj:`str`): folder containing population files
     """
 

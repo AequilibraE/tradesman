@@ -6,7 +6,7 @@ from tradesman.model_creation.import_population import import_population
 
 def test_exception(nauru_test):
     with pytest.raises(ValueError):
-        import_population(project=nauru_test, model_place="Namibia", source="Meta", overwrite=False)
+        import_population(project=nauru_test, country_name="Namibia", source="Meta", overwrite=False)
 
 
 class MockResponse:
@@ -28,6 +28,6 @@ def mock_raster(monkeypatch):
 
 @pytest.mark.parametrize("source", ["Meta", "WorldPop"])
 def test_import_population(source: str, nauru_test, mock_raster):
-    import_population(project=nauru_test, model_place="Nauru", source=source, overwrite=True)
+    import_population(project=nauru_test, country_name="Nauru", source=source, overwrite=True)
 
     assert nauru_test.conn.execute("SELECT SUM(population) FROM raw_population;").fetchone()[0] > 8

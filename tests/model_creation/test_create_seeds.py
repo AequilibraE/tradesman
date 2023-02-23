@@ -16,7 +16,6 @@ class TestCreateSeeds(unittest.TestCase):
         self.fldr = join(gettempdir(), "data")
         rename(temp_fldr, self.fldr)
         self.project = create_nauru_test(join(gettempdir(), uuid4().hex))
-        self.model_place = "Nauru"
 
         copy(
             src=join(abspath(dirname("tests")), "tests/data/nauru/population/data/seed_households.csv"),

@@ -4,15 +4,15 @@ import pandas as pd
 import pycountry
 
 
-def link_source(model_place: str, source="WorldPop"):
+def link_source(country_name: str, source="WorldPop"):
     """
     Returns the links to download the population rasters.
 
     Parameters:
-        *model_place*(:obj:`str`): current model place
+        *country_name*(:obj:`str`): model place country
         *source*(:obj:`str`): database source to download population data. Defaults to WorldPop.
     """
-    country_code = pycountry.countries.search_fuzzy(model_place)[0].alpha_3
+    country_code = pycountry.countries.search_fuzzy(country_name)[0].alpha_3
 
     if source.lower() == "WorldPop".lower():
         return (

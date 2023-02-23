@@ -14,7 +14,6 @@ class TestCreateTotalsTaz(unittest.TestCase):
         temp_fldr = mkdtemp(dir=gettempdir())
         rename(temp_fldr, join(gettempdir(), "data"))
         self.project = create_nauru_test(join(gettempdir(), uuid4().hex))
-        self.model_place = "Nauru"
 
     def tearDown(self) -> None:
         rmtree(join(gettempdir(), "data"))

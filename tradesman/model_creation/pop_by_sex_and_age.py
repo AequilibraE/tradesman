@@ -6,18 +6,18 @@ from tradesman.data.load_zones import load_zones
 from tradesman.data.population_raster import population_raster
 
 
-def get_pop_by_sex_age(project: Project, model_place: str):
+def get_pop_by_sex_age(project: Project, country_name: str):
     """
     Imports population by sex and age into the model.
 
     Parameters:
         *project*(:obj:`aequilibrae.project`): currently open project
-        *model_place*(:obj:`str`): current model place
+        *country_name*(:obj:`str`): model place country
     """
     url = "https://data.worldpop.org/GIS/AgeSex_structures/Global_2000_2020/2020/"
     sex = ["f", "m"]
     age = [0, 1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80]
-    country_code = pycountry.countries.search_fuzzy(model_place)[0].alpha_3
+    country_code = pycountry.countries.search_fuzzy(country_name)[0].alpha_3
 
     zoning = project.zoning
     fields = zoning.fields
