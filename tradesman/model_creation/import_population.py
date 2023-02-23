@@ -6,6 +6,15 @@ from tradesman.data.population_raster import population_raster
 
 
 def import_population(project: Project, model_place: str, source: str, overwrite=False):
+    """
+    Imports population information into the model.
+
+    Parameters:
+        *project*(:obj:`aequilibrae.project`): currently open project
+        *model_place*(:obj:`str`): current model place
+        *source*(:obj:`str`): database source to download population data. Defaults to WorldPop
+        *overwrite*(:obj:`bool`): overwrites existing raw_population info from the model. Defaults to False
+    """
     if sum(project.conn.execute("Select count(*) from raw_population").fetchone()) > 0:
         if not overwrite:
             return

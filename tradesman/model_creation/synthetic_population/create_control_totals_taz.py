@@ -9,10 +9,11 @@ from aequilibrae.project import Project
 def create_control_totals_taz(project: Project, dest_folder: str):
     """
     Create the file containing control totals for each TAZ in the project.
+
     Parameters:
          *project*(:obj:`aequilibrae.project): current project
-         *model_palce*(:obj:`str`): current model place
-         *dest_folder*(:obj:`str`): folder containing PopulationSim population files
+         *model_place*(:obj:`str`): current model place
+         *dest_folder*(:obj:`str`): folder containing population files
     """
 
     country_code = project.about.country_code

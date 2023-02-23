@@ -1,4 +1,4 @@
-from os import remove, rename
+from os import rename
 from os.path import join
 from shutil import rmtree
 from tempfile import gettempdir, mkdtemp

@@ -7,6 +7,7 @@ from geopandas.tools import sjoin
 def zones_with_population(project, zones_from_locations):
     """
     Saves hexbins with population into open project.
+
     Parameters:
          *project*(:obj:`aequilibrae.project`): current open project
          *zones_from_locations`(:obj:`geopandas.GeoDataFrame`): GeoDataFrame containing hexbins and their subdivision.

@@ -22,10 +22,11 @@ from tradesman.model_creation.synthetic_population.user_control_import import us
 def create_syn_pop(project: Project, cwd: str, thread_number=None, sample_size=0.01):
     """
     Creates files to build synthetic population.
+
     Parameters:
-         *project*(:obj:`aequilibrae.project`):
-         *model_place*(:obj:`str`):
-         *folder*(:obj:`str`):
+        *project*(:obj:`aequilibrae.project`):
+        *model_place*(:obj:`str`):
+        *folder*(:obj:`str`):
     """
 
     unzip_seed_files(cwd)
@@ -46,10 +47,11 @@ def create_syn_pop(project: Project, cwd: str, thread_number=None, sample_size=0
 def update_thread_number(folder: str, number: int):
     """
     Set the number of threads to generate the synthetic population.
-    If no number of threads is provided, the program considers it as the number of threads available in your computer.
+    If no number of threads is provided, the number of threads available in your computer is considered.
+
     Parameters:
-         *folder*(:obj:`str`): folder where the project files are.
-         *number*(:obj:`int`): number of threads used. By default uses the greatest number of threads available.
+        *folder*(:obj:`str`): folder where the project files are.
+        *number*(:obj:`int`): number of threads used. By default uses the greatest number of threads available.
     """
     count_cpu = mp.cpu_count()
     if number is not None:
@@ -84,9 +86,10 @@ def update_thread_number(folder: str, number: int):
 def run_populationsim(multithread: bool, project: Project, folder: str, thread_number=None):
     """
     Runs PopulationSim and exports the results to the project database.
+
     Parameters:
          *multithread*(:obj:`bool`): run PopulationSim with multi-threads. Defaults to False
-         *project*(:obj:`aequilibrae.project`): currenty open project
+         *project*(:obj:`aequilibrae.project`): currently open project
          *folder*(:obj:`str`): path to folder containing population info.
          *thread_number*(:obj:`int`): number of threads one wants to use.
     """

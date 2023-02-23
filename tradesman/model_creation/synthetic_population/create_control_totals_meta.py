@@ -6,6 +6,7 @@ from os.path import join
 def create_control_totals_meta(dest_folder: str):
     """
     Create the file containing control totals for each meta region (upper level) in the project.
+
     Parameters:
          *dest_folder*(:obj:`str`): folder containing PopulationSim population files
     """

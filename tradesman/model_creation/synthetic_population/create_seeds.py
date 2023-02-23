@@ -9,8 +9,9 @@ from aequilibrae.project import Project
 
 def create_buckets(project: Project, folder: str, sample=0.02):
     """
-    Creates buckets containg households and population info.
+    Creates buckets containing households and population info.
     This function outputs are the inputs for creating the seeds.
+
     Parameters:
          *model_place*(:obj:`str`): current model place
          *project*(:obj:`aequilibrae.Project`): current project
@@ -60,8 +61,10 @@ def create_buckets(project: Project, folder: str, sample=0.02):
         else:
             prop_6.append(i)
 
-    # Retun infos about the number of seeds to be sorted
-    show_seed_stats(num_hh=[prop_1, prop_2, prop_4, prop_6], sort_number=sort_number, household_info=household_info)
+    num_hh = [prop_1, prop_2, prop_4, prop_6]
+
+    # Return infos about the number of seeds to be sorted
+    __show_seed_stats(num_hh=num_hh, sort_number=sort_number, household_info=household_info)
 
     # Create the buckets containing households (by size) and persons (according to the household size they live in)
     house_bucket_1 = seed_households[seed_households.NP == 1]
@@ -80,7 +83,6 @@ def create_buckets(project: Project, folder: str, sample=0.02):
 
     persons_bucket_6 = seed_persons[seed_persons.hhnum.isin(house_bucket_6.hhnum.tolist())]
 
-    num_hh = [prop_1, prop_2, prop_4, prop_6]
     households = [house_bucket_1, house_bucket_2, house_bucket_4, house_bucket_6]
     persons = [persons_bucket_1, persons_bucket_2, persons_bucket_4, persons_bucket_6]
 
@@ -105,8 +107,16 @@ def create_buckets(project: Project, folder: str, sample=0.02):
     pd.concat(total_persons).to_csv(join(folder, "data/seed_persons.csv"), sep=",", index=False)
 
 
-def show_seed_stats(num_hh, sort_number, household_info):
-    print("Calculated vs Expected percentual of households per size in the sample")
+def __show_seed_stats(num_hh, sort_number, household_info):
+    """
+    Prints the calculated and expected seed stats for the population sample.
+
+    Parameters:
+         *num_hh*(:obj:`list`): list with the number of households per bucket
+         *sort_number*(:obj:`int`): number of households to sample
+         *household_info*(:obj:`pandas.DataFrame`): pandas.DataFrame with household proportion information
+    """
+    print("Calculated vs Expected percentage of households per size in the sample")
     print("")
     table_1 = [
         ["1 person", round((len(num_hh[0]) / sort_number) * 100, 2), household_info.HHBASE1.tolist()[0]],
@@ -118,7 +128,7 @@ def show_seed_stats(num_hh, sort_number, household_info):
     print(tabulate.tabulate(table_1, headers=["# Person", "Calculated", "Expected"]))
     print("")
 
-    print("Difference in calculated vs expected percentual of households in the sample")
+    print("Difference in calculated vs expected percentage of households in the sample")
     print("")
     table_2 = [
         ["1 person", round((len(num_hh[0]) / sort_number) * 100 - household_info.HHBASE1.tolist()[0], 2)],

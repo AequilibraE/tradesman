@@ -13,6 +13,14 @@ from tradesman.data.load_zones import load_zones
 
 
 class ImportMicrosoftBuildingData:
+    """
+    Triggers the import of building information from Microsoft Bing.
+
+    Parameters:
+        *model_place*(:obj:`str`): current model place
+        *project*(:obj:`aequilibrae.project`): currently open project
+    """
+
     def __init__(self, model_place: str, project: Project):
         self.__model_place = model_place
         self._project = project
@@ -34,10 +42,16 @@ class ImportMicrosoftBuildingData:
         return r.json()[0]["address"]["country"]
 
     def __initialize(self):
+        """
+        Checks if Microsoft Bing has any building information about the desired country.
+        """
         if self.__country_name not in self.__country_list.Location.values:
             raise FileNotFoundError("Microsoft Bing does not provide information about this region.")
 
     def microsoft_buildings(self):
+        """
+        Import building information from Microsoft Bing.
+        """
         url = self.__country_list[self.__country_list.Location == self.__country_name].Url.values
 
         frame_list = []
@@ -63,7 +77,7 @@ class ImportMicrosoftBuildingData:
 
         buildings_by_zone["geom"] = buildings_by_zone.geometry.to_wkb()
 
-        # Create columns in zones' table with microsoft buiilding information
+        # Create columns in zones' table with microsoft building information
         self._project.conn.execute("ALTER TABLE zones ADD microsoft_building_count INT;")
         self._project.conn.commit()
 

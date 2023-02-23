@@ -10,6 +10,16 @@ from tradesman.data_retrieval.osm_tags.osm_tag_values import amenity_values, bui
 
 
 class ImportOsmData:
+    """
+    Triggers the import of OSM data and saves it into the database.
+
+    Parameters:
+         *tag*(:obj:`str`): data tag to download
+         *project*(:obj:`aequilibrae.project`): currently open project
+         *osm_data*(:obj:`dict`): dictionary to store downloaded data
+
+    """
+
     def __init__(self, tag: str, project: Project, osm_data: dict):
         self.__tag = tag
         self._project = project
@@ -42,6 +52,12 @@ class ImportOsmData:
         self.__initialize()
 
     def import_osm_data(self, tile_size=25):
+        """
+        Imports OSM data.
+
+        Parameters:
+            *tile_size*(:obj:`int`): tile size (in kilometers)
+        """
         df = pd.DataFrame.from_dict(generic_tag(self.__tag, self.__osm_data, self._project))
 
         tag_value = building_values if self.__tag == "building" else amenity_values
@@ -72,7 +88,7 @@ class ImportOsmData:
         self._project.conn.execute(exp)
         self._project.conn.commit()
 
-        # For small geographical regions, some zones can have zero buildings and/or amenitites
+        # For small geographical regions, some zones can have zero buildings and/or amenities
         # So we execute the following query to replace NaN values in zones table by zeros
         zero_counts = [i for i in np.arange(1, len(self.__zones) + 1) if i not in counting_table.zone_id.values]
         count_qry = f"UPDATE zones SET osm_{self.__tag}_count=0 WHERE zone_id=?;"
@@ -126,7 +142,10 @@ class ImportOsmData:
         return tag_by_zone
 
     def __initialize(self):
-        if self.__tag not in ["building", "amenity"]:
+        """
+        Checks the desired tag. Currently supports only amenity and building.
+        """
+        if self.__tag not in ["amenity", "building"]:
             raise ValueError("Tag value not available.")
 
     @property

@@ -8,8 +8,9 @@ from tradesman.model_creation.synthetic_population.seeds_url import population_u
 
 def unzip_seed_files(cwd: str):
     """
-    This function unzips the folder containg the pre-loaded popoulation and household seeds for creating synthetic population.
-    Args.:
+    Unzips the folder containing the pre-loaded population and household seeds for creating synthetic population.
+
+    Parameters:
         *cwd*(:obj:`str`): current working directory
     """
     if isdir(join(cwd, "population")):

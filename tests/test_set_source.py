@@ -19,7 +19,7 @@ class TestSetSource(unittest.TestCase):
 
     def test_set_boundaries_source_exception(self):
         with self.assertRaises(ValueError) as exception_context:
-            set_political_boundaries_source("dinossaur")
+            set_political_boundaries_source("dinosaur")
         self.assertEqual(str(exception_context.exception), "Source not available.")
 
 

@@ -1,6 +1,5 @@
 import unittest
-from os.path import abspath, dirname, join
-from shutil import copytree, rmtree
+from os.path import join
 from tempfile import gettempdir
 from unittest import mock
 from uuid import uuid4
@@ -59,7 +58,7 @@ class TestImportOsmData(unittest.TestCase):
 
     def test_import_osm_data_exception(self):
         with self.assertRaises(ValueError) as exception_context:
-            ImportOsmData(tag="dinossaur", project=self.project, osm_data=self.osm_data).import_osm_data()
+            ImportOsmData(tag="dinosaur", project=self.project, osm_data=self.osm_data).import_osm_data()
 
         self.assertEqual(str(exception_context.exception), "Tag value not available.")
 

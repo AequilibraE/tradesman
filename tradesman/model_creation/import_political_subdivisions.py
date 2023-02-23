@@ -15,6 +15,11 @@ from shapely.ops import unary_union
 class ImportPoliticalSubdivisions:
     """
     Imports all political subdivisions into the model.
+
+    Parameters:
+        *model_place*(:obj:`str`): current model place
+        *source*(:obj:`str`): database source to download geographic data. Defaults to GADM
+        *project*(:obj:`aequilibrae.project`): currently open project
     """
 
     def __init__(self, model_place: str, source: str, project: Project):
@@ -29,7 +34,7 @@ class ImportPoliticalSubdivisions:
         """
         Add the model's country border.
 
-        Args.:
+        Parameters:
              *overwrite*(:obj:`bool`): re-write country borders if it already exists. Defaults to False.
         """
         data = self.__get_subdivisions()[["country_name", "division_name", "level", "geom"]]
@@ -57,9 +62,9 @@ class ImportPoliticalSubdivisions:
         GADM or geoBoundaries, it adds the upper-level geometries to the model file.  Otherwise, it adds the
         lower-level geometries which intersect model area.
 
-        Args.:
+        Parameters:
              *level*(:obj:`int`): number of levels to download.
-             *overwrite*(:obj:`bool`): re-write political subdivisions if it already exists. Defaults to False.
+             *overwrite*(:obj:`bool`): overwrite political subdivisions if it already exists. Defaults to False.
         """
         data = self.__get_subdivisions()
 
@@ -160,7 +165,7 @@ class ImportPoliticalSubdivisions:
         """
         Returns shapely.Polygons or shapely.MultiPolygons.
 
-        Args.:
+        Parameters:
              *dct*(:obj:`dict`): dictionary with coordinates.
         """
 
@@ -252,6 +257,9 @@ class ImportPoliticalSubdivisions:
         """
         Returns a GeoSeries with geometries centroids.
         For geometries that are MultiPolygons, we consider the centroid of the largest shape.
+
+        Parameters:
+            *df*(:obj:`geopandas.GeoDataFrame`): geopandas.GeoDataFrame
         """
         centers = []
         for _, row in df.iterrows():

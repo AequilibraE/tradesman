@@ -6,7 +6,7 @@ from aequilibrae import Project
 
 def create_geo_cross_walk(project: Project, dest_folder: str):
     """
-    Creates the geographic controls over which PopulatioSim will generate the synthetic population.
+    Creates the geographic controls over which PopulationSim will generate the synthetic population.
     Parameters:
          *project*(:obj:`aequilibrae.Project`): current project
          *dest_folder*(:obj:`str`): folder containing PopulationSim population files

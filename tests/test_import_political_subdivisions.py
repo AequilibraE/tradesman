@@ -10,7 +10,7 @@ def test_import_model_exception(create_path):
         model.import_model_area()
 
 
-def test_unexisting_source(create_path):
+def test_unexistent_source(create_path):
     with pytest.raises(ValueError):
         Tradesman(network_path=create_path, model_place="Coquimbo, Chile", boundaries_source="Cencosud")
 

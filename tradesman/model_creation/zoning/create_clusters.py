@@ -12,7 +12,8 @@ from tqdm import tqdm
 
 def create_clusters(hexbins, max_zone_pop=10000, min_zone_pop=500):
     """
-    This function creates population clusters by state.
+    Creates population clusters by state.
+
     Parameters:
          *hexbins*(:obj:`geopandas.GeoDataFrame`): GeoDataFrame containing hexbins and population info
          *max_zone_pop*(:obj:`int`): max population within a zone. Defaults to 10,000

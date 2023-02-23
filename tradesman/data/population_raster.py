@@ -4,7 +4,6 @@ from tempfile import gettempdir
 
 import numpy as np
 import pandas as pd
-import rasterio
 from aequilibrae import Project
 from scipy.sparse import coo_matrix
 from tradesman.data.mask_raster import mask_raster
@@ -14,6 +13,14 @@ from tradesman.utils.tqdm_download import TqdmUpTo
 
 
 def population_raster(data_link: str, field_name: str, project: Project):
+    """
+    Reads the population raster.
+
+    Parameters:
+        *data_link*(:obj:`str`): URL link to download the file
+        *field_name*(:obj:`str`): desired filed name
+        *project*(:obj:`aequilibrae.project`): currently open project
+    """
     dest_path = join(gettempdir(), f"{field_name}.tif")
     if not isfile(dest_path):
         with TqdmUpTo(unit="B", unit_scale=True, unit_divisor=1024, miniters=1, desc=f"{field_name}.tif") as t:
@@ -30,7 +37,7 @@ def population_raster(data_link: str, field_name: str, project: Project):
     y_max = dataset.bounds.top
     x_size, y_size = dataset.res
 
-    # Computes the  X and Y indices for the XY grid that will represent our raster
+    # Computes the X and Y indices for the XY grid that will represent our raster
     y_idx = []
     for row in range(height):
         y = row * (-y_size) + y_max + (y_size / 2)  # to centre the point

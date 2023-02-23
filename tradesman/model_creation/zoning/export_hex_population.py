@@ -1,6 +1,7 @@
 def saves_hex_pop_to_file(project, zones_with_pop):
     """
     Saves hexbins with population into open project.
+
     Parameters:
          *project*(:obj:`aequilibrae.project`): currently open project
          *zones_with_pop`(:obj:`geopandas.GeoDataFrame`): GeoDataFrame containing zones with population

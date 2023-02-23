@@ -59,40 +59,47 @@ class Tradesman:
         self._boundaries.import_model_area()
 
     def add_country_borders(self, overwrite=False):
-        """Retrieves country borders and adds to the model.
-        Args:
-               *overwrite* (:obj:`bool`): User option for overwriting data that may already exist in the model. Defaults to False
+        """
+        Retrieves country borders and adds to the model.
+
+        Parameters:
+            *overwrite* (:obj:`bool`): User option for overwriting data that may already exist in the model. Defaults to False
         """
 
         self._boundaries.add_country_borders(overwrite)
 
     def set_population_source(self, source="WorldPop"):
-        """Sets the source for the raster population data
-        Args:
-               *source* (:obj:`str`): Can be 'WorldPop' or 'Meta'. Defaults to WorldPop
+        """
+        Sets the source for downloading population data
+
+        Parameters:
+            *source* (:obj:`str`): Can be 'WorldPop' or 'Meta'. Defaults to WorldPop
         """
         self.__population_source = set_population_source(source)
 
     def set_political_boundaries_source(self, source="GADM"):
         """
-        Sets the source for downloading political boundaries and subdivisions.
-        Args.:
-             *source*(:obj:`str`): Takes "GADM" or "GeoBoundaries". Dafaults to GADM.
+        Sets the source for downloading geographic data.
+
+        Parameters:
+             *source*(:obj:`str`): Takes "GADM" or "GeoBoundaries". Defaults to GADM.
         """
         self._boundaries_source = set_political_boundaries_source(source)
 
     def import_network(self):
-        """Triggers the import of the network from OSM and adds subdivisions into the model.
-        If the network already exists in the folder, it will be loaded, otherwise it will be created."""
+        """
+        Triggers the import of the network from OSM and adds subdivisions into the model.
+        If the network already exists in the folder, it will be loaded, otherwise it will be created.
+        """
 
         self._network.build_network()
 
     def import_subdivisions(self, subdivision_levels=2, overwrite=False):
         """Imports political subdivisions.
 
-        Args:
-               *subdivisions* (:obj:`int`): Number of subdivision levels to import. Defaults to 2
-               *overwrite* (:obj:`bool`): Deletes pre-existing subdivisions. Defaults to False
+        Parameters:
+            *subdivisions* (:obj:`int`): Number of subdivision levels to import. Defaults to 2
+            *overwrite* (:obj:`bool`): Deletes pre-existing subdivisions. Defaults to False
 
         """
 
@@ -102,8 +109,8 @@ class Tradesman:
         """
         Triggers the import of population from raster into the model
 
-        Args:
-                *overwrite* (:obj:`bool`): Deletes pre-existing population_source_import. Defaults to False
+        Parameters:
+            *overwrite* (:obj:`bool`): Deletes pre-existing population_source_import. Defaults to False
         """
 
         import_population(
@@ -111,9 +118,10 @@ class Tradesman:
         )
 
     def build_zoning(self, hexbin_size=200, max_zone_pop=10000, min_zone_pop=500, save_hexbins=False, overwrite=False):
-        """Creates hexagonal bins, and then clusters it regarding the political subdivision.
+        """
+        Creates hexagonal bins, and then clusters it regarding the political subdivision.
 
-        Args:
+        Parameters:
              *hexbin_size*(:obj:`int`): size of the hexagonal bins to be created.
              *max_zone_pop*(:obj:`int`): max population living within a zone.
              *min_zone_pop*(:obj:`int`): min population living within a zone.
@@ -126,9 +134,10 @@ class Tradesman:
         zone_builder(self._project, hexbin_size, max_zone_pop, min_zone_pop, save_hexbins)
 
     def get_political_subdivisions(self, level: int = None) -> gpd.GeoDataFrame:
-        """Return political subdivisions from a country.
+        """
+        Return political subdivisions from a country.
 
-        Args:
+        Parameters:
              *level*(:obj:`int`): Number of subdivision levels to import. Default imports all levels.
         """
 
@@ -161,6 +170,9 @@ class Tradesman:
         """
         Triggers the import of buildings from both OSM and Microsoft Bing.
         Data will be exported as columns in zones file and as a separate SQL file.
+
+        Parameters:
+            *download_from_bing(:obj:`bool`): downloads building data from Microsoft Bing. Defaults to True.
         """
 
         building_import(self.__model_place, self._project, self.__osm_data, download_from_bing)
@@ -175,6 +187,10 @@ class Tradesman:
     def synthesize_population(self, multithread=False, thread_number=2):
         """
         Triggers the creation of synthetic population.
+
+        Parameters:
+            *multithread*(:obj:`bool`): sets if one wants to use multiple threads or not. Defaults to False.
+            *thread_number*(:obj:`int`): number of threads for multiprocessing
         """
 
         run_populationsim(multithread, self._project, self.__folder, thread_number)

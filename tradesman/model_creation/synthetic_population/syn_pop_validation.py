@@ -10,12 +10,11 @@ from matplotlib import cycler
 
 def validate_non_controlled_vars(country_code: str, folder: str):
     """
-    Validates the synthetic pooulation previously created, using non-controlled variables.
+    Validates the synthetic population previously created using non-controlled variables.
 
-    Args:
-         *model_place*:
-         *folder*:
-
+    Parameters:
+        *country_code*(:obj:`str`): ISO-3 country code
+        *folder*(:obj:`str`): path to population folder
     """
 
     controls = pd.read_csv(join(dirname(__file__), "controls_and_validation/hh_composition_data_validation.csv"))
@@ -90,6 +89,13 @@ def validate_non_controlled_vars(country_code: str, folder: str):
 
 
 def validate_controlled_vars(fldr):
+    """
+    Validates the synthetic population previously created using controlled variables.
+    Adapted from https://github.com/activitysim/populationSim/tree/master/scripts
+
+    Parameters:
+        *fldr*(:obj:`str`): path to population folder
+    """
     region_yaml = join(fldr, "verification.yaml")
 
     plt.style.use("ggplot")
@@ -103,22 +109,9 @@ def validate_controlled_vars(fldr):
 
     parameters = {}
 
-    # ignore sys.argv if running validation notebook
-    # is_script = "ipykernel" not in sys.modules
-
-    # if is_script and len(sys.argv) > 1:
-    #     if os.path.isfile(sys.argv[1]):
-    #         region_yaml = sys.argv[1]
-
     with open(region_yaml) as f:
         parameters.update(yaml.safe_load(f))
 
-    # if is_script and len(sys.argv) > 2:
-    #     if os.path.isfile(sys.argv[2]):
-    #         parameters_csv = sys.argv[2]
-    #         parameters.update(pd.read_csv(parameters_csv, header=None, index_col=0, comment='#').to_dict()[1])
-
-    # popsim_dir      = parameters.get('POPSIMDIR') or parameters.get('popsim_dir')
     validation_dir = parameters.get("VALID_DIR") or parameters.get("validation_dir")
     geography_file = parameters.get("geographies")
     use_geographies = parameters.get("group_geographies")
@@ -136,17 +129,15 @@ def validate_controlled_vars(fldr):
 
     summary_df = pd.DataFrame()
     for summary_file in summary_files:
-        filepath = os.path.join(fldr, summary_file)  # mudar popsimdir para fldr
+        filepath = os.path.join(fldr, summary_file)
         df = pd.read_csv(filepath)
         summary_df = pd.concat([summary_df, df])
 
-    # summary_df.head()
-
     for geog in use_geographies:
         if geog not in summary_df.geography.unique():
-            summary_df = pd.concat([summary_df, meta_geog_df(summary_df, geog, fldr, geography_file, use_geographies)])
-
-    # summary_df.tail()
+            summary_df = pd.concat(
+                [summary_df, __meta_geog_df(summary_df, geog, fldr, geography_file, use_geographies)]
+            )
 
     fig_w = 3
     fig_l = int(len(aggregate_list) / fig_w) + 1
@@ -155,7 +146,7 @@ def validate_controlled_vars(fldr):
 
     stats = []
     for params, ax in zip(aggregate_list, axes.ravel()):
-        s, f, diff = process_control(summary_df, **params)
+        s, f, diff = __process_control(summary_df, **params)
         stats.append(s)
 
         ax.set_title(f"{params['geography']} - {params['name']}")
@@ -173,14 +164,12 @@ def validate_controlled_vars(fldr):
 
     std_fig.savefig(os.path.join(fldr, validation_dir, f"{scenario}_{region}_popsim_convergence_stdev.pdf"))
 
-    # seed_cols = (seed_hh_cols.values())
     geog = seed_hh_cols.get("geog")
     geog_weight = seed_hh_cols.get("geog_weight")
-    # hh_id = seed_hh_cols.get('hh_id')
 
-    expanded_hhids = pd.read_csv(os.path.join(fldr, exp_hh_file), usecols=[exp_hh_id_col])  # popsim/fldr
+    expanded_hhids = pd.read_csv(os.path.join(fldr, exp_hh_file), usecols=[exp_hh_id_col])
 
-    seed_hh_df = pd.read_csv(os.path.join(fldr, seed_hh_file), usecols=["PUMA", "WGTP", "hhnum"])  # popsim/fldr
+    seed_hh_df = pd.read_csv(os.path.join(fldr, seed_hh_file), usecols=["PUMA", "WGTP", "hhnum"])
     seed_hh_df.rename(columns={"hhnum": "hh_id"}, inplace=True)
     seed_hh_df.set_index(keys="hh_id", inplace=True)
 
@@ -219,7 +208,6 @@ def validate_controlled_vars(fldr):
     )
 
     uniformity_df.to_csv(os.path.join(fldr, validation_dir, "uniformity.csv"))
-    # uniformity_df
 
     geogs = df[geog].unique()
     geog_fig = plt.figure(figsize=(10 * len(geogs), 10))
@@ -234,11 +222,9 @@ def validate_controlled_vars(fldr):
         ax.hist(bins[:-1], bins, weights=counts * 100 / len(geog_df), alpha=0.6)
 
 
-def meta_geog_df(summary_df, meta_geog, folder, geography_file, use_geographies):
+def __meta_geog_df(summary_df, meta_geog, folder, geography_file, use_geographies):
     """
-    This function creates a ____ for the upper level geography.
-
-
+    Adapted from https://github.com/activitysim/populationSim/tree/master/scripts
     """
 
     geography_df = pd.read_csv(os.path.join(folder, geography_file))
@@ -251,24 +237,9 @@ def meta_geog_df(summary_df, meta_geog, folder, geography_file, use_geographies)
     return geog_df
 
 
-def process_control(summary_df, name, geography, control, result):
+def __process_control(summary_df, name, geography, control, result):
     """
-    Global
-    ------
-    summary_df: pandas DataFrame
-
-    Parameters
-    ----------
-    name: str, output plot title
-    geography: str, groupby geography
-    control: str, control column name in summary table
-    result: str, result column name in summary table
-
-    Returns
-    -------
-
-    stats: pandas Series of statistics, aggregated by geography/control/result
-    frequencies: pandas Series of control vs. results differences
+    Adapted from https://github.com/activitysim/populationSim/tree/master/scripts
     """
 
     sub_df = summary_df[summary_df.geography == geography][[control, result]].dropna(axis=0, how="any")
