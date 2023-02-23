@@ -84,7 +84,7 @@ def __load_cache(cache_name):
     """
     Load data cached to memory.
 
-    Parameter:
+    Parameters:
          *cache_name*: cache file name
     """
     with bz2.BZ2File(cache_name, "rb") as f:

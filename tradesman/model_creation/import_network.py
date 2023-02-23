@@ -16,9 +16,9 @@ class ImportNetwork:
     """
     Imports network from OSM or allows the user to manually import network from .osm or .pbf files.
 
-    Args.:
-        *project*(:obj:`aequilibrae.project.Project`):
-        *model_place*(:obj:`str`):
+    Parameters:
+        *project*(:obj:`aequilibrae.project.Project`): currently open project
+        *model_place*(:obj:`str`): current model place
         *pbf_path*(:obj:`str`): path to osm or pbf file. Optional.
 
     """
@@ -35,6 +35,9 @@ class ImportNetwork:
         self.new_node_fields = {"osm_node_id": {"description": "osm_id", "type": "text", "required": False}}
 
     def build_network(self):
+        """
+        Builds the network.
+        """
         if not self.pbf_path:
             self.par.parameters["network"]["links"]["fields"]["one-way"].extend(extra_fields)
             self.par.write_back()
@@ -46,7 +49,7 @@ class ImportNetwork:
 
             print("Convert to GMNS ...")
             print(" ")
-            net = og.getNetFromFile(self.pbf_path, network_types=("auto"))  # Fix it later
+            net = og.getNetFromFile(self.pbf_path, network_types=("auto"))
             og.outputNetToCSV(net, output_folder=gettempdir(), prefix=f"{self.model_place}-gmns-", encoding="utf-8")
 
             print(" ")
@@ -84,7 +87,7 @@ class ImportNetwork:
         """
         Fix files created from osm2gmns to fit AequilibraE create_from_gmns.
 
-        Args.:
+        Parameters:
              *file_path*(:obj:`str`):
              *model_place*(:obj:`str`):
         """
@@ -118,7 +121,7 @@ class ImportNetwork:
         """
         Loads data from OSM.
 
-        Args.:
+        Parameters:
              *model_place*(:obj:`str`):
              *tile_size*(:obj:`int`):
         """
@@ -152,6 +155,9 @@ class ImportNetwork:
                 gc.collect()
 
     def __setup_tables(self):
+        """
+        Creates the missing columns when importing data from GMNS.
+        """
         self.project.conn.execute("ALTER TABLE links RENAME COLUMN osm_way_id TO osm_id;")
 
         self.project.conn.execute("ALTER TABLE links ADD COLUMN bridge text;")
@@ -161,6 +167,9 @@ class ImportNetwork:
         self.project.conn.commit()
 
     def __update_links(self):
+        """
+        Updates the links which are bridge, toll or tunnel.
+        """
         bridge_list = []
         toll_list = []
         tunnel_list = []

@@ -15,8 +15,9 @@ from shapely.geometry import Polygon
 def get_maritime_boundaries(model_place: str):
     """
     Import maritime boundaries from countries. If country has no maritime boundary, it returns None.
+
     Parameters:
-         *model_place*(:obj:`str`):
+         *model_place*(:obj:`str`): current model place
     """
     country_code = pycountry.countries.search_fuzzy(model_place)[0].alpha_3
 
@@ -35,6 +36,12 @@ def get_maritime_boundaries(model_place: str):
 
 
 def place_is_country(model_place: str):
+    """
+    Checks if model_place is a country.
+
+    Parameters:
+         *model_place*(:obj:`str`): current model place
+    """
     search_place = model_place.lower().replace(" ", "+")
 
     nom_url = (
@@ -53,8 +60,9 @@ def place_is_country(model_place: str):
 def delete_links_and_nodes(model_place, project: Project):
     """
     Removes links and nodes outside the political subdivision.
+
     Parameters:
-         *model_place*(:obj:`str`):
+         *model_place*(:obj:`str`): current model place
          *project*(:obj:`aequilibrae.project.Project`): currently open project
     """
 

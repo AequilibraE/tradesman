@@ -1,3 +1,5 @@
+# Simplifies the existing tags for amenity and building for top-level tags
+
 amenity_values = {
     "bar": "sustenance",
     "biergarten": "sustenance",
@@ -129,7 +131,7 @@ building_values = {
     "dormitory": "residential",
     "farm": "residential",
     "ger": "residential",
-    "hotel": "temporary_accomodation",
+    "hotel": "temporary_accommodation",
     "house": "residential",
     "houseboat": "residential",
     "residential": "residential",
@@ -187,10 +189,10 @@ building_values = {
     "garage": "cars",
     "garages": "cars",
     "parking": "cars",
-    "digester": "power_techincal",
-    "service": "power_techincal",
-    "transformer_tower": "power_techincal",
-    "water_tower": "power_techincal",
+    "digester": "power_technical",
+    "service": "power_technical",
+    "transformer_tower": "power_technical",
+    "water_tower": "power_technical",
     "beach_hut": "others",
     "bunker": "others",
     "bridge": "others",

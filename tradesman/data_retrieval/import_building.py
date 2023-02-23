@@ -12,7 +12,7 @@ def building_import(model_place: str, project: Project, osm_data: dict, download
          *model_place*(:obj:`str`): current model place
          *project*(:obj:`aequilibrae.project): current project.
          *osm_data*(:obj:`dict`): stores downloaded data.
-         *download_from_bing(:obj:`bool`): donwloads building data from Microsoft Bing. Defaults to True.
+         *download_from_bing(:obj:`bool`): downloads building data from Microsoft Bing. Defaults to True.
     """
 
     if download_from_bing:

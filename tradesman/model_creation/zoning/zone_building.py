@@ -12,6 +12,7 @@ from time import gmtime, strftime
 def zone_builder(project, hexbin_size: int, max_zone_pop: int, min_zone_pop: int, save_hexbins: bool):
     """
     Build Traffic Analysis Zones.
+
     Parameters:
          *project*(:obj:`aequilibrae.project`): currently open project
          *hexbin_size*(:obj:`int`): size of the hexbin size. Defaults to 200

@@ -12,6 +12,7 @@ has_dask_geopandas = iutil.find_spec("dask_geopandas") is not None
 def zones_with_location(hexb, states):
     """
     Identifies which political subdivision the hexbins belong to.
+
     Parameters:
          *hexb*(:obj:`geopandas.GeoDataFrame`): GeoDataFrame containing all hexbins within the model area.
          *states*(:obj:`geopandas.GeoDataFrame`): GeoDataFrame containing all political divisions at the lowest level available.

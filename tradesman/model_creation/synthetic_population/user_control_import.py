@@ -6,7 +6,8 @@ import yaml
 
 def user_change_controls(overwrite=False, **kwargs):
     """
-    Allows the user to input the control files if one wish to use other variables rather than those provived by Tradesman.
+    Allows the user to input the control files if one wish to use other variables rather than those provided by Tradesman.
+
     Parameters:
          *overwrite*(:obj:`bool`): replaces the control file. Default: False
          *src_file*(:obj:`str`): path to the new control file
@@ -20,6 +21,7 @@ def user_change_controls(overwrite=False, **kwargs):
 def user_change_settings(overwrite=False, **kwargs):
     """
     Allows the user to set other variables for the synthetic population. By default, for synthetic persons information related to age, sex, occupation, journey to work and race are provided. As for synthetic households, the information provided are number of persons in the household and average household income.
+
     Parameters:
          *overwrite*(:obj:`bool`): replaces the settings file. Default: False
          *household_settings*(:obj:`list`): list with household parameters to add
@@ -41,6 +43,7 @@ def user_change_settings(overwrite=False, **kwargs):
 def user_import_new_seeds(overwrite=False, **kwargs):
     """
     Allows the user to set their own seed_persons and seed_household files. It is mandatory to provide the new control_totals for the existing geographical units.
+
     Parameters:
          *overwrite*(:obj:`bool`): replaces seed_households and seed_persons files. Default: False
          *persons_seed_path*(:obj:`str`): path to new seed_persons file
@@ -56,6 +59,7 @@ def user_import_new_seeds(overwrite=False, **kwargs):
 def user_import_new_totals(overwrite=False, **kwargs):
     """
     Allows the user to change the existing controls. One must pay close attention to the geographical encoding of areas, once it must be the same for all files.
+
     Parameters:
          *overwrite*(:obj:`bool`): replaces the geo_cross_walk, control_totals_taz and control_totals_meta files. Default: False
          *totals_lower_level*(:obj:`str`): path to the new control_totals_taz file
@@ -73,6 +77,7 @@ def user_import_new_totals(overwrite=False, **kwargs):
 def user_change_geographies(overwrite=False, **kwargs):
     """
     Replaces values in settings.yaml file in case the geographies provided in the new files are different than TAZ < PUMA < REGION.
+
     Parameters:
          *overwrite*(:obj:`bool`): replaces the geography configurations in settings file. Default: False
          *seed_geography*(:obj:`str`):
@@ -93,7 +98,8 @@ def user_change_geographies(overwrite=False, **kwargs):
 
 def user_change_validation_parameters(overwrite: bool, model_place: str, dest_folder: str, **kwargs):
     """
-    Replaces validation parameters in case of changes in geopgraphies and/or controls.
+    Replaces validation parameters in case of changes in geographies and/or controls.
+
     Parameters:
           *overwrite*(:obj:`bool`): replaces the validation file. Default: False
           *model_place*(:obj:`str`): current model place

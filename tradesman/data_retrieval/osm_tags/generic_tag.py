@@ -4,12 +4,12 @@ from aequilibrae.project import Project
 
 def generic_tag(tag: str, osm_data: dict, project: Project, tile_size=25):
     """
-    Finds all [amenities] (<https://wiki.openstreetmap.org/wiki/Key:amenity>)  or [building] (<https://wiki.openstreetmap.org/wiki/Key:building>) for the model area.
+    Finds all [amenity] (<https://wiki.openstreetmap.org/wiki/Key:amenity>)  or [building] (<https://wiki.openstreetmap.org/wiki/Key:building>) for the model area.
 
     Parameters:
-         *tag*(:obj:`str`): download objects from Open Street Maps. Takes amenity or buildings.
+         *tag*(:obj:`str`): download objects from Open Street Maps. Takes amenity or building.
          *osm_data*(:obj:`dict`): stores downloaded data.
-         *project*(:obj:`aequilibrae.project): current project.
+         *project*(:obj:`aequilibrae.project): currently open project.
          *tile_size*(:obj:`float`): The size of the tile we want to split our area in. Defaults to 25km side.
     """
     queries = [

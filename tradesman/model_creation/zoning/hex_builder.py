@@ -15,6 +15,7 @@ has_dask_geopandas = iutil.find_spec("dask_geopandas") is not None
 def hex_builder(coverage_area, hex_height, epsg=3857):
     """
     Creates hexbins that covers all project area.
+
     Parameters:
          *coverage_area*(:obj:`geopandas.GeoDataFrame`): GeoDataFrame containing country borders
          *hex_height*(:obj:`int`): size of the hexbin size. Defaults to 200

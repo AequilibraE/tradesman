@@ -9,6 +9,14 @@ from tradesman.data_retrieval.country_main_area import model_borders
 
 
 def bounding_boxes(project: Project, km_side=25):
+    """
+    Creates a bounding box for the model area.
+
+    Parameters:
+         *project*(:obj:`aequilibrae.project`): currently open project
+         *km_side*(:obj:`int`): size of the box to be created
+
+    """
     country = model_borders(project)
 
     geo_country = gpd.GeoDataFrame(
