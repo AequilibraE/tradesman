@@ -37,22 +37,21 @@ release = "TBD"
 # ones.
 extensions = [
     "nbsphinx",
-    # "sphinx_gallery.load_style",
-    # "sphinx_gallery.gen_gallery",
+    "sphinx_gallery.load_style",
+    "sphinx_gallery.gen_gallery",
     "sphinx.ext.autodoc",
     "sphinx.ext.intersphinx",
     "sphinx.ext.coverage",
     "sphinx.ext.mathjax",
     "sphinx_autodoc_annotation",
     "sphinx.ext.autosummary",
-    "sphinx.ext.githubpages",
-    # 'rst2pdf.pdfbuilder',
+    "sphinx_git",
 ]
 
-# sphinx_gallery_conf = {
-#     'examples_dirs': ['examples'],  # path to your example scripts
-#     'gallery_dirs': ['_auto_examples'],  # path to where to save gallery generated output
-# }
+sphinx_gallery_conf = {
+    "examples_dirs": ["examples"],  # path to your example scripts
+    "gallery_dirs": ["_auto_examples"],  # path to where to save gallery generated output
+}
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
 
