@@ -9,6 +9,10 @@ from sklearn.cluster import KMeans
 from shapely.geometry import box
 from tqdm import tqdm
 
+import os
+
+os.environ["OMP_NUM_THREADS"] = "1"
+
 
 def create_clusters(hexbins, max_zone_pop=10000, min_zone_pop=500):
     """
@@ -20,6 +24,11 @@ def create_clusters(hexbins, max_zone_pop=10000, min_zone_pop=500):
          *min_zone_pop*(:obj:`int`): min population within a zone. Defaults to 500
     """
 
+    if hexbins.population.max() > max_zone_pop:
+        raise ValueError(
+            """There is at least one hexbin with population greater than max_zone_pop.
+        Plase change the parameter value."""
+        )
     hexbins["zone_id"] = -1
     centroids = hexbins.geometry.centroid
     hexbins = hexbins.assign(x=centroids.x.values, y=centroids.y.values)
@@ -54,11 +63,11 @@ def create_clusters(hexbins, max_zone_pop=10000, min_zone_pop=500):
             if prov_pop.shape[0] < 2:
                 continue
 
-            kmeans = KMeans(n_clusters=segments, random_state=0)
+            kmeans = KMeans(n_clusters=segments, random_state=0, n_init="auto")
             centr_results = kmeans.fit_predict(X=prov_pop[["x", "y"]].values, sample_weight=prov_pop.population.values)
             df.loc[fltr, "zone_id"] = centr_results[:] + master_zone_id
 
-            t = df.groupby(["zone_id"]).sum()
+            t = df.groupby(["zone_id"]).sum(numeric_only=True)
             ready = t.loc[t.population <= max_zone_pop].shape[0]
             avg = int(np.nansum(t.loc[t.population <= max_zone_pop, "population"]) / max(1, ready))
             t = t.loc[t.population > max_zone_pop]
@@ -78,8 +87,8 @@ def create_clusters(hexbins, max_zone_pop=10000, min_zone_pop=500):
     zoning = zoning.join(pop_total)
 
     exceptions = 0
-    while zoning[zoning.geometry.type == "MultiPolygon"].shape[0] > exceptions:
-        print(1)
+    counter = zoning[zoning.geometry.type == "MultiPolygon"].shape[0]
+    while counter > exceptions:
         for zid, record in zoning[zoning.geometry.type == "MultiPolygon"].iterrows():
             zone_df = df[df.zone_id == zid]
             with warnings.catch_warnings():
@@ -88,7 +97,10 @@ def create_clusters(hexbins, max_zone_pop=10000, min_zone_pop=500):
             island_pop = {isl: zone_df[adj_mtx.component_labels == isl].population.sum() for isl in islands}
             max_island = max(island_pop.values())
             remove_islands = [k for k, v in island_pop.items() if v < max_island]
-            failed = 0
+            # failed = 0
+            if len(remove_islands) == 0:
+                counter -= 1
+                continue
             for rmv in remove_islands:
                 island_hexbins = zone_df[adj_mtx.component_labels == rmv].hex_id
                 if zone_df[df.hex_id.isin(island_hexbins)].population.sum() > min_zone_pop:
@@ -98,15 +110,15 @@ def create_clusters(hexbins, max_zone_pop=10000, min_zone_pop=500):
 
                 closeby = []
                 for island_geo in zone_df[adj_mtx.component_labels == rmv].geometry.values:
-                    closeby.extend([x for x in df.sindex.nearest(box(*island_geo.bounds), 6)[1]])
+                    closeby.extend([x for x in df.sindex.nearest(box(*island_geo.bounds))[1]])
                 closeby = list(set(list(closeby)))
                 if not closeby:
-                    failed = 1
+                    # failed = 1
                     continue
                 adjacent = df.loc[df.index.isin(closeby), :]
                 available = [x for x in adjacent.zone_id.unique() if x != zid]
                 if not available:
-                    failed = 1
+                    # failed = 1
                     continue
 
                 same_area = [
@@ -124,14 +136,15 @@ def create_clusters(hexbins, max_zone_pop=10000, min_zone_pop=500):
                         adjacent.zone_id == counts, "division_name"
                     ].values[0]
                     df.loc[df.hex_id.isin(island_hexbins), "zone_id"] = counts
-            exceptions += failed
+            # exceptions += failed
+            counter -= 1
 
         zoning = df.dissolve(by="zone_id")[["division_name", "geometry"]]
         pop_total = df[["zone_id", "population"]].groupby(["zone_id"]).sum(numeric_only=True)["population"]
         zoning = zoning.join(pop_total)
 
     zoning = df.dissolve(by="zone_id")[["division_name", "geometry"]]
-    pop_total = df[["zone_id", "population"]].groupby(["zone_id"]).sum()["population"]
+    pop_total = df[["zone_id", "population"]].groupby(["zone_id"]).sum(numeric_only=True)["population"]
     zoning = zoning.join(pop_total)
 
     zoning = zoning.reset_index(drop=True)

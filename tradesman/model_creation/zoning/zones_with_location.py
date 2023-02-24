@@ -1,4 +1,5 @@
 import geopandas as gpd
+import numpy as np
 import pandas as pd
 from geopandas.tools import sjoin
 from shapely.geometry import box
@@ -45,4 +46,12 @@ def zones_with_location(hexb, states):
         data_complete.drop_duplicates(subset=["hex_id"], inplace=True)
         geom_colum = "geometry_x"
 
-    return gpd.GeoDataFrame(data_complete[["hex_id", "division_name"]], geometry=data_complete[geom_colum])
+    gdf = gpd.GeoDataFrame(data_complete[["hex_id", "division_name"]], geometry=data_complete[geom_colum])
+
+    gdf = gdf.explode(index_parts=True).drop_duplicates()
+
+    gdf.reset_index(drop=True, inplace=True)
+
+    gdf["hex_id"] = np.arange(1, len(gdf) + 1)
+
+    return gdf
