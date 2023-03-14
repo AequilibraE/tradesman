@@ -120,6 +120,7 @@ amenity_values = {
     "refugee_site": "others",
     "vending_machine": "others",
     "user defined": "others",
+    0: "undetermined",
 }
 
 building_values = {
@@ -206,4 +207,5 @@ building_values = {
     "tent": "others",
     "tree_house": "others",
     "yes": "undetermined",
+    0: "undetermined",
 }
