@@ -29,7 +29,7 @@ class ImportMicrosoftBuildingData:
             "https://minedbuildings.blob.core.windows.net/global-buildings/dataset-links.csv"
         )
 
-        self.__country_name = self.__nominatim_get_name()
+        self.__country_name = self.__nominatim_get_name().replace(" ", "")
 
         self.__initialize()
 
