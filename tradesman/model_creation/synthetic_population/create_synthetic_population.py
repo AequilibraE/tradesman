@@ -25,8 +25,7 @@ def create_syn_pop(project: Project, cwd: str, thread_number=None, sample_size=0
 
     Parameters:
         *project*(:obj:`aequilibrae.project`):
-        *model_place*(:obj:`str`):
-        *folder*(:obj:`str`):
+        *cwd*(:obj:`str`):
     """
 
     unzip_seed_files(cwd)

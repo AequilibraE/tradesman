@@ -5,13 +5,13 @@ from tradesman.data.population_file_address import link_source
 from tradesman.data.population_raster import population_raster
 
 
-def import_population(project: Project, model_place: str, source: str, overwrite=False):
+def import_population(project: Project, country_name: str, source: str, overwrite=False):
     """
     Imports population information into the model.
 
     Parameters:
         *project*(:obj:`aequilibrae.project`): currently open project
-        *model_place*(:obj:`str`): current model place
+        *country_name*(:obj:`str`): model place country
         *source*(:obj:`str`): database source to download population data. Defaults to WorldPop
         *overwrite*(:obj:`bool`): overwrites existing raw_population info from the model. Defaults to False
     """
@@ -20,12 +20,12 @@ def import_population(project: Project, model_place: str, source: str, overwrite
             return
         project.conn.execute("DELETE FROM raw_population;")
 
-    url = link_source(model_place, source)
+    url = link_source(country_name, source)
 
     if url == "no file":
         raise ValueError("Could not find a population file to import")
 
-    df = population_raster(url, f"pop_{model_place}", project)
+    df = population_raster(url, f"pop_{country_name}", project)
     gdf = gpd.GeoDataFrame(df, geometry=gpd.points_from_xy(df.longitude, df.latitude), crs=4326)
 
     model_area = gpd.read_postgis(

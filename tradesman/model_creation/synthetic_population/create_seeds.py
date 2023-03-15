@@ -13,7 +13,6 @@ def create_buckets(project: Project, folder: str, sample=0.02):
     This function outputs are the inputs for creating the seeds.
 
     Parameters:
-         *model_place*(:obj:`str`): current model place
          *project*(:obj:`aequilibrae.Project`): current project
          *folder*(:obj:`str`): folder containing PopulationSim population files
          *sample*(:obj:`float`): percentage of population one want to compose the seed.

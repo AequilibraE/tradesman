@@ -10,7 +10,7 @@ from tradesman.model_creation.pop_by_sex_and_age import get_pop_by_sex_age
 
 class TestPopBySexAndAge(unittest.TestCase):
     def setUp(self) -> None:
-        self.model_place = "Nauru"
+        self.country_name = "Nauru"
         self.fldr = join(gettempdir(), uuid4().hex)
         self.project = create_nauru_test(self.fldr)
         self.mock_raster = mock.patch("tradesman.model_creation.pop_by_sex_and_age.population_raster")
@@ -25,7 +25,7 @@ class TestPopBySexAndAge(unittest.TestCase):
         self.mock_sjoin.stop()
 
     def test_get_pop_by_sex_age(self):
-        get_pop_by_sex_age(self.project, self.model_place)
+        get_pop_by_sex_age(self.project, self.country_name)
 
         f_10_pop = self.project.conn.execute("SELECT SUM(POPF10) FROM zones;").fetchone()[0]
         self.assertEqual(f_10_pop, 0)
