@@ -101,13 +101,28 @@ def run_populationsim(multithread: bool, project: Project, folder: str, thread_n
         [sys.executable, "run_populationsim.py"], cwd=pop_fldr, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT
     )
 
-    pd.read_csv(join(pop_fldr, "output/synthetic_persons.csv")).to_sql(
+    pd.read_csv(join(pop_fldr, "output/synthetic_persons.csv"))[["hh_id", "TAZ", "AGEP", "SEX"]].to_sql(
         "synthetic_persons", con=project.conn, if_exists="replace"
     )
 
-    pd.read_csv(join(pop_fldr, "output/synthetic_households.csv")).to_sql(
+    pd.read_csv(join(pop_fldr, "output/synthetic_households.csv"))[["hh_id", "TAZ", "NP"]].to_sql(
         "synthetic_households", con=project.conn, if_exists="replace"
     )
+
+    fields = [
+        ("synthetic_persons", "hh_id", "household id"),
+        ("synthetic_persons", "TAZ", "Unique Traffic Analysis Zones id"),
+        ("synthetic_persons", "AGEP", "synthetic person age"),
+        ("synthetic_persons", "SEX", "synthetic person sex"),
+        ("synthetic_households", "hh_id", "household id"),
+        ("synthetic_households", "TAZ", "Unique Traffic Analysis Zones id"),
+        ("synthetic_households", "NP", "number of persons in the household"),
+    ]
+
+    project.conn.executemany(
+        "INSERT INTO 'attributes_documentation' (name_table, attribute, description) VALUES (?, ?, ?);", fields
+    )
+    project.conn.commit()
 
     user_change_validation_parameters(overwrite=False, model_place=project.about.model_name, dest_folder=pop_fldr)
 
