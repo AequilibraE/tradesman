@@ -7,18 +7,25 @@ On this example, we plot some data obtained from a Tradesman model.
 
 # %%
 # Imports
+import os
+
+os.environ["USE_PYGEOS"] = "0"
+
 import geopandas as gpd
 import matplotlib.pyplot as plt
 import contextily as cx
-import sqlite3
-from aequilibrae.project.spatialite_connection import spatialite_connection
 import folium
 
-# %%
-# Let's open a spatialite connection using AequilibraE.
-# As we manipulate spatial data, it will be incredibly useful.
+from tradesman.utils.create_tradesman_example import create_tradesman_example
+from tempfile import gettempdir
+from uuid import uuid4
+from os.path import join
 
-cnx = spatialite_connection(sqlite3.connect(r"D:\OuterLoop\Tradesman\20230214\Coquimbo\project_database.sqlite"))
+# %%
+# Let's create our project and establish a connection
+prj = create_tradesman_example(join(gettempdir(), uuid4().hex))
+
+cnx = prj.conn
 
 # %%
 # Let's identify the region we are plotting our data.
@@ -47,8 +54,8 @@ for lvl in range(-1, subdivisions.level.max() + 1):
             tiles="CartoDB positron",
             tooltip=False,
             popup=True,
-            location=[-30.61926, -70.86065],
-            zoom_start=7,
+            location=[-0.52943, 166.9346],
+            zoom_start=13,
             legend=False,
             color=colors[lvl + 1],
         )
@@ -58,8 +65,8 @@ for lvl in range(-1, subdivisions.level.max() + 1):
             tiles="CartoDB positron",
             tooltip=False,
             popup=True,
-            location=[-30.61926, -70.86065],
-            zoom_start=7,
+            location=[-0.52943, 166.9346],
+            zoom_start=13,
             legend=False,
             color=colors[lvl + 1],
         )
@@ -88,8 +95,8 @@ zones.explore(
     cmap="Greens",
     tooltip=False,
     style_kwds={"fillOpacity": 1.0},
-    zoom_start=11,
-    location=[-29.951474, -71.172293],
+    zoom_start=13,
+    location=[-0.52943, 166.9346],
     popup=True,
 )
 # %%
@@ -107,8 +114,8 @@ zones.explore(
     cmap="RdPu",
     tooltip=False,
     style_kwds={"fillOpacity": 1.0},
-    zoom_start=7,
-    location=[-30.61926, -70.86065],
+    zoom_start=13,
+    location=[-0.52943, 166.9346],
     popup=True,
 )
 
@@ -153,9 +160,9 @@ zones.plot(
     facecolor="whitesmoke",
     cmap="Oranges",
     scheme="equal_interval",
-    k=4,
+    k=5,
     legend=True,
-    legend_kwds={"loc": "upper right", "fmt": "{:.0f}"},
+    legend_kwds={"loc": "upper left", "fmt": "{:.2f}"},
 )
 cx.add_basemap(ax[0], crs=4326, source=cx.providers.Stamen.TonerLite)
 
@@ -168,40 +175,25 @@ zones.plot(
     cmap="Blues",
     legend=True,
     scheme="equal_interval",
-    k=4,
-    legend_kwds={"loc": "upper right", "fmt": "{:.0f}"},
+    k=5,
+    legend_kwds={"loc": "upper left", "fmt": "{:.2f}"},
 )
 cx.add_basemap(ax[1], crs=4326, source=cx.providers.Stamen.TonerLite)
 
 fig.show()
 
 # %%
-# Our model also has OpenStreetMaps Building information. Let's take a look at the location and types of buildings we have in Coquimbo.
+# Our model also has OpenStreetMaps Building information. Let's take a look at the location of some building types.
 
 # %%
 # Import the data
-buildings = gpd.read_postgis(
-    "SELECT building, zone_id, ST_AsBinary(geometry)geom FROM osm_building WHERE geometry IS NOT NULL;",
-    con=cnx,
-    geom_col="geom",
-    crs=4326,
-)
+qry = "SELECT building, zone_id, ST_AsBinary(geometry)geom FROM osm_building WHERE geometry IS NOT NULL;"
+buildings = gpd.read_postgis(qry, con=cnx, geom_col="geom", crs=4326)
+buildings = buildings[buildings.building.isin(["undetermined", "Religious", "residential", "commercial"])]
+
 # %%
 # And plot it
-colors = [
-    "#73b7b8",
-    "#0077b6",
-    "#f05a29",
-    "#f05a29",
-    "#76c8b1",
-    "#50b99b",
-    "#dc244b",
-    "#af1d3c",
-    "#023e8a",
-    "#52a1a3",
-    "#f6cb52",
-    "#f3b816",
-]
+colors = ["#73b7b8", "#0077b6", "#f05a29", "#f05a29"]
 
 m = None
 
@@ -215,8 +207,8 @@ for idx, bld in enumerate(buildings.building.unique()):
             tiles="CartoDB positron",
             tooltip=False,
             popup=True,
-            zoom_start=14,
-            location=[-29.9541855, -71.3479664],
+            zoom_start=13,
+            location=[-0.52943, 166.9346],
             legend=False,
             color=colors[idx],
         )
@@ -226,8 +218,8 @@ for idx, bld in enumerate(buildings.building.unique()):
             tiles="CartoDB positron",
             tooltip=False,
             popup=True,
-            zoom_start=14,
-            location=[-29.9541855, -71.3479664],
+            zoom_start=13,
+            location=[-0.52943, 166.9346],
             legend=False,
             color=colors[idx],
         )
@@ -238,11 +230,11 @@ m
 
 # %%
 # Finally, let's check out our model's network.
-# As we imported data from OpenStreetMaps, it is possible that we have several _link_type_ categories. We'll plot only five of them, which usually are the most numerous.
+# As we imported data from OpenStreetMaps, it is possible that we have several _link_type_ categories. We'll plot only five of them.
 links = gpd.read_postgis(
     "SELECT link_type, distance, modes, ST_AsBinary(geometry) geom FROM links;", con=cnx, geom_col="geom", crs=4326
 )
-links = links[links.link_type.isin(["motorway", "trunk", "primary", "secondary", "tertiary"])]
+links = links[links.link_type.isin(["unclassified", "residential", "primary", "track", "tertiary"])]
 
 # %%
 colors = ["#219EBC", "#ffb703", "#8ECAE6", "#023047", "#fb8500"]
@@ -257,8 +249,8 @@ for idx, tp in enumerate(links.link_type.unique()):
             tiles="CartoDB positron",
             tooltip=False,
             popup=True,
-            zoom_start=14,
-            location=[-29.9541855, -71.3479664],
+            zoom_start=13,
+            location=[-0.52943, 166.9346],
             legend=False,
             color=colors[idx],
         )
@@ -268,8 +260,8 @@ for idx, tp in enumerate(links.link_type.unique()):
             tiles="CartoDB positron",
             tooltip=False,
             popup=True,
-            zoom_start=14,
-            location=[-29.9541855, -71.3479664],
+            zoom_start=13,
+            location=[-0.52943, 166.9346],
             legend=False,
             color=colors[idx],
         )
