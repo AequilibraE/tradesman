@@ -45,7 +45,8 @@ extensions = [
     "sphinx.ext.mathjax",
     "sphinx_autodoc_annotation",
     "sphinx.ext.autosummary",
-    "sphinx_git",
+    "sphinx.ext.githubpages",
+    # 'rst2pdf.pdfbuilder',
 ]
 
 sphinx_gallery_conf = {
