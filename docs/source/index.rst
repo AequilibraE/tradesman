@@ -72,3 +72,4 @@ Do you want to choose which steps to do?:
    data_sources
    zoning
    synthetic_population
+   _auto_examples/index
