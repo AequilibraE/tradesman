@@ -13,10 +13,14 @@ pkg_data = {"tradesman.data": ["population/*.csv"]}
 loose_modules = ["__version__"]
 
 if __name__ == "__main__":
+    reqs = ["shapely>=2.0", "geopandas", "openmatrix", "rasterio", "matplotlib", "pycountry", "aequilibrae", "tabulate",
+            "tqdm", "pysal"]
+    extra_reqs = {"all_features": ["osm2gmns >= 0.6.8", "populationsim >= 0.5.1", "dask_geopandas"]}
     setup(
         name="tradesman",
         version="0.2",
-        install_requires=["pysal", "openmatrix", "rasterio", "matplotlib", "aequilibrae"],
+        install_requires=reqs,
+        extra_requires=extra_reqs,
         packages=pkgs,
         package_dir={"": "."},
         py_modules=loose_modules,

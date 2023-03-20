@@ -1,4 +1,5 @@
 shapely>=2.0
+geopandas
 openmatrix
 rasterio
 matplotlib
@@ -7,4 +8,3 @@ aequilibrae
 tabulate
 tqdm
 pysal
-fiona==1.9.0
