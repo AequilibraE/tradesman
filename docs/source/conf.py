@@ -16,6 +16,15 @@ import os
 import sys
 
 
+try:
+    import tradesman
+except ImportError as e:
+    sys.path.insert(0, os.path.abspath("../.."))
+    import tradesman
+    import warnings
+
+    warnings.warn(f"It is really annoying to deal with Flake8 sometimes. {e.args}")
+
 # -- Project information -----------------------------------------------------
 
 
