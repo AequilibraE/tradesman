@@ -15,7 +15,6 @@
 import os
 import sys
 
-
 try:
     import tradesman
 except ImportError as e:
