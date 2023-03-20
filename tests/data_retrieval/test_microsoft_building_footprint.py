@@ -16,12 +16,11 @@ class TestMicrosoftBuildingFootprint(unittest.TestCase):
         self.project = create_nauru_test(self.fldr)
 
     def test_initialize(self):
-        with self.assertRaises(FileNotFoundError) as exception_context:
-            ImportMicrosoftBuildingData(model_place="Papua New Guinea", project=self.project)
+        png = ImportMicrosoftBuildingData(model_place="Papua New Guinea", project=self.project)
+        self.assertFalse(png._available, "Should not have for PNG")
 
-        self.assertEqual(
-            str(exception_context.exception), "Microsoft Bing does not provide information about this region."
-        )
+        brl = ImportMicrosoftBuildingData(model_place="Brazil", project=self.project)
+        self.assertTrue(brl._available, "Should have for Brazil")
 
     # @unittest.skip
     @mock.patch("tradesman.data_retrieval.osm_tags.microsoft_building_footprint.max")
