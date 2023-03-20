@@ -16,6 +16,8 @@ def building_import(model_place: str, project: Project, osm_data: dict, download
     """
 
     if download_from_bing:
-        ImportMicrosoftBuildingData(model_place, project).microsoft_buildings()
+        mcsftbldg = ImportMicrosoftBuildingData(model_place, project)
+        if mcsftbldg._available:
+            mcsftbldg.microsoft_buildings()
 
     ImportOsmData(tag="building", project=project, osm_data=osm_data).import_osm_data()
