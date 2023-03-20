@@ -75,6 +75,7 @@ jobs:
         pip install -r requirements_dev.txt
         pip install -r requirements.txt
         pip install -r requirements_optional.txt
+        pip install -r docs/requirements_docs.txt
 
     - name: Builds documentation
       run: |
