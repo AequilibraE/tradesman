@@ -11,7 +11,7 @@ pkgs = [pkg for pkg in find_packages()]
 
 pkg_data = {
     "tradesman.data": ["population/*.csv"],
-    "tradesman.model_creation.synthetic_population": ["controls_and_validation/*.csv"],
+    "tradesman.model_creation": ["database_structure/*.*", "synthetic_population/controls_and_validation/*.csv"],
 }
 loose_modules = ["__version__"]
 
