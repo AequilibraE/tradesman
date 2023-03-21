@@ -1,9 +1,10 @@
 from os.path import join, abspath, dirname
 from tempfile import gettempdir
+import requests
 import unittest
 from unittest import mock
 from uuid import uuid4
-from aequilibrae.project import Project
+from aequilibrae import Project, Parameters
 
 import pandas as pd
 
@@ -19,6 +20,13 @@ class TestImportNetwork(unittest.TestCase):
 
         self.pbf_path = join(abspath(dirname("tests")), "tests/data/monaco/monaco-latest.osm.pbf")
         self.model_place = "Monaco"
+
+        try:
+            r = requests.get("https://lz4.overpass-api.de/api/interpreter")
+        except:
+            par = Parameters()
+            par.parameters["osm"]["overpass_endpoint"] = "https://overpass.kumi.systems/api/interpreter"
+            par.write_back()
 
     def tearDown(self) -> None:
         self.project.close()

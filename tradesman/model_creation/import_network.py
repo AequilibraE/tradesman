@@ -125,7 +125,7 @@ class ImportNetwork:
              *model_place*(:obj:`str`):
              *tile_size*(:obj:`int`):
         """
-        url = "http://overpass-api.de/api/interpreter"
+        url = self.project.parameters["osm"]["overpass_endpoint"]
 
         # We won't download any area bigger than 25km by 25km
         bboxes = bounding_boxes(self.project, tile_size)
