@@ -22,8 +22,8 @@ class TestImportNetwork(unittest.TestCase):
         self.model_place = "Monaco"
 
         try:
-            r = requests.get("https://lz4.overpass-api.de/api/interpreter")
-        except:
+            requests.get("https://lz4.overpass-api.de/api/interpreter")
+        except ConnectionRefusedError:
             par = Parameters()
             par.parameters["osm"]["overpass_endpoint"] = "https://overpass.kumi.systems/api/interpreter"
             par.write_back()
