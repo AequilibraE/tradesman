@@ -1,7 +1,7 @@
 from aequilibrae.project import Project
 
-from .osm_tags.import_osm_data import ImportOsmData
-from .osm_tags.microsoft_building_footprint import ImportMicrosoftBuildingData
+from tradesman.data_retrieval.osm_tags.import_osm_data import ImportOsmData
+from tradesman.data_retrieval.osm_tags.microsoft_building_footprint import ImportMicrosoftBuildingData
 
 
 def building_import(model_place: str, project: Project, osm_data: dict, download_from_bing=True):

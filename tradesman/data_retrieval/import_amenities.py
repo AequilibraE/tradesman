@@ -1,5 +1,5 @@
 from aequilibrae.project import Project
-from .osm_tags.import_osm_data import ImportOsmData
+from tradesman.data_retrieval.osm_tags.import_osm_data import ImportOsmData
 
 
 def import_amenities(project: Project, osm_data: dict):
