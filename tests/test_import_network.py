@@ -23,7 +23,7 @@ class TestImportNetwork(unittest.TestCase):
 
         try:
             requests.get("https://lz4.overpass-api.de/api/interpreter")
-        except ConnectionRefusedError:
+        except requests.exceptions.ConnectionError:
             par = Parameters()
             par.parameters["osm"]["overpass_endpoint"] = "https://overpass.kumi.systems/api/interpreter"
             par.write_back()

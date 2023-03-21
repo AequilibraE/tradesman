@@ -38,6 +38,12 @@ class ImportNetwork:
         """
         Builds the network.
         """
+        try:
+            requests.get("https://lz4.overpass-api.de/api/interpreter")
+        except requests.exceptions.ConnectionError:
+            self.par.parameters["osm"]["overpass_endpoint"] = "https://overpass.kumi.systems/api/interpreter"
+            self.par.write_back()
+
         if not self.pbf_path:
             self.par.parameters["network"]["links"]["fields"]["one-way"].extend(extra_fields)
             self.par.write_back()
