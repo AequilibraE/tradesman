@@ -51,7 +51,7 @@ model.import_pop_by_sex_and_age()
 # %%
 # We can also import amenity and building information from OSM.
 model.import_amenities()
-model.import_buildings()
+model.import_buildings(False)
 
 # %%
 # With Tradesman, we can also create a synthetic population for our model.
@@ -59,7 +59,7 @@ model.import_buildings()
 # our population sample.
 
 # %%
-model.build_population_synthesizer_data()
+model.build_population_synthesizer_data(sample_size=0.02)
 
 # %%
 # Than we synthesize our data.
@@ -68,4 +68,4 @@ model.build_population_synthesizer_data()
 # At the end of the process, we will receive two outputs related to the validation of our synthetic population.
 
 # %%
-model.synthesize_population()
+model.synthesize_population(thread_number=1)
