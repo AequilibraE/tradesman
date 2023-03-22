@@ -72,10 +72,15 @@ jobs:
         sudo apt-get install libsqlite3-mod-spatialite
         sudo apt-get install -y libspatialite-dev
         sudo ln -s /usr/lib/x86_64-linux-gnu/mod_spatialite.so /usr/lib/x86_64-linux-gnu/mod_spatialite
-        pip install -r requirements_dev.txt
         pip install -r requirements.txt
+        pip install -r requirements_dev.txt
         pip install -r requirements_optional.txt
         pip install -r docs/requirements_docs.txt
+
+    - name: prepare data
+      run: |
+        ls
+        copy tests/data/docs/population.zip /tmp/
 
     - name: Builds documentation
       run: |
