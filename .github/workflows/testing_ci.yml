@@ -80,7 +80,7 @@ jobs:
     - name: prepare data
       run: |
         ls
-        copy tests/data/docs/population.zip /tmp/
+        cp tests/data/docs/population.zip /tmp/
 
     - name: Builds documentation
       run: |
