@@ -10,7 +10,7 @@ on:
 jobs:
 
   linting:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
       - name: Set Python environment
@@ -33,7 +33,7 @@ jobs:
 
   unit_tests:
     needs: linting
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python 3.9
@@ -77,7 +77,7 @@ jobs:
         pip install -r requirements_optional.txt
         pip install -r docs/requirements_docs.txt
 
-    - name: prepare data
+    - name: Prepare data
       run: mv ./tests/data/docs/population.zip /tmp/population.zip
 
     - name: Builds documentation
@@ -101,7 +101,7 @@ jobs:
 
   builds_package:
     needs: build_documentation
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python 3.9
