@@ -38,6 +38,12 @@ class ImportNetwork:
         """
         Builds the network.
         """
+        try:
+            requests.get("https://lz4.overpass-api.de/api/interpreter")
+        except requests.exceptions.ConnectionError:
+            self.par.parameters["osm"]["overpass_endpoint"] = "https://overpass.kumi.systems/api/interpreter"
+            self.par.write_back()
+
         if not self.pbf_path:
             self.par.parameters["network"]["links"]["fields"]["one-way"].extend(extra_fields)
             self.par.write_back()
@@ -125,7 +131,7 @@ class ImportNetwork:
              *model_place*(:obj:`str`):
              *tile_size*(:obj:`int`):
         """
-        url = "http://overpass-api.de/api/interpreter"
+        url = self.project.parameters["osm"]["overpass_endpoint"]
 
         # We won't download any area bigger than 25km by 25km
         bboxes = bounding_boxes(self.project, tile_size)

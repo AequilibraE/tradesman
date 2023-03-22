@@ -51,7 +51,7 @@ class ImportOsmData:
 
         self.__initialize()
 
-    def import_osm_data(self, tile_size=25):
+    def import_osm_data(self):
         """
         Imports OSM data.
 
@@ -59,6 +59,9 @@ class ImportOsmData:
             *tile_size*(:obj:`int`): tile size (in kilometers)
         """
         df = pd.DataFrame.from_dict(generic_tag(self.__tag, self.__osm_data, self._project))
+
+        if len(df) == 0:
+            return
 
         tag_value = building_values if self.__tag == "building" else amenity_values
 

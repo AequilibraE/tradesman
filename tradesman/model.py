@@ -177,14 +177,13 @@ class Tradesman:
 
         building_import(self.__model_place, self._project, self.__osm_data, download_from_bing)
 
-    def build_population_synthesizer_data(self):
+    def build_population_synthesizer_data(self, sample_size=0.01):
         """
         Triggers the import of data to create the synthetic population.
         """
+        create_syn_pop(self._project, self.__folder, sample_size=sample_size)
 
-        create_syn_pop(self._project, self.__folder)
-
-    def synthesize_population(self, multithread=False, thread_number=2):
+    def synthesize_population(self, thread_number=None, multithread=False):
         """
         Triggers the creation of synthetic population.
 

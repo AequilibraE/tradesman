@@ -1,8 +1,9 @@
 from math import floor
 import multiprocessing as mp
 import subprocess
+import warnings
 import yaml
-from os.path import join
+from os.path import join, isfile
 import pandas as pd
 import sys
 
@@ -19,7 +20,7 @@ from tradesman.model_creation.synthetic_population.unzip_seed_files import unzip
 from tradesman.model_creation.synthetic_population.user_control_import import user_change_validation_parameters
 
 
-def create_syn_pop(project: Project, cwd: str, thread_number=None, sample_size=0.01):
+def create_syn_pop(project: Project, cwd: str, sample_size=0.01):
     """
     Creates files to build synthetic population.
 
@@ -31,8 +32,6 @@ def create_syn_pop(project: Project, cwd: str, thread_number=None, sample_size=0
     unzip_seed_files(cwd)
 
     pop_fldr = join(cwd, "population")
-
-    update_thread_number(pop_fldr, thread_number)
 
     create_buckets(project, folder=pop_fldr, sample=sample_size)
 
@@ -94,12 +93,22 @@ def run_populationsim(multithread: bool, project: Project, folder: str, thread_n
     """
     pop_fldr = join(folder, "population")
 
-    if multithread:
+    num_zones = project.conn.execute("SELECT COUNT(*) FROM zones;").fetchone()[0]
+
+    if multithread or num_zones > 100:
         update_thread_number(pop_fldr, thread_number)
+    else:
+        update_thread_number(pop_fldr, number=1)
 
     subprocess.run(
         [sys.executable, "run_populationsim.py"], cwd=pop_fldr, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT
     )
+
+    if not isfile(join(pop_fldr, "output/final_summary_TAZ.csv")):
+        warnings.warn(
+            "Synthetic population was not generated. Please increase your sample size or change the number of threads."
+        )
+        return
 
     pd.read_csv(join(pop_fldr, "output/synthetic_persons.csv"))[["hh_id", "TAZ", "AGEP", "SEX"]].to_sql(
         "synthetic_persons", con=project.conn, if_exists="replace"

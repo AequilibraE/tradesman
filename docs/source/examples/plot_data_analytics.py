@@ -2,7 +2,7 @@
 Plotting Data
 =============
 
-On this example, we plot some data obtained from a Tradesman model.
+In this example, we plot some data obtained from a Tradesman model.
 """
 
 # %%
@@ -11,21 +11,39 @@ import os
 
 os.environ["USE_PYGEOS"] = "0"
 
-import geopandas as gpd
-import matplotlib.pyplot as plt
-import contextily as cx
-import folium
-
-from tradesman.utils.create_tradesman_example import create_tradesman_example
-from tempfile import gettempdir
 from uuid import uuid4
-from os.path import join
+from tempfile import gettempdir
+from aequilibrae.project import Project
+import folium
+import contextily as cx
+import matplotlib.pyplot as plt
+import geopandas as gpd
+from zipfile import ZipFile
+from urllib.request import urlretrieve
 
 # %%
-# Let's create our project and establish a connection
-prj = create_tradesman_example(join(gettempdir(), uuid4().hex))
+# Let's download our project data.
+# This data is available as part of the project documentation, and presents
+# La Serena and Coquimbo metropolitan area in Chile.
 
-cnx = prj.conn
+URL = "https://github.com/AequilibraE/tradesman/releases/download/V0.1b/coquimbo.zip"
+
+proj_fldr = os.path.join(gettempdir(), uuid4().hex)
+file_fldr = os.path.join(gettempdir(), "coquimbo.zip")
+
+if not os.path.isfile(file_fldr):
+    urlretrieve(URL, file_fldr)
+
+ZipFile(file_fldr).extractall(proj_fldr)
+
+# %%
+# Open an AequilibraE project
+proj = Project()
+proj.open(proj_fldr)
+
+# %%
+# We establish a connection
+cnx = proj.conn
 
 # %%
 # Let's identify the region we are plotting our data.
@@ -54,8 +72,8 @@ for lvl in range(-1, subdivisions.level.max() + 1):
             tiles="CartoDB positron",
             tooltip=False,
             popup=True,
-            location=[-0.52943, 166.9346],
-            zoom_start=13,
+            location=[-29.935717, -71.260520],
+            zoom_start=11,
             legend=False,
             color=colors[lvl + 1],
         )
@@ -65,8 +83,8 @@ for lvl in range(-1, subdivisions.level.max() + 1):
             tiles="CartoDB positron",
             tooltip=False,
             popup=True,
-            location=[-0.52943, 166.9346],
-            zoom_start=13,
+            location=[-29.935717, -71.260520],
+            zoom_start=11,
             legend=False,
             color=colors[lvl + 1],
         )
@@ -75,7 +93,7 @@ folium.LayerControl().add_to(m)
 
 m
 # %%
-# Feel free to turn on/off all the layers. If you click in the subdivisions, you can also check its name and level.
+# Feel free to turn on/off all the layers. If you click on the subdivisions, you can also check its name and level.
 
 # %%
 # Now let's move on and import some information about our model's TAZs.
@@ -95,8 +113,8 @@ zones.explore(
     cmap="Greens",
     tooltip=False,
     style_kwds={"fillOpacity": 1.0},
-    zoom_start=13,
-    location=[-0.52943, 166.9346],
+    zoom_start=11,
+    location=[-29.935717, -71.260520],
     popup=True,
 )
 # %%
@@ -104,7 +122,7 @@ zones.explore(
 zones["TOTALF_POP"] = zones[[f"POPF{i}" for i in range(1, 19)]].sum(axis=1)
 # Total male population per zone
 zones["TOTALM_POP"] = zones[[f"POPM{i}" for i in range(1, 19)]].sum(axis=1)
-# Ratio of male population with respect to female population
+# Ratio of the male population with respect to the female population
 zones["PP_FM"] = zones.TOTALM_POP / zones.TOTALF_POP
 
 # %%
@@ -114,13 +132,13 @@ zones.explore(
     cmap="RdPu",
     tooltip=False,
     style_kwds={"fillOpacity": 1.0},
-    zoom_start=13,
-    location=[-0.52943, 166.9346],
+    zoom_start=11,
+    location=[-29.935717, -71.260520],
     popup=True,
 )
 
 # %%
-# In an ideal scenario, the ratio of male population with respect to female population would be close to 1.06. In countries such as India or China, this ratio is a bit larger, 1.12 and 1.15, respectively. This difference is responsible for creating an abnormal sex ratios at birth.
+# In an ideal scenario, the ratio of the male population with respect to the female population would be close to 1.06. In countries such as India or China, this ratio is a bit larger, 1.12 and 1.15, respectively. This difference is responsible for creating abnormal sex ratios at birth.
 
 # %%
 # Now, let's analyze the median age of male and female inhabitants per zone.
@@ -149,7 +167,7 @@ for sex in ["F", "M"]:
     zones[f"MEDIAN_AGE_{sex}"] = median_values
 
 # %%
-# Let's take a look in our data!
+# Let's take a look at our data!
 fig, ax = plt.subplots(1, 2, constrained_layout=True, frameon=False, figsize=(12, 8))
 
 zones.plot(
@@ -207,8 +225,8 @@ for idx, bld in enumerate(buildings.building.unique()):
             tiles="CartoDB positron",
             tooltip=False,
             popup=True,
-            zoom_start=13,
-            location=[-0.52943, 166.9346],
+            zoom_start=15,
+            location=[-29.9541855, -71.3479664],
             legend=False,
             color=colors[idx],
         )
@@ -218,8 +236,8 @@ for idx, bld in enumerate(buildings.building.unique()):
             tiles="CartoDB positron",
             tooltip=False,
             popup=True,
-            zoom_start=13,
-            location=[-0.52943, 166.9346],
+            zoom_start=15,
+            location=[-29.9541855, -71.3479664],
             legend=False,
             color=colors[idx],
         )
@@ -231,10 +249,10 @@ m
 # %%
 # Finally, let's check out our model's network.
 # As we imported data from OpenStreetMaps, it is possible that we have several _link_type_ categories. We'll plot only five of them.
-links = gpd.read_postgis(
-    "SELECT link_type, distance, modes, ST_AsBinary(geometry) geom FROM links;", con=cnx, geom_col="geom", crs=4326
-)
-links = links[links.link_type.isin(["unclassified", "residential", "primary", "track", "tertiary"])]
+
+qry = "SELECT link_type, distance, modes, ST_AsBinary(geometry) geom FROM links;"
+links = gpd.read_postgis(qry, con=cnx, geom_col="geom", crs=4326)
+links = links[links.link_type.isin(["motorway", "trunk", "primary", "secondary", "tertiary"])]
 
 # %%
 colors = ["#219EBC", "#ffb703", "#8ECAE6", "#023047", "#fb8500"]
@@ -249,8 +267,8 @@ for idx, tp in enumerate(links.link_type.unique()):
             tiles="CartoDB positron",
             tooltip=False,
             popup=True,
-            zoom_start=13,
-            location=[-0.52943, 166.9346],
+            zoom_start=11,
+            location=[-29.935717, -71.260520],
             legend=False,
             color=colors[idx],
         )
@@ -260,8 +278,8 @@ for idx, tp in enumerate(links.link_type.unique()):
             tiles="CartoDB positron",
             tooltip=False,
             popup=True,
-            zoom_start=13,
-            location=[-0.52943, 166.9346],
+            zoom_start=11,
+            location=[-29.935717, -71.260520],
             legend=False,
             color=colors[idx],
         )
