@@ -78,9 +78,7 @@ jobs:
         pip install -r docs/requirements_docs.txt
 
     - name: prepare data
-      run: |
-        ls
-        mv ./tests/data/docs/population.zip /tmp/population.zip
+      run: mv ./tests/data/docs/population.zip /tmp/population.zip
 
     - name: Builds documentation
       run: |
