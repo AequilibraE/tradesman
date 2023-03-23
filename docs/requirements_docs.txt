@@ -5,3 +5,4 @@ nbsphinx
 folium
 sphinx-gallery
 ipython_genutils
+contextily

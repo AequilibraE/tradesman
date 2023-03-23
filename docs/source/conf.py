@@ -15,6 +15,14 @@
 import os
 import sys
 
+try:
+    import tradesman
+except ImportError as e:
+    sys.path.insert(0, os.path.abspath("../.."))
+    import tradesman
+    import warnings
+
+    warnings.warn(f"It is really annoying to deal with Flake8 sometimes. {e.args}")
 
 # -- Project information -----------------------------------------------------
 
@@ -37,8 +45,8 @@ release = "TBD"
 # ones.
 extensions = [
     "nbsphinx",
-    # "sphinx_gallery.load_style",
-    # "sphinx_gallery.gen_gallery",
+    "sphinx_gallery.load_style",
+    "sphinx_gallery.gen_gallery",
     "sphinx.ext.autodoc",
     "sphinx.ext.intersphinx",
     "sphinx.ext.coverage",
@@ -49,10 +57,10 @@ extensions = [
     # 'rst2pdf.pdfbuilder',
 ]
 
-# sphinx_gallery_conf = {
-#     'examples_dirs': ['examples'],  # path to your example scripts
-#     'gallery_dirs': ['_auto_examples'],  # path to where to save gallery generated output
-# }
+sphinx_gallery_conf = {
+    "examples_dirs": ["examples"],  # path to your example scripts
+    "gallery_dirs": ["_auto_examples"],  # path to where to save gallery generated output
+}
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
 

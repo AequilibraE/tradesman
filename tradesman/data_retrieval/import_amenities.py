@@ -1,4 +1,4 @@
-from aequilibrae import Project
+from aequilibrae.project import Project
 from tradesman.data_retrieval.osm_tags.import_osm_data import ImportOsmData
 
 

@@ -1,4 +1,5 @@
 import gzip
+import warnings
 from os.path import isfile, join
 from tempfile import gettempdir
 from urllib.request import urlretrieve
@@ -25,6 +26,7 @@ class ImportMicrosoftBuildingData:
         self.__model_place = model_place
         self._project = project
         self.__zones = load_zones(project)
+        self._available = True
         self.__country_list = pd.read_csv(
             "https://minedbuildings.blob.core.windows.net/global-buildings/dataset-links.csv"
         )
@@ -46,12 +48,16 @@ class ImportMicrosoftBuildingData:
         Checks if Microsoft Bing has any building information about the desired country.
         """
         if self.__country_name not in self.__country_list.Location.values:
-            raise FileNotFoundError("Microsoft Bing does not provide information about this region.")
+            warnings.warn("Microsoft Bing does not provide information about this region.")
+            self._available = False
 
     def microsoft_buildings(self):
         """
         Import building information from Microsoft Bing.
         """
+        if not self._available:
+            warnings.warn("Didn't I tell you it was not available?")
+            return
         url = self.__country_list[self.__country_list.Location == self.__country_name].Url.values
 
         frame_list = []
