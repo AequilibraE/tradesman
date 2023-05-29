@@ -20,7 +20,7 @@ from tradesman.model_creation.zoning.zone_building import zone_builder
 
 class Tradesman:
     def __init__(
-        self, network_path: str, model_place: str = None, pbf_path: str = None, boundaries_source: str = "GADM"
+            self, network_path: str, model_place: str = None, pbf_path: str = None, boundaries_source: str = "GADM"
     ):
         # If the model exists, you would only tell where it is (network_path), and the software
         # would check and populate the model place.  Needs to be implemented
@@ -112,6 +112,11 @@ class Tradesman:
         Parameters:
             *overwrite* (:obj:`bool`): Deletes pre-existing population_source_import. Defaults to False
         """
+
+        fields = self._project.zoning.fields
+        if "population" not in fields.all_fields():
+            fields.add("population", "Total population", "INTEGER")
+            fields.save()
 
         import_population(
             self._project, self._project.about.country_name, self.__population_source, overwrite=overwrite
