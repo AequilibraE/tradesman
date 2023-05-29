@@ -113,6 +113,11 @@ class Tradesman:
             *overwrite* (:obj:`bool`): Deletes pre-existing population_source_import. Defaults to False
         """
 
+        fields = self._project.zoning.fields
+        if "population" not in fields.all_fields():
+            fields.add("population", "Total population", "INTEGER")
+            fields.save()
+
         import_population(
             self._project, self._project.about.country_name, self.__population_source, overwrite=overwrite
         )
