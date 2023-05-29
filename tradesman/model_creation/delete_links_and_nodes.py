@@ -97,7 +97,7 @@ def delete_links_and_nodes(model_place, project: Project):
 
     del_links = list(links[~links.link_id.isin(inner_gdf.link_id)][["link_id"]].itertuples(index=False, name=None))
 
-    remove_triggers(project.conn, project.logger)
+    remove_triggers(project.conn, project.logger, "network")
 
     project.conn.executemany("DELETE FROM links WHERE link_id=?", del_links)
     project.conn.commit()
@@ -111,4 +111,4 @@ def delete_links_and_nodes(model_place, project: Project):
     project.conn.execute(nodes_query)
     project.conn.commit()
 
-    add_triggers(project.conn, project.logger)
+    add_triggers(project.conn, project.logger, "network")
