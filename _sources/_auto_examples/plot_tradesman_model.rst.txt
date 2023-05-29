@@ -136,7 +136,7 @@ Later we import population data into our model. We use WorldPop as our source, b
 
  .. code-block:: none
 
-    pop_Nauru.tif: 0.00B [00:00, ?B/s]    pop_Nauru.tif:  62%|######2   | 8.00k/12.9k [00:00<00:00, 18.5kB/s]    pop_Nauru.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 37.0kB/s]
+    pop_Nauru.tif: 0.00B [00:00, ?B/s]    pop_Nauru.tif:  62%|######2   | 8.00k/12.9k [00:00<00:00, 17.9kB/s]    pop_Nauru.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 35.7kB/s]
 
 
 
@@ -161,33 +161,33 @@ Nauru has a small population, so we will set our zones to range between 100 and 
  .. code-block:: none
 
     Expect 868 total hexbins for this bounding box
-      0%|          | 0/31 [00:00<?, ?it/s]    100%|##########| 31/31 [00:00<00:00, 1245.58it/s]
+      0%|          | 0/31 [00:00<?, ?it/s]    100%|##########| 31/31 [00:00<00:00, 1345.51it/s]
     /home/runner/work/tradesman/tradesman/tradesman/model_creation/zoning/zones_with_location.py:23: UserWarning: Geometry is in a geographic CRS. Results from 'centroid' are likely incorrect. Use 'GeoSeries.to_crs()' to re-project geometries to a projected CRS before this operation.
 
       centroids = gpd.GeoDataFrame(hexb[["hex_id"]], geometry=hexb.centroid, crs="EPSG:4326")
-    /opt/hostedtoolcache/Python/3.9.16/x64/lib/python3.9/site-packages/geopandas/array.py:344: UserWarning: Geometry is in a geographic CRS. Results from 'sjoin_nearest' are likely incorrect. Use 'GeoSeries.to_crs()' to re-project geometries to a projected CRS before this operation.
+    /opt/hostedtoolcache/Python/3.9.16/x64/lib/python3.9/site-packages/geopandas/array.py:364: UserWarning: Geometry is in a geographic CRS. Results from 'sjoin_nearest' are likely incorrect. Use 'GeoSeries.to_crs()' to re-project geometries to a projected CRS before this operation.
 
       warnings.warn(
     /home/runner/work/tradesman/tradesman/tradesman/model_creation/zoning/create_clusters.py:33: UserWarning: Geometry is in a geographic CRS. Results from 'centroid' are likely incorrect. Use 'GeoSeries.to_crs()' to re-project geometries to a projected CRS before this operation.
 
       centroids = hexbins.geometry.centroid
     0it [00:00, ?it/s]Done 0/14 states
-    3it [00:00, 28.95it/s]    14it [00:00, 71.20it/s]
+    3it [00:00, 25.03it/s]    14it [00:00, 70.36it/s]
     /opt/hostedtoolcache/Python/3.9.16/x64/lib/python3.9/site-packages/libpysal/weights/weights.py:172: UserWarning: The weights matrix is not fully connected: 
      There are 2 disconnected components.
       warnings.warn(message)
-    /opt/hostedtoolcache/Python/3.9.16/x64/lib/python3.9/site-packages/geopandas/geodataframe.py:1415: UserWarning: Boolean Series key will be reindexed to match DataFrame index.
+    /opt/hostedtoolcache/Python/3.9.16/x64/lib/python3.9/site-packages/geopandas/geodataframe.py:1475: UserWarning: Boolean Series key will be reindexed to match DataFrame index.
       result = super().__getitem__(key)
     /opt/hostedtoolcache/Python/3.9.16/x64/lib/python3.9/site-packages/libpysal/weights/weights.py:172: UserWarning: The weights matrix is not fully connected: 
      There are 2 disconnected components.
      There is 1 island with id: 39.
       warnings.warn(message)
-    /opt/hostedtoolcache/Python/3.9.16/x64/lib/python3.9/site-packages/geopandas/geodataframe.py:1415: UserWarning: Boolean Series key will be reindexed to match DataFrame index.
+    /opt/hostedtoolcache/Python/3.9.16/x64/lib/python3.9/site-packages/geopandas/geodataframe.py:1475: UserWarning: Boolean Series key will be reindexed to match DataFrame index.
       result = super().__getitem__(key)
     /opt/hostedtoolcache/Python/3.9.16/x64/lib/python3.9/site-packages/libpysal/weights/weights.py:172: UserWarning: The weights matrix is not fully connected: 
      There are 2 disconnected components.
       warnings.warn(message)
-    /opt/hostedtoolcache/Python/3.9.16/x64/lib/python3.9/site-packages/geopandas/geodataframe.py:1415: UserWarning: Boolean Series key will be reindexed to match DataFrame index.
+    /opt/hostedtoolcache/Python/3.9.16/x64/lib/python3.9/site-packages/geopandas/geodataframe.py:1475: UserWarning: Boolean Series key will be reindexed to match DataFrame index.
       result = super().__getitem__(key)
 
 
@@ -212,42 +212,42 @@ Now we'll gather information about total inhabitants by sex and age.
 
  .. code-block:: none
 
-    NRU_POPF1.tif: 0.00B [00:00, ?B/s]    NRU_POPF1.tif:  52%|#####2    | 8.00k/15.4k [00:00<00:00, 22.1kB/s]    NRU_POPF1.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 44.1kB/s]
-    NRU_POPF2.tif: 0.00B [00:00, ?B/s]    NRU_POPF2.tif:  52%|#####2    | 8.00k/15.3k [00:00<00:00, 21.4kB/s]    NRU_POPF2.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 42.8kB/s]
-    NRU_POPF3.tif: 0.00B [00:00, ?B/s]    NRU_POPF3.tif:  52%|#####2    | 8.00k/15.4k [00:00<00:00, 22.0kB/s]    NRU_POPF3.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 43.9kB/s]
-    NRU_POPF4.tif: 0.00B [00:00, ?B/s]    NRU_POPF4.tif:  52%|#####2    | 8.00k/15.4k [00:00<00:00, 22.5kB/s]    NRU_POPF4.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 44.9kB/s]
-    NRU_POPF5.tif: 0.00B [00:00, ?B/s]    NRU_POPF5.tif:  52%|#####2    | 8.00k/15.4k [00:00<00:00, 20.6kB/s]    NRU_POPF5.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 41.2kB/s]
-    NRU_POPF6.tif: 0.00B [00:00, ?B/s]    NRU_POPF6.tif:  52%|#####1    | 8.00k/15.4k [00:00<00:00, 22.3kB/s]    NRU_POPF6.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 44.5kB/s]
-    NRU_POPF7.tif: 0.00B [00:00, ?B/s]    NRU_POPF7.tif:  52%|#####2    | 8.00k/15.3k [00:00<00:00, 22.7kB/s]    NRU_POPF7.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 45.3kB/s]
-    NRU_POPF8.tif: 0.00B [00:00, ?B/s]    NRU_POPF8.tif:  52%|#####2    | 8.00k/15.3k [00:00<00:00, 21.8kB/s]    NRU_POPF8.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 43.6kB/s]
-    NRU_POPF9.tif: 0.00B [00:00, ?B/s]    NRU_POPF9.tif:  52%|#####1    | 8.00k/15.4k [00:00<00:00, 21.7kB/s]    NRU_POPF9.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 43.2kB/s]
-    NRU_POPF10.tif: 0.00B [00:00, ?B/s]    NRU_POPF10.tif:  52%|#####1    | 8.00k/15.4k [00:00<00:00, 22.3kB/s]    NRU_POPF10.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 44.6kB/s]
-    NRU_POPF11.tif: 0.00B [00:00, ?B/s]    NRU_POPF11.tif:  52%|#####1    | 8.00k/15.4k [00:00<00:00, 21.1kB/s]    NRU_POPF11.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 42.2kB/s]
-    NRU_POPF12.tif: 0.00B [00:00, ?B/s]    NRU_POPF12.tif:  52%|#####2    | 8.00k/15.4k [00:00<00:00, 21.2kB/s]    NRU_POPF12.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 42.3kB/s]
-    NRU_POPF13.tif: 0.00B [00:00, ?B/s]    NRU_POPF13.tif:  52%|#####2    | 8.00k/15.3k [00:00<00:00, 22.5kB/s]    NRU_POPF13.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 45.0kB/s]
-    NRU_POPF14.tif: 0.00B [00:00, ?B/s]    NRU_POPF14.tif:  52%|#####1    | 8.00k/15.4k [00:00<00:00, 21.7kB/s]    NRU_POPF14.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 43.3kB/s]
-    NRU_POPF15.tif: 0.00B [00:00, ?B/s]    NRU_POPF15.tif:  52%|#####2    | 8.00k/15.4k [00:00<00:00, 20.2kB/s]    NRU_POPF15.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 40.4kB/s]
-    NRU_POPF16.tif: 0.00B [00:00, ?B/s]    NRU_POPF16.tif:  52%|#####2    | 8.00k/15.4k [00:00<00:00, 22.0kB/s]    NRU_POPF16.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 43.9kB/s]
-    NRU_POPF17.tif: 0.00B [00:00, ?B/s]    NRU_POPF17.tif:  52%|#####2    | 8.00k/15.3k [00:00<00:00, 22.9kB/s]    NRU_POPF17.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 45.7kB/s]
-    NRU_POPF18.tif: 0.00B [00:00, ?B/s]    NRU_POPF18.tif:  52%|#####2    | 8.00k/15.4k [00:00<00:00, 23.1kB/s]    NRU_POPF18.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 46.1kB/s]
-    NRU_POPM1.tif: 0.00B [00:00, ?B/s]    NRU_POPM1.tif:  52%|#####1    | 8.00k/15.4k [00:03<00:03, 2.15kB/s]    NRU_POPM1.tif: 100%|##########| 16.0k/16.0k [00:03<00:00, 4.30kB/s]
-    NRU_POPM2.tif: 0.00B [00:00, ?B/s]    NRU_POPM2.tif:  52%|#####1    | 8.00k/15.4k [00:00<00:00, 23.2kB/s]    NRU_POPM2.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 46.4kB/s]
-    NRU_POPM3.tif: 0.00B [00:00, ?B/s]    NRU_POPM3.tif:  52%|#####2    | 8.00k/15.3k [00:00<00:00, 23.9kB/s]    NRU_POPM3.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 47.6kB/s]
-    NRU_POPM4.tif: 0.00B [00:00, ?B/s]    NRU_POPM4.tif:  52%|#####2    | 8.00k/15.4k [00:00<00:00, 21.0kB/s]    NRU_POPM4.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 41.9kB/s]
-    NRU_POPM5.tif: 0.00B [00:00, ?B/s]    NRU_POPM5.tif:  52%|#####1    | 8.00k/15.4k [00:00<00:00, 23.0kB/s]    NRU_POPM5.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 45.9kB/s]
-    NRU_POPM6.tif: 0.00B [00:00, ?B/s]    NRU_POPM6.tif:  52%|#####1    | 8.00k/15.4k [00:00<00:00, 21.6kB/s]    NRU_POPM6.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 43.2kB/s]
-    NRU_POPM7.tif: 0.00B [00:00, ?B/s]    NRU_POPM7.tif:  52%|#####2    | 8.00k/15.4k [00:00<00:00, 22.2kB/s]    NRU_POPM7.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 44.4kB/s]
-    NRU_POPM8.tif: 0.00B [00:00, ?B/s]    NRU_POPM8.tif:  52%|#####2    | 8.00k/15.4k [00:00<00:00, 22.4kB/s]    NRU_POPM8.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 44.7kB/s]
-    NRU_POPM9.tif: 0.00B [00:00, ?B/s]    NRU_POPM9.tif:  52%|#####2    | 8.00k/15.4k [00:00<00:00, 21.4kB/s]    NRU_POPM9.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 42.7kB/s]
-    NRU_POPM10.tif: 0.00B [00:00, ?B/s]    NRU_POPM10.tif:  52%|#####1    | 8.00k/15.4k [00:00<00:00, 22.2kB/s]    NRU_POPM10.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 44.3kB/s]
-    NRU_POPM11.tif: 0.00B [00:00, ?B/s]    NRU_POPM11.tif:  52%|#####2    | 8.00k/15.4k [00:00<00:00, 21.6kB/s]    NRU_POPM11.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 43.2kB/s]
-    NRU_POPM12.tif: 0.00B [00:00, ?B/s]    NRU_POPM12.tif:  52%|#####2    | 8.00k/15.4k [00:00<00:00, 21.3kB/s]    NRU_POPM12.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 42.6kB/s]
-    NRU_POPM13.tif: 0.00B [00:00, ?B/s]    NRU_POPM13.tif:  52%|#####1    | 8.00k/15.4k [00:00<00:00, 22.3kB/s]    NRU_POPM13.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 44.5kB/s]
-    NRU_POPM14.tif: 0.00B [00:00, ?B/s]    NRU_POPM14.tif:  52%|#####1    | 8.00k/15.4k [00:00<00:00, 19.7kB/s]    NRU_POPM14.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 39.3kB/s]
-    NRU_POPM15.tif: 0.00B [00:00, ?B/s]    NRU_POPM15.tif:  52%|#####2    | 8.00k/15.4k [00:00<00:00, 21.7kB/s]    NRU_POPM15.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 43.4kB/s]
-    NRU_POPM16.tif: 0.00B [00:00, ?B/s]    NRU_POPM16.tif:  52%|#####2    | 8.00k/15.4k [00:00<00:00, 22.2kB/s]    NRU_POPM16.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 44.2kB/s]
-    NRU_POPM17.tif: 0.00B [00:00, ?B/s]    NRU_POPM17.tif:  52%|#####2    | 8.00k/15.4k [00:00<00:00, 21.1kB/s]    NRU_POPM17.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 42.2kB/s]
-    NRU_POPM18.tif: 0.00B [00:00, ?B/s]    NRU_POPM18.tif:  52%|#####2    | 8.00k/15.3k [00:00<00:00, 22.3kB/s]    NRU_POPM18.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 44.6kB/s]
+    NRU_POPF1.tif: 0.00B [00:00, ?B/s]    NRU_POPF1.tif:  52%|#####2    | 8.00k/15.4k [00:00<00:00, 30.9kB/s]    NRU_POPF1.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 61.7kB/s]
+    NRU_POPF2.tif: 0.00B [00:00, ?B/s]    NRU_POPF2.tif:  52%|#####2    | 8.00k/15.3k [00:00<00:00, 31.2kB/s]    NRU_POPF2.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 62.2kB/s]
+    NRU_POPF3.tif: 0.00B [00:00, ?B/s]    NRU_POPF3.tif:  52%|#####2    | 8.00k/15.4k [00:00<00:00, 30.9kB/s]    NRU_POPF3.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 61.7kB/s]
+    NRU_POPF4.tif: 0.00B [00:00, ?B/s]    NRU_POPF4.tif:  52%|#####2    | 8.00k/15.4k [00:00<00:00, 31.1kB/s]    NRU_POPF4.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 62.2kB/s]
+    NRU_POPF5.tif: 0.00B [00:00, ?B/s]    NRU_POPF5.tif:  52%|#####2    | 8.00k/15.4k [00:00<00:00, 31.1kB/s]    NRU_POPF5.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 62.0kB/s]
+    NRU_POPF6.tif: 0.00B [00:00, ?B/s]    NRU_POPF6.tif:  52%|#####1    | 8.00k/15.4k [00:00<00:00, 29.3kB/s]    NRU_POPF6.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 58.5kB/s]
+    NRU_POPF7.tif: 0.00B [00:00, ?B/s]    NRU_POPF7.tif:  52%|#####2    | 8.00k/15.3k [00:00<00:00, 31.2kB/s]    NRU_POPF7.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 62.3kB/s]
+    NRU_POPF8.tif: 0.00B [00:00, ?B/s]    NRU_POPF8.tif:  52%|#####2    | 8.00k/15.3k [00:00<00:00, 31.1kB/s]    NRU_POPF8.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 62.1kB/s]
+    NRU_POPF9.tif: 0.00B [00:00, ?B/s]    NRU_POPF9.tif:  52%|#####1    | 8.00k/15.4k [00:00<00:00, 31.2kB/s]    NRU_POPF9.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 62.2kB/s]
+    NRU_POPF10.tif: 0.00B [00:00, ?B/s]    NRU_POPF10.tif:  52%|#####1    | 8.00k/15.4k [00:00<00:00, 31.0kB/s]    NRU_POPF10.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 62.0kB/s]
+    NRU_POPF11.tif: 0.00B [00:00, ?B/s]    NRU_POPF11.tif:  52%|#####1    | 8.00k/15.4k [00:00<00:00, 31.1kB/s]    NRU_POPF11.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 62.1kB/s]
+    NRU_POPF12.tif: 0.00B [00:00, ?B/s]    NRU_POPF12.tif:  52%|#####2    | 8.00k/15.4k [00:00<00:00, 30.6kB/s]    NRU_POPF12.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 61.2kB/s]
+    NRU_POPF13.tif: 0.00B [00:00, ?B/s]    NRU_POPF13.tif:  52%|#####2    | 8.00k/15.3k [00:00<00:00, 30.9kB/s]    NRU_POPF13.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 61.7kB/s]
+    NRU_POPF14.tif: 0.00B [00:00, ?B/s]    NRU_POPF14.tif:  52%|#####1    | 8.00k/15.4k [00:00<00:00, 31.0kB/s]    NRU_POPF14.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 62.0kB/s]
+    NRU_POPF15.tif: 0.00B [00:00, ?B/s]    NRU_POPF15.tif:  52%|#####2    | 8.00k/15.4k [00:00<00:00, 31.1kB/s]    NRU_POPF15.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 62.1kB/s]
+    NRU_POPF16.tif: 0.00B [00:00, ?B/s]    NRU_POPF16.tif:  52%|#####2    | 8.00k/15.4k [00:00<00:00, 29.2kB/s]    NRU_POPF16.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 58.4kB/s]
+    NRU_POPF17.tif: 0.00B [00:00, ?B/s]    NRU_POPF17.tif:  52%|#####2    | 8.00k/15.3k [00:00<00:00, 31.0kB/s]    NRU_POPF17.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 61.9kB/s]
+    NRU_POPF18.tif: 0.00B [00:00, ?B/s]    NRU_POPF18.tif:  52%|#####2    | 8.00k/15.4k [00:00<00:00, 29.2kB/s]    NRU_POPF18.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 58.2kB/s]
+    NRU_POPM1.tif: 0.00B [00:00, ?B/s]    NRU_POPM1.tif:  52%|#####1    | 8.00k/15.4k [00:00<00:00, 30.9kB/s]    NRU_POPM1.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 61.7kB/s]
+    NRU_POPM2.tif: 0.00B [00:00, ?B/s]    NRU_POPM2.tif:  52%|#####1    | 8.00k/15.4k [00:00<00:00, 31.2kB/s]    NRU_POPM2.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 62.2kB/s]
+    NRU_POPM3.tif: 0.00B [00:00, ?B/s]    NRU_POPM3.tif:  52%|#####2    | 8.00k/15.3k [00:00<00:00, 30.7kB/s]    NRU_POPM3.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 61.2kB/s]
+    NRU_POPM4.tif: 0.00B [00:00, ?B/s]    NRU_POPM4.tif:  52%|#####2    | 8.00k/15.4k [00:00<00:00, 31.0kB/s]    NRU_POPM4.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 62.0kB/s]
+    NRU_POPM5.tif: 0.00B [00:00, ?B/s]    NRU_POPM5.tif:  52%|#####1    | 8.00k/15.4k [00:00<00:00, 31.1kB/s]    NRU_POPM5.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 62.1kB/s]
+    NRU_POPM6.tif: 0.00B [00:00, ?B/s]    NRU_POPM6.tif:  52%|#####1    | 8.00k/15.4k [00:00<00:00, 31.1kB/s]    NRU_POPM6.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 62.1kB/s]
+    NRU_POPM7.tif: 0.00B [00:00, ?B/s]    NRU_POPM7.tif:  52%|#####2    | 8.00k/15.4k [00:00<00:00, 30.9kB/s]    NRU_POPM7.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 61.7kB/s]
+    NRU_POPM8.tif: 0.00B [00:00, ?B/s]    NRU_POPM8.tif:  52%|#####2    | 8.00k/15.4k [00:00<00:00, 30.8kB/s]    NRU_POPM8.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 61.4kB/s]
+    NRU_POPM9.tif: 0.00B [00:00, ?B/s]    NRU_POPM9.tif:  52%|#####2    | 8.00k/15.4k [00:00<00:00, 30.7kB/s]    NRU_POPM9.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 61.3kB/s]
+    NRU_POPM10.tif: 0.00B [00:00, ?B/s]    NRU_POPM10.tif:  52%|#####1    | 8.00k/15.4k [00:00<00:00, 31.2kB/s]    NRU_POPM10.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 62.2kB/s]
+    NRU_POPM11.tif: 0.00B [00:00, ?B/s]    NRU_POPM11.tif:  52%|#####2    | 8.00k/15.4k [00:00<00:00, 30.6kB/s]    NRU_POPM11.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 61.1kB/s]
+    NRU_POPM12.tif: 0.00B [00:00, ?B/s]    NRU_POPM12.tif:  52%|#####2    | 8.00k/15.4k [00:00<00:00, 30.1kB/s]    NRU_POPM12.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 60.2kB/s]
+    NRU_POPM13.tif: 0.00B [00:00, ?B/s]    NRU_POPM13.tif:  52%|#####1    | 8.00k/15.4k [00:00<00:00, 31.1kB/s]    NRU_POPM13.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 62.1kB/s]
+    NRU_POPM14.tif: 0.00B [00:00, ?B/s]    NRU_POPM14.tif:  52%|#####1    | 8.00k/15.4k [00:00<00:00, 28.7kB/s]    NRU_POPM14.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 57.3kB/s]
+    NRU_POPM15.tif: 0.00B [00:00, ?B/s]    NRU_POPM15.tif:  52%|#####2    | 8.00k/15.4k [00:00<00:00, 31.2kB/s]    NRU_POPM15.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 62.2kB/s]
+    NRU_POPM16.tif: 0.00B [00:00, ?B/s]    NRU_POPM16.tif:  52%|#####2    | 8.00k/15.4k [00:00<00:00, 29.6kB/s]    NRU_POPM16.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 59.0kB/s]
+    NRU_POPM17.tif: 0.00B [00:00, ?B/s]    NRU_POPM17.tif:  52%|#####2    | 8.00k/15.4k [00:00<00:00, 31.1kB/s]    NRU_POPM17.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 62.0kB/s]
+    NRU_POPM18.tif: 0.00B [00:00, ?B/s]    NRU_POPM18.tif:  52%|#####2    | 8.00k/15.3k [00:00<00:00, 31.1kB/s]    NRU_POPM18.tif: 100%|##########| 16.0k/16.0k [00:00<00:00, 62.1kB/s]
 
 
 
@@ -294,19 +294,19 @@ our population sample.
 
     # Person      Calculated    Expected
     ----------  ------------  ----------
-    1 person           28.99       22.84
-    2-3 person         42.03       50.52
-    4-5 person         26.09       22.09
-    6+ person           2.9         4.55
+    1 person           27.54       22.84
+    2-3 person         43.48       50.52
+    4-5 person         23.19       22.09
+    6+ person           5.8         4.55
 
     Difference in calculated vs expected percentage of households in the sample
 
     # Person      Diff.
     ----------  -------
-    1 person       6.15
-    2-3 person    -8.49
-    4-5 person     4
-    6+ person     -1.65
+    1 person       4.7
+    2-3 person    -7.04
+    4-5 person     1.1
+    6+ person      1.25
 
 
 
@@ -341,7 +341,7 @@ At the end of the process, we will receive two outputs related to the validation
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 3 minutes  33.296 seconds)
+   **Total running time of the script:** ( 5 minutes  50.963 seconds)
 
 
 .. _sphx_glr_download__auto_examples_plot_tradesman_model.py:

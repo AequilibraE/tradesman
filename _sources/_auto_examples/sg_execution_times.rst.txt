@@ -6,10 +6,10 @@
 
 Computation times
 =================
-**04:00.609** total execution time for **_auto_examples** files:
+**06:16.076** total execution time for **_auto_examples** files:
 
 +--------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_plot_tradesman_model.py` (``plot_tradesman_model.py``) | 03:33.296 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_plot_tradesman_model.py` (``plot_tradesman_model.py``) | 05:50.963 | 0.0 MB |
 +--------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr__auto_examples_plot_data_analytics.py` (``plot_data_analytics.py``)   | 00:27.313 | 0.0 MB |
+| :ref:`sphx_glr__auto_examples_plot_data_analytics.py` (``plot_data_analytics.py``)   | 00:25.113 | 0.0 MB |
 +--------------------------------------------------------------------------------------+-----------+--------+
