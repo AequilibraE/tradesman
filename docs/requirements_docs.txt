@@ -1,4 +1,4 @@
-Sphinx<6.0.0
+Sphinx
 pydata-sphinx-theme
 sphinx_autodoc_annotation
 nbsphinx

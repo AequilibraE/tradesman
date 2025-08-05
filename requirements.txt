@@ -1,11 +1,7 @@
-numpy<1.24
+numpy<1.99
 aequilibrae
-shapely>=2.0
-geopandas
-openmatrix
 rasterio
 matplotlib
 pycountry
 tabulate
-tqdm
 pysal

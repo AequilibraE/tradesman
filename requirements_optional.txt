@@ -1,3 +1,3 @@
-osm2gmns >= 0.6.8
+osm2gmns
 populationsim >= 0.5.1
 dask_geopandas

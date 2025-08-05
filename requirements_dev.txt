@@ -1,12 +1,6 @@
-cython
 setuptools-cythonize
 wheel
 pytest
-Sphinx<6.0
-pydata-sphinx-theme
-sphinx_autodoc_annotation
-nbsphinx
-sphinx-gallery
 jupyterlab
-folium
-ipython_genutils
+ruff==0.9.10
+black==25.1.0
