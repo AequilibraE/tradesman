@@ -12,8 +12,9 @@ def zones_with_population(project, zones_from_locations):
          *project*(:obj:`aequilibrae.project`): current open project
          *zones_from_locations`(:obj:`geopandas.GeoDataFrame`): GeoDataFrame containing hexbins and their subdivision.
     """
-    sql = "SELECT population, Hex(ST_AsBinary(GEOMETRY)) as geom FROM raw_population;"
-    pop_data = gpd.GeoDataFrame.from_postgis(sql, project.conn, geom_col="geom", crs=4326)
+    with project.db_connection as conn:
+        sql = "SELECT population, Hex(ST_AsBinary(GEOMETRY)) as geom FROM raw_population;"
+        pop_data = gpd.GeoDataFrame.from_postgis(sql, conn, geom_col="geom", crs=4326)
 
     pop_to_zone = sjoin(pop_data, zones_from_locations, how="right")
     pop_to_zone = pop_to_zone[["hex_id", "population"]]

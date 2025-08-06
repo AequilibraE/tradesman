@@ -29,7 +29,8 @@ class TestMicrosoftBuildingFootprint(unittest.TestCase):
 
         buildings.microsoft_buildings()
 
-        df = pd.read_sql("SELECT microsoft_building_count, microsoft_building_area FROM zones;", con=self.project.conn)
+        with self.project.db_connection as conn:
+            df = pd.read_sql("SELECT microsoft_building_count, microsoft_building_area FROM zones;", con=conn)
 
         self.assertIn("microsoft_building_count", df.columns.values)
 

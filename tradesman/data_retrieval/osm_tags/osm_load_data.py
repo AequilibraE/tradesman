@@ -69,15 +69,15 @@ def __cache_name(element: str, project: Project):
          *element*(:obj:`str`): objects downloaded from Open Street Maps. Takes amenity or buildings.
          *project*(:obj:`aequilibrae.project): current project.
     """
+    with project.db_connection as conn:
+        sql_coverage = "SELECT Hex(ST_AsBinary(geometry)) as geometry FROM political_subdivisions where level=0;"
+        coverage_area = gpd.GeoDataFrame.from_postgis(sql_coverage, conn, geom_col="geometry", crs=4326)
+        area_bounds = coverage_area.bounds.values
+        m = hashlib.md5()
+        m.update(element.encode())
+        m.update("".join([str(x) for x in area_bounds]).encode())
 
-    sql_coverage = "SELECT Hex(ST_AsBinary(geometry)) as geometry FROM political_subdivisions where level=0;"
-    coverage_area = gpd.GeoDataFrame.from_postgis(sql_coverage, project.conn, geom_col="geometry", crs=4326)
-    area_bounds = coverage_area.bounds.values
-    m = hashlib.md5()
-    m.update(element.encode())
-    m.update("".join([str(x) for x in area_bounds]).encode())
-
-    return join(gettempdir(), f"{m.hexdigest()}.pkl")
+        return join(gettempdir(), f"{m.hexdigest()}.pkl")
 
 
 def __load_cache(cache_name):

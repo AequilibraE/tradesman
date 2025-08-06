@@ -133,8 +133,10 @@ class Tradesman:
              *save_hexbins*(:obj:`bool`): saves the hexagonal bins with population. Defaults to False.
              *overwrite* (:obj:`bool`): Deletes pre-existing HexBins and Zones. Defaults to False
         """
+        with self._project.db_connection as conn:
+            num_zones = conn.execute("Select count(*) from Zones").fetchone()
 
-        if not overwrite and sum(self._project.conn.execute("Select count(*) from Zones").fetchone()) > 0:
+        if not overwrite and sum(num_zones) > 0:
             return
         zone_builder(self._project, hexbin_size, max_zone_pop, min_zone_pop, save_hexbins)
 
@@ -204,7 +206,8 @@ class Tradesman:
             self._project.open(self.__folder)
         else:
             self._project.new(self.__folder)
-            add_new_tables(self._project.conn)
+            with self._project.db_connection as conn:
+                add_new_tables(conn)
 
     @property
     def place(self):

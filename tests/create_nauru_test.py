@@ -58,7 +58,7 @@ def create_nauru_test(folder):
             zone.save()
 
         zones_from_location = gpd.GeoDataFrame.from_postgis(
-            "SELECT zone_id,  Hex(ST_AsBinary(geometry)) as geom FROM zones;", project.conn, geom_col="geom", crs=4326
+            "SELECT zone_id,  Hex(ST_AsBinary(geometry)) as geom FROM zones;", conn, geom_col="geom", crs=4326
         )
 
         population = [358, 686, 541, 966, 474, 158, 1088, 214, 1178, 473, 59, 1004, 186, 499, 331, 199, 763, 447, 222]

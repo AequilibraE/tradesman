@@ -6,14 +6,14 @@ def export_zones(zone_data, project):
          *zone_data*(:obj:`geopandas.GeoDataFrame`): GeoDataFrame with zones and population info
          *project*(:obj:`aequilibrae.project`): currently open project
     """
-    max_zone = zone_data.index.max()
+    with project.db_connection as conn:
+        max_zone = zone_data.index.max()
 
-    min_node = project.conn.execute("Select min(node_id) from nodes").fetchone()[0]
+        min_node = conn.execute("Select min(node_id) from nodes").fetchone()[0]
 
-    if min_node <= max_zone:
-        increment = project.conn.execute("Select max(node_id) from nodes").fetchone()[0] + 1
-        project.conn.execute("update nodes set node_id =node_id + ?", [increment])
-        project.conn.commit()
+        if min_node <= max_zone:
+            increment = conn.execute("Select max(node_id) from nodes").fetchone()[0] + 1
+            conn.execute("update nodes set node_id =node_id + ?", [increment])
 
     zoning = project.zoning
     for zone_id, row in zone_data.iterrows():

@@ -28,9 +28,10 @@ def basic_RAI_data(project):
 
     # Add subdivision info
     # print('Obtaining country subdivisions')
-    sql = "SELECT division_name, level, Hex(ST_AsBinary(GEOMETRY)) as geom FROM political_subdivisions;"
-    subdivisions = gpd.GeoDataFrame.from_postgis(sql, project.conn, geom_col="geom", crs=4326)
-    subdivisions = subdivisions[subdivisions.level == subdivisions.level.max()]
+    with project.db_connection as conn:
+        sql = "SELECT division_name, level, Hex(ST_AsBinary(GEOMETRY)) as geom FROM political_subdivisions;"
+        subdivisions = gpd.GeoDataFrame.from_postgis(sql, conn, geom_col="geom", crs=4326)
+        subdivisions = subdivisions[subdivisions.level == subdivisions.level.max()]
 
     df = gpd.sjoin(df, subdivisions)
     df.drop(columns=["index_right"], inplace=True)

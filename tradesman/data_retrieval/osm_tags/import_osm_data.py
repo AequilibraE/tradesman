@@ -45,9 +45,10 @@ class ImportOsmData:
                 "field_type": ', "area" FLOAT',
             },
         }
-        self.__all_tables = [
-            x[0] for x in project.conn.execute("SELECT name FROM sqlite_master WHERE type ='table'").fetchall()
-        ]
+        with project.db_connection as conn:
+            self.__all_tables = [
+                x[0] for x in conn.execute("SELECT name FROM sqlite_master WHERE type ='table'").fetchall()
+            ]
 
         self.__initialize()
 
