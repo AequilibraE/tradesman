@@ -1,4 +1,3 @@
-numpy<1.99
 aequilibrae
 rasterio
 matplotlib

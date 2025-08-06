@@ -5,14 +5,7 @@
 	"build": {
 		"dockerfile": "Dockerfile",
 		"context": "..",
-		"args": { 
-			// Update 'VARIANT' to pick a Python version: 3, 3.10, 3.9, 3.8, 3.7, 3.6
-			// Append -bullseye or -buster to pin to an OS version.
-			// Use -bullseye variants on local on arm64/Apple Silicon.
-			"VARIANT": "3.11-bullseye",
-			// Options
-			"NODE_VERSION": "lts/*"
-		}
+		"args": { }
 	},
 
 	// Configure tool-specific properties.
@@ -47,10 +40,9 @@
 	// "forwardPorts": [],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "pip3 install --user -r requirements.txt",
+	"postCreateCommand": "python3 -m venv .venv --system-site-packages && . .venv/bin/activate && pip install -U uv pip && uv pip install -r requirements.txt && uv pip install -r requirements_optional.txt && uv pip install -r requirements_dev.txt",
 
 	// Comment out to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
-	"remoteUser": "vscode",
 	"features": {},
 	"mounts": [
 		"source=C:/,target=/workspaces/drive_c,type=bind,consistency=cached",

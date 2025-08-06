@@ -1,6 +1,6 @@
 [tool.black]
 line-length = 120
-target-version = ['py39', 'py310', 'py311', 'py312']
+target-version = ['py310', 'py311', 'py312']
 include = '\.pyi?$'
 
 [tool.ruff]
@@ -52,7 +52,7 @@ version = "0.2"
 description = "A Python package for building complete AequilibraE models from open data"
 authors = [
     {name = "Pedro Camargo", email = "pedro@outerloop.io"},
-    {name = "Renata Akemii", email = "renata@outerloop.io"}
+    {name = "Renata Akemi", email = "renata@outerloop.io"}
 ]
 maintainers = [
     {name = "Pedro Camargo", email = "pedro@outerloop.io"},

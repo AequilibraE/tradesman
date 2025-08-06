@@ -1,5 +1,3 @@
-setuptools-cythonize
-wheel
 pytest
 jupyterlab
 ruff==0.9.10
