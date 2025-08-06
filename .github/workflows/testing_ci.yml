@@ -86,7 +86,7 @@ jobs:
         make html
 
     - name: Keeps documentation on GitHub
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: documentation
         path: docs/build/
@@ -121,7 +121,7 @@ jobs:
       run: python setup.py sdist bdist_wheel
 
     - name: Stores artifacts along with the workflow result
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: library
         path: dist/*.whl
