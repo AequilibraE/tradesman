@@ -164,13 +164,12 @@ class ImportNetwork:
         """
         Creates the missing columns when importing data from GMNS.
         """
-        self.project.conn.execute("ALTER TABLE links RENAME COLUMN osm_way_id TO osm_id;")
+        with self.project.db_connection as conn:
+            conn.execute("ALTER TABLE links RENAME COLUMN osm_way_id TO osm_id;")
 
-        self.project.conn.execute("ALTER TABLE links ADD COLUMN bridge text;")
-        self.project.conn.execute("ALTER TABLE links ADD COLUMN toll text;")
-        self.project.conn.execute("ALTER TABLE links ADD COLUMN tunnel text;")
-
-        self.project.conn.commit()
+            conn.execute("ALTER TABLE links ADD COLUMN bridge text;")
+            conn.execute("ALTER TABLE links ADD COLUMN toll text;")
+            conn.execute("ALTER TABLE links ADD COLUMN tunnel text;")
 
     def __update_links(self):
         """
@@ -194,7 +193,7 @@ class ImportNetwork:
         toll_list = [(x,) for x in toll_list]
         tunnel_list = [(x,) for x in tunnel_list]
 
-        self.project.conn.executemany("UPDATE links SET bridge='yes' WHERE osm_id=?;", bridge_list)
-        self.project.conn.executemany("UPDATE links SET toll='yes' WHERE osm_id=?;", toll_list)
-        self.project.conn.executemany("UPDATE links SET tunnel='yes' WHERE osm_id=?;", tunnel_list)
-        self.project.conn.commit()
+        with self.project.db_connection as conn:
+            conn.executemany("UPDATE links SET bridge='yes' WHERE osm_id=?;", bridge_list)
+            conn.executemany("UPDATE links SET toll='yes' WHERE osm_id=?;", toll_list)
+            conn.executemany("UPDATE links SET tunnel='yes' WHERE osm_id=?;", tunnel_list)

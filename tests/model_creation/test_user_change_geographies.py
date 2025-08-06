@@ -16,7 +16,7 @@ class TestUsarChangeGeographies(unittest.TestCase):
 
         with open(join(self.fldr, "settings.yaml"), mode="w") as file:
             yaml.dump(
-                dict(seed_geography="PUMA", geographies=["REGION", "PUMA", "TAZ"]), file, default_flow_style=False
+                {"seed_geography": "PUMA", "geographies": ["REGION", "PUMA", "TAZ"]}, file, default_flow_style=False
             )
 
     def tearDown(self) -> None:

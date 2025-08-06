@@ -37,11 +37,10 @@ def create_nauru_test(folder):
         extent = network.extent()
 
         b = extent.bounds
-        conn.execute(
+        grid = conn.execute(
             "select st_asbinary(HexagonalGrid(GeomFromWKB(?), ?, 0, GeomFromWKB(?)))",
             [extent.wkb, zone_side, Point(b[2], b[3]).wkb],
-        )
-        grid = conn.cursor().fetchone()[0]
+        ).fetchone()[0]
         grid = shapely.wkb.loads(grid)
 
         grid = [p for p in grid.geoms if p.intersects(geo)]

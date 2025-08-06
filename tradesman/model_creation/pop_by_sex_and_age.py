@@ -45,8 +45,6 @@ def get_pop_by_sex_age(project: Project, country_name: str):
             else:
                 fields.add(field_name, f"{preffix}male population over {age[a]} years old.", "INTEGER")
 
-            project.conn.executemany(f"UPDATE zones SET {field_name}=? WHERE zone_id=?;", list_of_tuples)
-            project.conn.commit()
-
-            project.conn.execute(f"UPDATE zones SET {field_name}=0 WHERE {field_name} IS NULL;")
-            project.conn.commit()
+            with project.db_connection as conn:
+                conn.executemany(f"UPDATE zones SET {field_name}=? WHERE zone_id=?;", list_of_tuples)
+                conn.execute(f"UPDATE zones SET {field_name}=0 WHERE {field_name} IS NULL;")

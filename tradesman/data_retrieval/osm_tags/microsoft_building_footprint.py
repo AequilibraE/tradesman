@@ -83,25 +83,25 @@ class ImportMicrosoftBuildingData:
 
         buildings_by_zone["geom"] = buildings_by_zone.geometry.to_wkb()
 
-        # Create columns in zones' table with microsoft building information
-        self._project.conn.execute("ALTER TABLE zones ADD microsoft_building_count INT;")
-        self._project.conn.commit()
+        with self._project.db_connection as conn:
+            # Create columns in zones' table with microsoft building information
+            conn.execute("ALTER TABLE zones ADD microsoft_building_count INT;")
+            conn.commit()
 
-        self._project.conn.execute("ALTER TABLE zones ADD microsoft_building_area FLOAT;")
-        self._project.conn.commit()
+            conn.execute("ALTER TABLE zones ADD microsoft_building_area FLOAT;")
+            conn.commit()
 
-        self._project.conn.execute(
-            "UPDATE zones SET microsoft_building_area=ROUND(0,2), microsoft_building_count=0 WHERE microsoft_building_count IS NULL;"
-        )
-        self._project.conn.commit()
-
-        qry = "UPDATE zones SET microsoft_building_count=?, microsoft_building_area=ROUND(?, 2) WHERE zone_id=?;"
-        list_of_tuples = list(
-            zip(
-                buildings_by_zone.groupby("zone_id").count().id.values,
-                buildings_by_zone.groupby("zone_id").sum(numeric_only=True).area.values,
-                np.arange(1, max(buildings_by_zone.zone_id) + 1),
+            conn.execute(
+                "UPDATE zones SET microsoft_building_area=ROUND(0,2), microsoft_building_count=0 WHERE microsoft_building_count IS NULL;"
             )
-        )
-        self._project.conn.executemany(qry, list_of_tuples)
-        self._project.conn.commit()
+            conn.commit()
+
+            qry = "UPDATE zones SET microsoft_building_count=?, microsoft_building_area=ROUND(?, 2) WHERE zone_id=?;"
+            list_of_tuples = list(
+                zip(
+                    buildings_by_zone.groupby("zone_id").count().id.values,
+                    buildings_by_zone.groupby("zone_id").sum(numeric_only=True).area.values,
+                    np.arange(1, max(buildings_by_zone.zone_id) + 1),
+                )
+            )
+            conn.executemany(qry, list_of_tuples)

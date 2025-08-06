@@ -110,8 +110,8 @@ def create_clusters(hexbins, max_zone_pop=10000, min_zone_pop=500):
 
                 closeby = []
                 for island_geo in zone_df[adj_mtx.component_labels == rmv].geometry.values:
-                    closeby.extend([x for x in df.sindex.nearest(box(*island_geo.bounds))[1]])
-                closeby = list(set(list(closeby)))
+                    closeby.extend(list(df.sindex.nearest(box(*island_geo.bounds))[1]))
+                closeby = list(set(closeby))
                 if not closeby:
                     # failed = 1
                     continue

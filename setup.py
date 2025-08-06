@@ -7,7 +7,7 @@ sys.dont_write_bytecode = True
 
 here = os.path.dirname(os.path.realpath(__file__))
 
-pkgs = [pkg for pkg in find_packages()]
+pkgs = list(find_packages())
 
 pkg_data = {
     "tradesman.data": ["population/*.csv"],
