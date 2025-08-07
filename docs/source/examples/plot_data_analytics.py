@@ -14,9 +14,8 @@ os.environ["USE_PYGEOS"] = "0"
 from uuid import uuid4
 from tempfile import gettempdir
 from aequilibrae.project import Project
+import branca
 import folium
-import contextily as cx
-import matplotlib.pyplot as plt
 import geopandas as gpd
 from zipfile import ZipFile
 from urllib.request import urlretrieve
@@ -166,38 +165,43 @@ for sex in ["F", "M"]:
 
 # %%
 # Let's take a look at our data!
-fig, ax = plt.subplots(1, 2, constrained_layout=True, frameon=False, figsize=(12, 8))
+fig = branca.element.Figure()
 
-zones.plot(
-    ax=ax[0],
+subplot1 = fig.add_subplot(1, 2, 1)
+subplot2 = fig.add_subplot(1, 2, 2)
+
+map1 = folium.Map(location=[-29.935717, -71.260520], zoom_start=12)
+map1 = zones.explore(
+    m=map1,
     column="MEDIAN_AGE_F",
     linewidth=0.1,
-    edgecolor="black",
-    facecolor="whitesmoke",
     cmap="Oranges",
     scheme="equal_interval",
     k=5,
-    legend=True,
+    legend=False,
     legend_kwds={"loc": "upper left", "fmt": "{:.2f}"},
+    tiles="CartoDB positron",
 )
-cx.add_basemap(ax[0], crs=4326, source=cx.providers.Stamen.TonerLite)
+folium.LayerControl().add_to(map1)
 
-zones.plot(
-    ax=ax[1],
+map2 = folium.Map(location=[-29.935717, -71.260520], zoom_start=12)
+map2 = zones.explore(
+    m=map2,
     column="MEDIAN_AGE_M",
     linewidth=0.1,
-    edgecolor="black",
-    facecolor="whitesmoke",
     cmap="Blues",
-    legend=True,
+    legend=False,
     scheme="equal_interval",
     k=5,
     legend_kwds={"loc": "upper left", "fmt": "{:.2f}"},
+    tiles="CartoDB positron",
 )
-cx.add_basemap(ax[1], crs=4326, source=cx.providers.Stamen.TonerLite)
+folium.LayerControl().add_to(map2)
 
-fig.show()
+subplot1.add_child(map1)
+subplot2.add_child(map2)
 
+fig
 # %%
 # Our model also has OpenStreetMaps Building information. Let's take a look at the location of some building types.
 

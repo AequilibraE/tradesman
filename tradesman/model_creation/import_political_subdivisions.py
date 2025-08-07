@@ -7,6 +7,7 @@ import pandas as pd
 import pycountry
 import requests
 from aequilibrae.project import Project
+from aequilibrae.project.network.osm.osm_params import http_headers
 from numpy import arange
 from shapely.geometry import MultiPolygon, Polygon
 from shapely.ops import unary_union
@@ -185,17 +186,21 @@ class ImportPoliticalSubdivisions:
             if conn.execute("SELECT COUNT(*) FROM political_subdivisions WHERE level=-1;").fetchone()[0] > 0:
                 return
 
-        nom_url = f"https://nominatim.openstreetmap.org/search?q={self.__search_place}&format=json&polygon_geojson=1&addressdetails=1&accept-language=en"
+        timeout = 30
+        params = {"q": self.__search_place, "format": "json", "polygon_geojson": 1, "addressdetails": 1}
 
-        r = requests.get(nom_url)
+        url = "https://nominatim.openstreetmap.org/"
+        url = url.rstrip("/") + "/search"
 
-        if len(r.json()) == 0:
+        response = requests.get(url, params=params, timeout=timeout, headers=http_headers)
+
+        if response.status_code != 200:
             raise ValueError("The desired model place is not available.")
 
-        self._poly = self.__geometry_type(r.json()[0]["geojson"])
+        self._poly = self.__geometry_type(response.json()[0]["geojson"])
 
-        self._country_code = pycountry.countries.search_fuzzy(r.json()[0]["address"]["country"])[0].alpha_3
-        self._country_name = pycountry.countries.search_fuzzy(r.json()[0]["address"]["country"])[0].name
+        self._country_code = pycountry.countries.search_fuzzy(response.json()[0]["address"]["country"])[0].alpha_3
+        self._country_name = pycountry.countries.search_fuzzy(response.json()[0]["address"]["country"])[0].name
 
         df = (
             pd.DataFrame([self._poly.wkt], columns=["geometry"])
