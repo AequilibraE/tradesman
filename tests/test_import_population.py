@@ -30,4 +30,5 @@ def mock_raster(monkeypatch):
 def test_import_population(source: str, nauru_test, mock_raster):
     import_population(project=nauru_test, country_name="Nauru", source=source, overwrite=True)
 
-    assert nauru_test.conn.execute("SELECT SUM(population) FROM raw_population;").fetchone()[0] > 8
+    with nauru_test.db_connection as conn:
+        assert conn.execute("SELECT SUM(population) FROM raw_population;").fetchone()[0] > 8

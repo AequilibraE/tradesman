@@ -42,19 +42,16 @@ proj = Project()
 proj.open(proj_fldr)
 
 # %%
-# We establish a connection
-cnx = proj.conn
-
-# %%
-# Let's identify the region we are plotting our data.
+# We establish a connection to identify the region we are plotting our data.
 # First we import our subdivisions
 
-subdivisions = gpd.read_postgis(
-    "SELECT division_name, level, ST_AsBinary(geometry)geom FROM political_subdivisions;",
-    con=cnx,
-    geom_col="geom",
-    crs=4326,
-)
+with proj.db_connection as conn:
+    subdivisions = gpd.read_postgis(
+        "SELECT division_name, level, ST_AsBinary(geometry)geom FROM political_subdivisions;",
+        con=conn,
+        geom_col="geom",
+        crs=4326,
+    )
 
 # %%
 # Now we can plot our map!
@@ -97,8 +94,9 @@ m
 
 # %%
 # Now let's move on and import some information about our model's TAZs.
-zones = gpd.read_postgis("SELECT *, ST_AsBinary(geometry) geom FROM zones;", con=cnx, geom_col="geom", crs=4326)
-zones.drop(columns=["geometry"], inplace=True)
+with proj.db_connection as conn:
+    zones = gpd.read_postgis("SELECT *, ST_AsBinary(geometry) geom FROM zones;", con=conn, geom_col="geom", crs=4326)
+    zones.drop(columns=["geometry"], inplace=True)
 
 # %%
 # And create new columns
@@ -205,9 +203,10 @@ fig.show()
 
 # %%
 # Import the data
-qry = "SELECT building, zone_id, ST_AsBinary(geometry)geom FROM osm_building WHERE geometry IS NOT NULL;"
-buildings = gpd.read_postgis(qry, con=cnx, geom_col="geom", crs=4326)
-buildings = buildings[buildings.building.isin(["undetermined", "Religious", "residential", "commercial"])]
+with proj.db_connection as conn:
+    qry = "SELECT building, zone_id, ST_AsBinary(geometry)geom FROM osm_building WHERE geometry IS NOT NULL;"
+    buildings = gpd.read_postgis(qry, con=conn, geom_col="geom", crs=4326)
+    buildings = buildings[buildings.building.isin(["undetermined", "Religious", "residential", "commercial"])]
 
 # %%
 # And plot it
@@ -249,10 +248,10 @@ m
 # %%
 # Finally, let's check out our model's network.
 # As we imported data from OpenStreetMaps, it is possible that we have several _link_type_ categories. We'll plot only five of them.
-
-qry = "SELECT link_type, distance, modes, ST_AsBinary(geometry) geom FROM links;"
-links = gpd.read_postgis(qry, con=cnx, geom_col="geom", crs=4326)
-links = links[links.link_type.isin(["motorway", "trunk", "primary", "secondary", "tertiary"])]
+with proj.db_connection as conn:
+    qry = "SELECT link_type, distance, modes, ST_AsBinary(geometry) geom FROM links;"
+    links = gpd.read_postgis(qry, con=conn, geom_col="geom", crs=4326)
+    links = links[links.link_type.isin(["motorway", "trunk", "primary", "secondary", "tertiary"])]
 
 # %%
 colors = ["#219EBC", "#ffb703", "#8ECAE6", "#023047", "#fb8500"]

@@ -1,4 +1,4 @@
-# See here for image contents: https://github.com/microsoft/vscode-dev-containers/tree/v0.241.1/containers/python-3/.devcontainer/base.Dockerfile
+# https://mcr.microsoft.com/en-us/artifact/mar/devcontainers/python/tags
 
 # Python version
 FROM mcr.microsoft.com/devcontainers/python:3.12-bullseye

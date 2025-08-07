@@ -66,9 +66,10 @@ def nauru_pop_test(nauru_test, tmp_path):
     df = population_raster(url, "pop_Nauru", nauru_test)
     gdf = gpd.GeoDataFrame(df, geometry=gpd.points_from_xy(df.longitude, df.latitude), crs=4326)
 
-    model_area = gpd.read_postgis(
-        "SELECT ST_AsBinary(geometry) as geom FROM political_subdivisions WHERE level=-1", con=nauru_test.conn, crs=4326
-    )
+    with nauru_test.db_connection as conn:
+        model_area = gpd.read_postgis(
+            "SELECT ST_AsBinary(geometry) as geom FROM political_subdivisions WHERE level=-1", con=conn, crs=4326
+        )
 
     select_pop = gdf.clip(model_area, keep_geom_type=True)[["longitude", "latitude", "population"]]
 
