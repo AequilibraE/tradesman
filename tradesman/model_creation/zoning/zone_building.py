@@ -28,7 +28,7 @@ def zone_builder(project, hexbin_size: int, max_zone_pop: int, min_zone_pop: int
         sql = "SELECT division_name, level, Hex(ST_AsBinary(geometry)) as geometry FROM political_subdivisions where level = -1;"
         model_area = gpd.GeoDataFrame.from_postgis(sql, conn, geom_col="geometry", crs=4326)
         if model_area.shape[0] > 0:
-            subdivisions = subdivisions[subdivisions.intersects(model_area.geometry.unary_union)]
+            subdivisions = subdivisions[subdivisions.intersects(model_area.geometry.union_all())]
 
         sql_coverage = "SELECT Hex(ST_AsBinary(geometry)) as geometry FROM political_subdivisions where division_name='model_area';"
         coverage_area = gpd.GeoDataFrame.from_postgis(sql_coverage, conn, geom_col="geometry", crs=4326)

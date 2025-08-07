@@ -6,11 +6,11 @@ import geopandas as gpd
 import pandas as pd
 import pycountry
 import requests
+import shapely
 from aequilibrae.project import Project
 from aequilibrae.project.network.osm.osm_params import http_headers
 from numpy import arange
 from shapely.geometry import MultiPolygon, Polygon
-from shapely.ops import unary_union
 
 
 class ImportPoliticalSubdivisions:
@@ -205,7 +205,7 @@ class ImportPoliticalSubdivisions:
         df = (
             pd.DataFrame([self._poly.wkt], columns=["geometry"])
             if isinstance(self._poly, Polygon)
-            else pd.DataFrame([unary_union(list(self._poly.geoms)).wkt], columns=["geometry"])
+            else pd.DataFrame([shapely.union_all(list(self._poly.geoms)).wkt], columns=["geometry"])
         )
 
         gdf = gpd.GeoDataFrame(df, geometry=gpd.GeoSeries.from_wkt(df.geometry), crs=4326)

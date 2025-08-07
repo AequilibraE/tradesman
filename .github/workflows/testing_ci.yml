@@ -21,15 +21,14 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m pip install setuptools --upgrade
-          python -m pip install black
+          python -m pip install --U setuptools uv
+          uv pip install -r requirements_dev.txt
 
-      # - name: Lint with flake8
-      #   run: flake8
-
+      # - name: Lint with ruff
+      #   run: ruff check .
+  
       - name: Check code format with Black
         run: black --check .
-
 
   unit_tests:
     needs: linting
@@ -42,13 +41,13 @@ jobs:
         python-version: 3.12
     - name: Install dependencies
       run: |
-        python -m pip install setuptools --upgrade
-        sudo apt-get install libsqlite3-mod-spatialite
-        sudo apt-get install -y libspatialite-dev
+        python -m pip install -U setuptools uv
+        sudo apt-get install -y libspatialite-dev libsqlite3-mod-spatialite
         sudo ln -s /usr/lib/x86_64-linux-gnu/mod_spatialite.so /usr/lib/x86_64-linux-gnu/mod_spatialite
-        pip install -r requirements_dev.txt
-        pip install -r requirements.txt
-        pip install -r requirements_optional.txt
+        uv pip install -r requirements.txt
+        uv pip install -r requirements_dev.txt
+        uv pip install -r requirements_optional.txt
+        python -m uv pip install -e .[dev]
 
     - name: Runs unit tests
       run: |
@@ -65,17 +64,12 @@ jobs:
         python-version: 3.12
     - name: Install dependencies
       run: |
-        sudo apt-get install -y pandoc
-        python -m pip install setuptools --upgrade
-        python -m pip install sphinx-gallery --user
-        python -m pip install wheel spatialite
-        sudo apt-get install libsqlite3-mod-spatialite
-        sudo apt-get install -y libspatialite-dev
+        python -m pip install -U setuptools uv
+        uv pip install wheel spatialite
+        sudo apt-get install -y libspatialite-dev libsqlite3-mod-spatialite pandoc
         sudo ln -s /usr/lib/x86_64-linux-gnu/mod_spatialite.so /usr/lib/x86_64-linux-gnu/mod_spatialite
-        pip install -r requirements.txt
-        pip install -r requirements_dev.txt
-        pip install -r requirements_optional.txt
-        pip install -r docs/requirements_docs.txt
+        uv pip install -r docs/requirements_docs.txt
+        python -m uv pip install -e .[dev]
 
     - name: Prepare data
       run: mv ./tests/data/docs/population.zip /tmp/population.zip
@@ -111,11 +105,11 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get install -y pandoc
-        python -m pip install setuptools --upgrade
-        python -m pip install wheel 
-        pip install -r requirements_dev.txt
-        pip install -r requirements.txt
-        pip install -r requirements_optional.txt        
+        python -m pip install -U setuptools uv
+        uv pip install wheel
+        uv pip install -r requirements_dev.txt
+        uv pip install -r requirements.txt
+        uv pip install -r requirements_optional.txt        
 
     - name: Builds package
       run: python setup.py sdist bdist_wheel
@@ -133,6 +127,6 @@ jobs:
         TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
         TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
       run: |
-        python -m pip install twine
+        uv pip install twine
         twine upload dist/*.whl
         twine upload dist/*.gz

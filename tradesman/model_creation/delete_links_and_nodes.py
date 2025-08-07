@@ -9,6 +9,7 @@ import pycountry
 import requests
 from aequilibrae.project import Project
 from aequilibrae.project.project_creation import add_triggers, remove_triggers
+from aequilibrae.project.network.osm.osm_params import http_headers
 from shapely.geometry import Polygon
 
 
@@ -44,13 +45,18 @@ def place_is_country(model_place: str):
     """
     search_place = model_place.lower().replace(" ", "+")
 
-    nom_url = (
-        f"https://nominatim.openstreetmap.org/search?q={search_place}&format=json&addressdetails=1&accept-language=en"
-    )
+    timeout = 30
+    params = {"q": search_place, "format": "json", "addressdetails": 1}
 
-    r = requests.get(nom_url)
+    url = "https://nominatim.openstreetmap.org/"
+    url = url.rstrip("/") + "/search"
 
-    country_name = pycountry.countries.search_fuzzy(r.json()[0]["address"]["country"])[0].name
+    response = requests.get(url, params=params, timeout=timeout, headers=http_headers)
+
+    if response.status_code != 200:
+        raise ValueError("The desired model place is not available.")
+
+    country_name = pycountry.countries.search_fuzzy(response.json()[0]["address"]["country"])[0].name
 
     if re.search(model_place, country_name):
         return True
