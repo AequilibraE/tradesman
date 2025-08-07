@@ -149,8 +149,6 @@ class ImportNetwork:
         Creates the missing columns when importing data from GMNS.
         """
         with self.project.db_connection as conn:
-            conn.execute("ALTER TABLE links RENAME COLUMN osm_way_id TO osm_id;")
-
             conn.execute("ALTER TABLE links ADD COLUMN bridge text;")
             conn.execute("ALTER TABLE links ADD COLUMN toll text;")
             conn.execute("ALTER TABLE links ADD COLUMN tunnel text;")
@@ -178,6 +176,6 @@ class ImportNetwork:
         tunnel_list = [(x,) for x in tunnel_list]
 
         with self.project.db_connection as conn:
-            conn.executemany("UPDATE links SET bridge='yes' WHERE osm_id=?;", bridge_list)
-            conn.executemany("UPDATE links SET toll='yes' WHERE osm_id=?;", toll_list)
-            conn.executemany("UPDATE links SET tunnel='yes' WHERE osm_id=?;", tunnel_list)
+            conn.executemany("UPDATE links SET bridge='yes' WHERE osm_way_id=?;", bridge_list)
+            conn.executemany("UPDATE links SET toll='yes' WHERE osm_way_id=?;", toll_list)
+            conn.executemany("UPDATE links SET tunnel='yes' WHERE osm_way_id=?;", tunnel_list)

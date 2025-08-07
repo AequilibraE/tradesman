@@ -13,7 +13,8 @@ from tradesman.model_creation.import_network import ImportNetwork
 
 class TestImportNetwork(unittest.TestCase):
     def setUp(self) -> None:
-        self.fldr = join(gettempdir(), uuid4().hex)
+        # self.fldr = join(gettempdir(), uuid4().hex)
+        self.fldr = join("tests", uuid4().hex)
 
         self.project = Project()
         self.project.new(self.fldr)
