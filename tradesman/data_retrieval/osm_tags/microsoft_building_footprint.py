@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 import requests
 from aequilibrae.project import Project
+from aequilibrae.project.network.osm.osm_params import http_headers
 
 from tradesman.data.load_zones import load_zones
 
@@ -28,7 +29,7 @@ class ImportMicrosoftBuildingData:
         self.__zones = load_zones(project)
         self._available = True
         self.__country_list = pd.read_csv(
-            "https://minedbuildings.blob.core.windows.net/global-buildings/dataset-links.csv"
+            "https://minedbuildings.z5.web.core.windows.net/global-buildings/dataset-links.csv"
         )
 
         self.__country_name = self.__nominatim_get_name().replace(" ", "")
@@ -37,11 +38,29 @@ class ImportMicrosoftBuildingData:
 
     def __nominatim_get_name(self):
         search_place = self.__model_place.lower().replace(" ", "+")
-        nom_url = f"https://nominatim.openstreetmap.org/search?q={search_place}&format=json&polygon_geojson=1&addressdetails=1&accept-language=en"
 
-        r = requests.get(nom_url)
+        timeout = 30
+        params = {"q": search_place, "format": "json", "polygon_geojson": 1, "addressdetails": 1}
 
-        return r.json()[0]["address"]["country"]
+        url = "https://nominatim.openstreetmap.org/"
+        url = url.rstrip("/") + "/search"
+
+        try:
+            response = requests.get(url, params=params, timeout=timeout, headers=http_headers)
+            if response.status_code != 200:
+                raise ValueError(f"Request failed with status code {response.status_code}")
+        except requests.exceptions.Timeout:
+            raise TimeoutError("Request timed out")
+        except requests.exceptions.ConnectionError:
+            raise ConnectionError("Failed to connect")
+        except requests.exceptions.RequestException as e:
+            raise Exception(f"Request error: {e}")
+
+        res = response.json()
+        if not res:
+            raise ValueError("The desired model place is not available.")
+
+        return res[0]["address"]["country"]
 
     def __initialize(self):
         """
