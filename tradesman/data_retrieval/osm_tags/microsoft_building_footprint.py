@@ -121,7 +121,7 @@ class ImportMicrosoftBuildingData:
                     buildings_by_zone.groupby("zone_id").count().id.values,
                     buildings_by_zone.groupby("zone_id").sum(numeric_only=True).area.values,
                     np.arange(1, max(buildings_by_zone.zone_id) + 1),
-                    strict=True,
+                    strict=False,
                 )
             )
             conn.executemany(qry, list_of_tuples)
