@@ -50,6 +50,7 @@ coverage.xml
 *.py,cover
 .hypothesis/
 .pytest_cache/
+.ruff_cache/
 
 # Translations
 *.mo
@@ -131,3 +132,4 @@ dmypy.json
 
 # Docs build
 docs/source/_auto_examples
+sg_execution_times.rst

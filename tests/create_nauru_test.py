@@ -62,7 +62,7 @@ def create_nauru_test(folder):
 
         population = [358, 686, 541, 966, 474, 158, 1088, 214, 1178, 473, 59, 1004, 186, 499, 331, 199, 763, 447, 222]
 
-        qry_values = list(zip(population, zones_from_location.zone_id.values))
+        qry_values = list(zip(population, zones_from_location.zone_id.values, strict=False))
 
         conn.executemany("UPDATE zones SET population=? WHERE zone_id=?;", qry_values)
 

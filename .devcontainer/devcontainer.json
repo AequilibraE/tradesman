@@ -40,7 +40,7 @@
 	// "forwardPorts": [],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "python3 -m venv .venv --system-site-packages && . .venv/bin/activate && pip install -U uv pip && uv pip install -r requirements.txt && uv pip install -r requirements_optional.txt && uv pip install -r requirements_dev.txt",
+	"postCreateCommand": "python3 -m venv .venv --system-site-packages && . .venv/bin/activate && python -m pip install -U uv pip && python -m uv pip install -e .[dev]",
 
 	// Comment out to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
 	"features": {},

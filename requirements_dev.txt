@@ -1,4 +1,0 @@
-pytest
-jupyterlab
-ruff==0.9.10
-black==25.1.0

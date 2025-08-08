@@ -1,6 +1,0 @@
-aequilibrae
-rasterio
-matplotlib
-pycountry
-tabulate
-pysal

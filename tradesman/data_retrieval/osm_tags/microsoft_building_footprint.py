@@ -49,12 +49,12 @@ class ImportMicrosoftBuildingData:
             response = requests.get(url, params=params, timeout=timeout, headers=http_headers)
             if response.status_code != 200:
                 raise ValueError(f"Request failed with status code {response.status_code}")
-        except requests.exceptions.Timeout:
-            raise TimeoutError("Request timed out")
-        except requests.exceptions.ConnectionError:
-            raise ConnectionError("Failed to connect")
+        except requests.exceptions.Timeout as e:
+            raise TimeoutError("Request timed out") from e
+        except requests.exceptions.ConnectionError as e:
+            raise ConnectionError("Failed to connect") from e
         except requests.exceptions.RequestException as e:
-            raise Exception(f"Request error: {e}")
+            raise Exception(f"Request error: {e}") from e
 
         res = response.json()
         if not res:
@@ -121,6 +121,7 @@ class ImportMicrosoftBuildingData:
                     buildings_by_zone.groupby("zone_id").count().id.values,
                     buildings_by_zone.groupby("zone_id").sum(numeric_only=True).area.values,
                     np.arange(1, max(buildings_by_zone.zone_id) + 1),
+                    strict=False,
                 )
             )
             conn.executemany(qry, list_of_tuples)

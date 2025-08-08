@@ -22,9 +22,9 @@ if __name__ == "__main__":
         "pycountry",
         "aequilibrae",
         "tabulate",
-        "pysal",
+        "libpysal",
     ]
-    extra_reqs = {"all_features": ["osm2gmns", "populationsim >= 0.5.1", "dask_geopandas"]}
+    extra_reqs = {"all_features": ["osm2gmns", "dask_geopandas"]}
     setup(
         name="tradesman",
         version="0.2",
