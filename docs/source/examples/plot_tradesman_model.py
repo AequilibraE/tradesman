@@ -58,8 +58,7 @@ model.import_buildings(False)
 # First, we build our seed sample. At the end of this step, it is possible to see the overall characteristics of
 # our population sample.
 
-# %%
-model.build_population_synthesizer_data(sample_size=0.02)
+# model.build_population_synthesizer_data(sample_size=0.02)
 
 # %%
 # Than we synthesize our data.
@@ -67,5 +66,4 @@ model.build_population_synthesizer_data(sample_size=0.02)
 # But as the size of the population increases, it is worth using multiple threads to reduce the processing time.
 # At the end of the process, we will receive two outputs related to the validation of our synthetic population.
 
-# %%
-model.synthesize_population(thread_number=1)
+# model.synthesize_population(thread_number=1)
