@@ -40,8 +40,6 @@ tests = [
 ]
 
 build = [
-    "numpy<1.99; python_version <= '3.10'",
-    "numpy>=2.0; python_version >= '3.11'",
     "setuptools",
     "twine",
     "wheel"
