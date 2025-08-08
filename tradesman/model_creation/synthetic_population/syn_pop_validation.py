@@ -145,7 +145,7 @@ def validate_controlled_vars(fldr):
     summary_fig, axes = plt.subplots(fig_l, fig_w, figsize=(fig_w * 5, fig_l * 5))
 
     stats = []
-    for params, ax in zip(aggregate_list, axes.ravel(), strict=False):
+    for params, ax in zip(aggregate_list, axes.ravel(), strict=True):
         s, f, diff = __process_control(summary_df, **params)
         stats.append(s)
 
