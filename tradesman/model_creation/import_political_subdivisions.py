@@ -1,16 +1,32 @@
 from os.path import isfile, join
 import re
+from collections import namedtuple
 from tempfile import gettempdir
 
 import geopandas as gpd
 import pandas as pd
 import pycountry
 import requests
-import shapely
+import duckdb
 from aequilibrae.project import Project
 from aequilibrae.project.network.osm.osm_params import http_headers
-from numpy import arange
 from shapely.geometry import MultiPolygon, Polygon
+from shapely import wkt
+
+MAPPING_LOCATIONS = {
+    'country': 0,
+    'dependency': 1,
+    'macroregion': 2,
+    'region': 3,
+    'macrocounty': 4,
+    'county': 5,
+    'localadmin': 6,
+    'locality': 7,
+    'borough': 8,
+    'macrohood': 9,
+    'neighborhood': 10,
+    'microhood': 11
+}
 
 
 class ImportPoliticalSubdivisions:
@@ -26,7 +42,7 @@ class ImportPoliticalSubdivisions:
     def __init__(self, model_place: str, source: str, project: Project):
         self.__model_place = model_place
         self.__search_place = model_place.lower().replace(" ", "+")
-        self._project = project
+        self.project = project
         self._source = source.lower()
 
         self.__source_control()
@@ -36,13 +52,14 @@ class ImportPoliticalSubdivisions:
         Add the model's country border.
 
         Parameters:
-             *overwrite*(:obj:`bool`): re-write country borders if it already exists. Defaults to False.
+            *overwrite*(:obj:`bool`): re-write country borders if it already exists.
+            Defaults to ``False``.
         """
-        data = self.__get_subdivisions()[["country_name", "division_name", "level", "geom"]]
-
+        data = self.__get_subdivisions()
         data = data[data.level == 0]
+        data["geom"] = data["geometry"].to_wkb()
 
-        with self._project.db_connection as conn:
+        with self.project.db_connection as conn:
             if overwrite:
                 conn.execute("DELETE FROM political_subdivisions WHERE level=0;")
                 conn.commit()
@@ -52,7 +69,7 @@ class ImportPoliticalSubdivisions:
             conn.executemany(sql, list(data.itertuples(index=False, name=None)))
 
             # If the model area is a country, we update the model area to avoid creating useless zones in the future
-            if re.search(self.__model_place, self._project.about.country_name):
+            if re.search(self.__model_place, self.project.about.country_name):
                 sql = """UPDATE political_subdivisions SET geometry=CastToMulti(GeomFromWKB(?, 4326)) WHERE level=-1;"""
                 conn.execute(sql, data.geom.values)
 
@@ -84,7 +101,7 @@ class ImportPoliticalSubdivisions:
         data = data[data.level <= level]
         data.sort_values(by="level", ascending=True, inplace=True)
 
-        with self._project.db_connection as conn:
+        with self.project.db_connection as conn:
             if overwrite:
                 conn.execute("DELETE FROM political_subdivisions WHERE level>0;")
                 conn.commit()
@@ -99,90 +116,94 @@ class ImportPoliticalSubdivisions:
         """
         Imports political boundaries for an entire country. Data for all levels is stored in a parquet file.
         """
-        country_data = []
+        if self._source == "overture":
+            url = "s3://overturemaps-us-west-2/release/2025-07-23.0/theme=divisions/type=division_area/*"
+            qry = """
+            SELECT
+                id as ovm_id,
+                division_id,
+                subtype,
+                names.primary as name,
+                ST_AsText(geometry) as geometry
+            FROM
+                read_parquet({}, hive_partitioning=1)
+            WHERE
+                country = '{}' AND
+                class = 'land'
+            """
+            qry = qry.format(url, self.project.about.country_code_2digit)
 
-        if self._source == "gadm":
-            url = "https://geodata.ucdavis.edu/gadm/gadm4.1/json/gadm41_{}_{}.json"
+            # Load duckdb spatial
+            conn = duckdb.connect()
+            conn.install_extension("spatial")
+            conn.load_extension("spatial")
+
+            adm_places = conn.execute(qry).df()
+            adm_places = gpd.GeoDataFrame(adm_places, geometry=adm_places['geometry'].apply(wkt.loads), crs="EPSG:4326")
+            adm_places["level"] = adm_places["subtype"].map(MAPPING_LOCATIONS)
+            adm_places["country_name"] = "Uruguay"
+            adm_places = adm_places.sort_values(by=["level", "division_name"]).reset_index(drop=True)
+
+            cols = ["level", "subtype", "ovm_id", "division_id", "country_name", "division_name", "geometry"]
+            adm_places = adm_places[cols]
+
         else:
-            url = "https://www.geoboundaries.org/data/geoBoundaries-3_0_0/{}/ADM{}/geoBoundaries-3_0_0-{}-ADM{}.geojson"
+            url = "http://www.geoboundaries.org/api/current/gbOpen/{}/ALL/"
+            url = url.format(self.project.about.country_code_3digit)
+            Place = namedtuple("Place", ["level", "fid", "geo_id", "country_name", "division_name", "geometry"])
 
-        for level in range(5):  # because we have at most 4 subdivision levels
-            fmt = (
-                url.format(self._project.about.country_code, level)
-                if self._source == "gadm"
-                else url.format(self._project.about.country_code, level, self._project.about.country_code, level)
-            )
-            req = requests.get(fmt)
-            if req.status_code == 404:
-                continue
-            req = req.json()
+            response = requests.get(url)
+            if response.status_code != 200:
+                raise ValueError(f"Request failed with status code {response.status_code}")
 
-            adm_level = {}
-            places = {}
-            for boundary in req["features"]:
-                if level == 0:
-                    adm_name = (
-                        boundary["properties"]["COUNTRY"]
-                        if self._source == "gadm"
-                        else boundary["properties"]["shapeName"]
+            adm_places = []
+            res = response.json()
+
+            for i, level in enumerate(res):
+                lvl_response = requests.get(level["gjDownloadURL"], timeout=30)
+                if lvl_response.status_code != 200:
+                    raise ValueError(f"Request failed with status code {response.status_code}")
+                inner_res = lvl_response.json()
+                for idx, boundary in enumerate(inner_res["features"]):
+                    geom = self.__geometry_type(boundary["geometry"])
+                    adm_places.extend(
+                        [
+                            Place(
+                                i,
+                                idx,
+                                boundary["properties"]["shapeID"],
+                                self.project.about.country_name,
+                                boundary["properties"]["shapeName"],
+                                geom.wkb,
+                            )
+                        ]
                     )
-                else:
-                    adm_name = (
-                        boundary["properties"][f"NAME_{level}"]
-                        if self._source == "gadm"
-                        else boundary["properties"]["shapeName"]
-                    )
 
-                if adm_name not in adm_level:
-                    adm_level[adm_name] = []
+            adm_places = pd.DataFrame(adm_places)
+            adm_places = gpd.GeoDataFrame(adm_places, geometry=gpd.GeoSeries.from_wkb(adm_places.geometry), crs="EPSG:4326")
+        
+        adm_places.to_parquet(join(gettempdir(), f"{self.project.about.country_name}_cache_{self._source}.parquet"))
 
-                adm_level[adm_name].append(self.__geometry_type(boundary["geometry"]))
+        return adm_places[["country_name", "division_name", "level", "geom"]]
 
-            for key, value in adm_level.items():
-                for idx, val in enumerate(value):
-                    places[f"{key}_{idx}"] = val.wkb
-
-            df = pd.DataFrame.from_dict(places, orient="index", columns=["geom"])
-            df.reset_index(inplace=True)
-            df.rename(columns={"index": "division_name"}, inplace=True)
-            df = df.assign(country_name=self._project.about.country_name, level=level)
-
-            gs = gpd.GeoSeries.from_wkb(df.geom)
-            country_data.append(gpd.GeoDataFrame(df, geometry=gs, crs=4326))
-
-        if len(country_data):
-            country_data = pd.concat(country_data)
-            country_data["idx"] = arange(len(country_data))
-            country_data.set_index("idx", inplace=True)
-            country_data.at[0, "division_name"] = "country_border"
-            country_data = country_data.drop_duplicates(subset=["division_name", "level"])
-
-        country_data.to_parquet(join(gettempdir(), f"{self._project.about.country_name}_cache_{self._source}.parquet"))
-
-        return country_data[["country_name", "division_name", "level", "geom"]]
-
-    def __geometry_type(self, dct):
+    def __geometry_type(self, geometry):
         """
         Returns shapely.Polygons or shapely.MultiPolygons.
 
         Parameters:
-             *dct*(:obj:`dict`): dictionary with coordinates.
+             *geometry*(:obj:`dict`): dictionary with geometry info.
         """
 
-        if dct["type"] == "Polygon":
-            return Polygon([(coordinate[0], coordinate[1]) for coordinate in dct["coordinates"][0]])
-        elif dct["type"] == "MultiPolygon":
-            poly = [
-                [(coordinate[0], coordinate[1]) for coordinate in dct["coordinates"][i][0]]
-                for i in range(len(dct["coordinates"]))
-            ]
-            return MultiPolygon([Polygon(i) for i in poly])
+        if geometry["type"] == "Polygon":
+            return Polygon(geometry["coordinates"][0])
+        elif geometry["type"] == "MultiPolygon":
+            return MultiPolygon(geometry["coordinates"])
 
     def import_model_area(self):
         """
         Add model area into project database.
         """
-        with self._project.db_connection as conn:
+        with self.project.db_connection as conn:
             if conn.execute("SELECT COUNT(*) FROM political_subdivisions WHERE level=-1;").fetchone()[0] > 0:
                 return
 
@@ -207,44 +228,54 @@ class ImportPoliticalSubdivisions:
         if not res:
             raise ValueError("The desired model place is not available.")
 
-        self._poly = self.__geometry_type(response.json()[0]["geojson"])
+        # We add useful place info to the project about table
+        country = pycountry.countries.lookup(res[0]["address"]["country"])
 
-        self._country_code = pycountry.countries.search_fuzzy(response.json()[0]["address"]["country"])[0].alpha_3
-        self._country_name = pycountry.countries.search_fuzzy(response.json()[0]["address"]["country"])[0].name
+        fields = ["model_place", "address_type", "country_name", "country_code_2digit", "country_code_3digit"]
 
-        df = (
-            pd.DataFrame([self._poly.wkt], columns=["geometry"])
-            if isinstance(self._poly, Polygon)
-            else pd.DataFrame([shapely.union_all(list(self._poly.geoms)).wkt], columns=["geometry"])
-        )
+        about = self.project.about
+        for field in fields:
+            about.add_info_field(field)
 
-        gdf = gpd.GeoDataFrame(df, geometry=gpd.GeoSeries.from_wkt(df.geometry), crs=4326)
-        gdf = gdf.assign(level=-1, division_name="model_area", country_name=f"{self._country_name}")
-        gdf["geom"] = gdf.geometry.to_wkb()
+        about.model_place = self.__model_place
+        about.address_type = res[0]["addresstype"]
+        about.country_name = country.name
+        about.country_code_2digit = country.alpha_2
+        about.country_code_3digit = country.alpha_3
 
-        with self._project.db_connection as conn:
+        if "ISO3166-2-lvl4" in res[0]["address"]:
+            about.add_info_field("subdivision_code")
+            about.subdivision_code = res[0]["address"]["ISO3166-2-lvl4"]
+
+        about.write_back()
+
+        # Manipulate geometry data
+        polygon = self.__geometry_type(res[0]["geojson"])
+
+        df = pd.DataFrame([[1, polygon.wkb]], columns=["fid", "geometry"], index=[0])
+        df = df.assign(level=-1, division_name="model_area", country_name=country.name)
+
+        with self.project.db_connection as conn:
             qry = "INSERT INTO political_subdivisions (country_name, division_name, level, geometry) \
                     VALUES(?, ?, ?, CastToMulti(GeomFromWKB(?, 4326)));"
             list_of_tuples = list(
-                gdf[["country_name", "division_name", "level", "geom"]].itertuples(index=False, name=None)
+                df[["country_name", "division_name", "level", "geometry"]].itertuples(index=False, name=None)
             )
 
             conn.executemany(qry, list_of_tuples)
 
-        self.__add_model_place_info_to_db()
-
     def __source_control(self):
         """Checks if the political subdivision source exists."""
-        if self._source not in ["gadm", "geoboundaries"]:
+        if self._source not in ["overture", "geoboundaries"]:
             raise ValueError("Source not available.")
 
     def __get_subdivisions(self):
         """
         Returns the parquet file with political subdivisions.
         """
-        file_name = join(gettempdir(), f"{self._project.about.country_name}_cache_{self._source}.parquet")
+        file_name = join(gettempdir(), f"{self.project.about.country_name}_cache_{self._source}.parquet")
         if isfile(file_name):
-            return gpd.read_parquet(file_name)
+            return gpd.read_parquet(file_name, columns=["country_name", "division_name", "level", "geometry"])
         else:
             return self.__boundaries_import()
 
@@ -252,20 +283,6 @@ class ImportPoliticalSubdivisions:
     def model_place(self):
         """Returns the name of the place for which the model was build."""
         return self.__model_place
-
-    def __add_model_place_info_to_db(self):
-        """
-        Adds model place information into the project database.
-        """
-        about = self._project.about
-        about.add_info_field("country_name")
-        about.add_info_field("country_code")
-
-        about.model_name = self.__model_place
-        about.country_name = self._country_name
-        about.country_code = self._country_code
-
-        about.write_back()
 
     def __get_centroids(self, df):
         """

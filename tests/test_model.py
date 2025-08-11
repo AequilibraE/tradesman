@@ -16,7 +16,7 @@ class TestModel(unittest.TestCase):
     def test_create(self):
         self.proj.create()
 
-        with self.proj._project.db_connection as conn:
+        with self.proj.project.db_connection as conn:
             self.assertGreater(conn.execute("SELECT COUNT(*) FROM political_subdivisions;").fetchone()[0], 0)
             self.assertGreater(conn.execute("SELECT SUM(population) FROM zones;").fetchone()[0], 1000)
             self.assertGreater(conn.execute("SELECT SUM(POPF13) FROM zones;").fetchone()[0], 10)

@@ -11,6 +11,7 @@ maintainers = [
 ]
 dependencies = [
     "aequilibrae<2.0.0",
+    "duckdb",
     "matplotlib",
     "pycountry",
     "libpysal",
@@ -95,6 +96,7 @@ exclude = [
     ".venv310",
     ".venv311",
     ".venv312",
+    ".ipynb",
 ]
 line-length = 120
 lint.dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"

@@ -3,7 +3,8 @@ import sys
 from os.path import isdir
 
 import geopandas as gpd
-from aequilibrae import Project
+from aequilibrae.context import get_logger
+from aequilibrae.project import Project
 
 from tradesman.data_retrieval import subdivisions
 from tradesman.data_retrieval.import_amenities import import_amenities
@@ -20,23 +21,27 @@ from tradesman.model_creation.zoning.zone_building import zone_builder
 
 class Tradesman:
     def __init__(
-        self, network_path: str, model_place: str = None, pbf_path: str = None, boundaries_source: str = "GADM"
+        self,
+        network_path: str,
+        model_place: str = None,
+        pbf_path: str = None,
+        boundaries_source: str = "overture",
+        logger=None,
     ):
-        # If the model exists, you would only tell where it is (network_path), and the software
-        # would check and populate the model place.  Needs to be implemented
+        # TODO: If the model exists, you would only tell where it is (network_path),
+        # and the software would check and populate the model place.
         self.__model_place = model_place
         self.__population_source = "WorldPop"
         self.__folder = network_path
-        self._project = Project()
+        self.project = Project()
         self.__osm_data = {}
         self.__pbf_path = pbf_path
-        self.__starts_logging()
+        self.logger = logger or get_logger()
 
         self.__initialize_model()
-        self._network = ImportNetwork(self._project, self.__model_place, self.__pbf_path)
 
         self._boundaries_source = boundaries_source
-        self._boundaries = ImportPoliticalSubdivisions(self.__model_place, self._boundaries_source, self._project)
+        self._boundaries = ImportPoliticalSubdivisions(self.__model_place, self._boundaries_source, self.project)
 
     def create(self):
         """Creates the entire model"""
@@ -58,12 +63,13 @@ class Tradesman:
 
         self._boundaries.import_model_area()
 
-    def add_country_borders(self, overwrite=False):
+    def add_country_borders(self, overwrite: bool = False):
         """
         Retrieves country borders and adds to the model.
 
         Parameters:
-            *overwrite* (:obj:`bool`): User option for overwriting data that may already exist in the model. Defaults to False
+            *overwrite* (:obj:`bool`): User option for overwriting data that may already exist in the model.
+            Defaults to ``False``
         """
 
         self._boundaries.add_country_borders(overwrite)
@@ -77,12 +83,12 @@ class Tradesman:
         """
         self.__population_source = set_population_source(source)
 
-    def set_political_boundaries_source(self, source="GADM"):
+    def set_political_boundaries_source(self, source="Overture"):
         """
         Sets the source for downloading geographic data.
 
         Parameters:
-             *source*(:obj:`str`): Takes "GADM" or "GeoBoundaries". Defaults to GADM.
+             *source*(:obj:`str`): Takes "Overture" or "GeoBoundaries". Defaults to Overture.
         """
         self._boundaries_source = set_political_boundaries_source(source)
 
@@ -92,6 +98,7 @@ class Tradesman:
         If the network already exists in the folder, it will be loaded, otherwise it will be created.
         """
 
+        self._network = ImportNetwork(self.project, self.__model_place, self.__pbf_path)
         self._network.build_network()
 
     def import_subdivisions(self, subdivision_levels=2, overwrite=False):
@@ -113,14 +120,12 @@ class Tradesman:
             *overwrite* (:obj:`bool`): Deletes pre-existing population_source_import. Defaults to False
         """
 
-        fields = self._project.zoning.fields
+        fields = self.project.zoning.fields
         if "population" not in fields.all_fields():
             fields.add("population", "Total population", "INTEGER")
             fields.save()
 
-        import_population(
-            self._project, self._project.about.country_name, self.__population_source, overwrite=overwrite
-        )
+        import_population(self.project, self.project.about.country_name, self.__population_source, overwrite=overwrite)
 
     def build_zoning(self, hexbin_size=200, max_zone_pop=10000, min_zone_pop=500, save_hexbins=False, overwrite=False):
         """
@@ -133,12 +138,12 @@ class Tradesman:
              *save_hexbins*(:obj:`bool`): saves the hexagonal bins with population. Defaults to False.
              *overwrite* (:obj:`bool`): Deletes pre-existing HexBins and Zones. Defaults to False
         """
-        with self._project.db_connection as conn:
+        with self.project.db_connection as conn:
             num_zones = conn.execute("Select count(*) from Zones").fetchone()
 
         if not overwrite and sum(num_zones) > 0:
             return
-        zone_builder(self._project, hexbin_size, max_zone_pop, min_zone_pop, save_hexbins)
+        zone_builder(self.project, hexbin_size, max_zone_pop, min_zone_pop, save_hexbins)
 
     def get_political_subdivisions(self, level: int = None) -> gpd.GeoDataFrame:
         """
@@ -148,7 +153,7 @@ class Tradesman:
              *level*(:obj:`int`): Number of subdivision levels to import. Default imports all levels.
         """
 
-        subd = subdivisions(self._project)
+        subd = subdivisions(self.project)
         if level is not None:
             subd = subd[subd.level == level]
         return subd
@@ -157,13 +162,13 @@ class Tradesman:
         """
         Close the project model.
         """
-        self._project.close()
+        self.project.close()
 
     def import_pop_by_sex_and_age(self):
         """
         Triggers the import of population pyramid from raster into the model.
         """
-        get_pop_by_sex_age(self._project, self._project.about.country_name)
+        get_pop_by_sex_age(self.project, self.project.about.country_name)
 
     def import_amenities(self):
         """
@@ -171,7 +176,7 @@ class Tradesman:
         Data will be exported as columns in zones file and as a separate SQL file.
         """
 
-        import_amenities(self._project, self.__osm_data)
+        import_amenities(self.project, self.__osm_data)
 
     def import_buildings(self, download_from_bing=True):
         """
@@ -182,13 +187,13 @@ class Tradesman:
             *download_from_bing(:obj:`bool`): downloads building data from Microsoft Bing. Defaults to True.
         """
 
-        building_import(self.__model_place, self._project, self.__osm_data, download_from_bing)
+        building_import(self.__model_place, self.project, self.__osm_data, download_from_bing)
 
     def build_population_synthesizer_data(self, sample_size=0.01):
         """
         Triggers the import of data to create the synthetic population.
         """
-        create_syn_pop(self._project, self.__folder, sample_size=sample_size)
+        create_syn_pop(self.project, self.__folder, sample_size=sample_size)
 
     def synthesize_population(self, thread_number=None, multithread=False):
         """
@@ -199,14 +204,14 @@ class Tradesman:
             *thread_number*(:obj:`int`): number of threads for multiprocessing
         """
 
-        run_populationsim(multithread, self._project, self.__folder, thread_number)
+        run_populationsim(multithread, self.project, self.__folder, thread_number)
 
     def __initialize_model(self):
         if isdir(self.__folder):
-            self._project.open(self.__folder)
+            self.project.open(self.__folder)
         else:
-            self._project.new(self.__folder)
-            with self._project.db_connection as conn:
+            self.project.new(self.__folder)
+            with self.project.db_connection as conn:
                 add_new_tables(conn)
 
     @property
@@ -214,15 +219,15 @@ class Tradesman:
         """Returns the name of the place for which this model was made"""
         return self.__model_place
 
-    @staticmethod
-    def __starts_logging():
-        logger = logging.getLogger("tradesman")
-        stdout_handler = logging.StreamHandler(sys.stdout)
-        formatter = logging.Formatter("%(asctime)s;%(name)s;%(message)s")
-        stdout_handler.setFormatter(formatter)
-        stdout_handler.name = "terminal"
+    # @staticmethod
+    # def __starts_logging():
+    #     logger = logging.getLogger("tradesman")
+    #     stdout_handler = logging.StreamHandler(sys.stdout)
+    #     formatter = logging.Formatter("%(asctime)s;%(name)s;%(message)s")
+    #     stdout_handler.setFormatter(formatter)
+    #     stdout_handler.name = "terminal"
 
-        for handler in logger.handlers:
-            if handler.name == "terminal":
-                return
-        logger.addHandler(stdout_handler)
+    #     for handler in logger.handlers:
+    #         if handler.name == "terminal":
+    #             return
+    #     logger.addHandler(stdout_handler)
