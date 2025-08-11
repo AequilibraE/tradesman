@@ -10,7 +10,7 @@ maintainers = [
     {name = "Pedro Camargo", email = "pedro@outerloop.io"},
 ]
 dependencies = [
-    "aequilibrae==1.4.3",
+    "aequilibrae<2.0.0",
     "matplotlib",
     "pycountry",
     "libpysal",
