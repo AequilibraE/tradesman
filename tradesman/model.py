@@ -41,7 +41,7 @@ class Tradesman:
         self.__initialize_model()
 
         self._boundaries_source = boundaries_source
-        self._boundaries = ImportPoliticalSubdivisions(self.__model_place, self._boundaries_source, self.project)
+        self._boundaries = ImportPoliticalSubdivisions(self.__model_place, self.project, self._boundaries_source)
 
     def create(self):
         """Creates the entire model"""
