@@ -1,0 +1,38 @@
+name: Scheduled Test
+
+on:
+  push:
+    branches: [develop]
+  pull_request:
+
+jobs:
+  scheduled_test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+          architecture: x64
+
+      - name: Install dependencies with develop aequilibrae
+        run: |
+          python -m pip install -U pip uv
+          python3 -m uv pip install "git+https://github.com/AequilibraE/aequilibrae.git@develop"
+          touch ./pyproject.toml
+          pip install -e .[dev]
+
+      - name: Download spatialite on Linux
+        run: |
+          sudo apt update
+          sudo apt install libspatialite-dev
+          sudo apt install -y libsqlite3-mod-spatialite
+          pip3 install spatialite
+          sudo ln -s /usr/lib/x86_64-linux-gnu/mod_spatialite.so /usr/lib/x86_64-linux-gnu/mod_spatialite
+
+      - name: Runs unit tests
+        run: |
+          python -m pytest -v
