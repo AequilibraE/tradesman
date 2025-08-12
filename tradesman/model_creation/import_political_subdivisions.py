@@ -1,5 +1,4 @@
 from os.path import isfile, join
-import re
 from collections import namedtuple
 from tempfile import gettempdir
 
@@ -13,19 +12,19 @@ from aequilibrae.project.network.osm.osm_params import http_headers
 from shapely.geometry import MultiPolygon, Polygon
 from shapely import wkt
 
-MAPPING_LOCATIONS = {
-    'country': 0,
-    'dependency': 1,
-    'macroregion': 2,
-    'region': 3,
-    'macrocounty': 4,
-    'county': 5,
-    'localadmin': 6,
-    'locality': 7,
-    'borough': 8,
-    'macrohood': 9,
-    'neighborhood': 10,
-    'microhood': 11
+OVM_MAPPING = {
+    "country": 0,
+    "dependency": 1,
+    "macroregion": 2,
+    "region": 3,
+    "macrocounty": 4,
+    "county": 5,
+    "localadmin": 6,
+    "locality": 7,
+    "borough": 8,
+    "macrohood": 9,
+    "neighborhood": 10,
+    "microhood": 11,
 }
 
 
@@ -39,11 +38,12 @@ class ImportPoliticalSubdivisions:
         *project*(:obj:`aequilibrae.project`): currently open project
     """
 
-    def __init__(self, model_place: str, source: str, project: Project):
+    def __init__(self, model_place: str, project: Project, source: str = "overture"):
         self.__model_place = model_place
         self.__search_place = model_place.lower().replace(" ", "+")
         self.project = project
         self._source = source.lower()
+        self._poly = None
 
         self.__source_control()
 
@@ -56,8 +56,9 @@ class ImportPoliticalSubdivisions:
             Defaults to ``False``.
         """
         data = self.__get_subdivisions()
-        data = data[data.level == 0]
+        data = data[data.level == 0].copy()
         data["geom"] = data["geometry"].to_wkb()
+        data = data[["country_name", "division_name", "level", "geom"]]
 
         with self.project.db_connection as conn:
             if overwrite:
@@ -65,41 +66,41 @@ class ImportPoliticalSubdivisions:
                 conn.commit()
 
             sql = """INSERT INTO political_subdivisions(country_name, division_name, level, geometry)
-                        VALUES(?, ?, ?, CastToMulti(GeomFromWKB(?, 4326)));"""
+                     VALUES(?, ?, ?, CastToMulti(GeomFromWKB(?, 4326)));"""
             conn.executemany(sql, list(data.itertuples(index=False, name=None)))
 
             # If the model area is a country, we update the model area to avoid creating useless zones in the future
-            if re.search(self.__model_place, self.project.about.country_name):
+            if self.project.about.address_type == "country":
                 sql = """UPDATE political_subdivisions SET geometry=CastToMulti(GeomFromWKB(?, 4326)) WHERE level=-1;"""
                 conn.execute(sql, data.geom.values)
 
-    def import_subdivisions(self, level: int, overwrite: bool = False):
+    def import_subdivisions(self, level: int = 2, overwrite: bool = False):
         """
         Add the model's subdivisions. If the model area is smaller than the smallest geographical subdivision from
-        GADM or geoBoundaries, it adds the upper-level geometries to the model file.  Otherwise, it adds the
+        overture or geoBoundaries, it adds the upper-level geometries to the model file. Otherwise, it adds the
         lower-level geometries which intersect model area.
 
         Parameters:
-             *level*(:obj:`int`): number of levels to download.
-             *overwrite*(:obj:`bool`): overwrite political subdivisions if it already exists. Defaults to False.
+            *level*(:obj:`int`): number of levels to download.
+            *overwrite*(:obj:`bool`): overwrite political subdivisions if it already exists. Defaults to False.
         """
-        data = self.__get_subdivisions()
+        subdiv = self.__get_subdivisions()
+        subdiv = subdiv[subdiv.level > 0].copy()
 
-        if len(data) == 1:
+        # There are subdivisions if the geometry centroids are within the model area polygon.
+        centroids = self.__get_centroids(subdiv)
+        centroids = centroids[centroids.within(self.area_polygon)]
+        subdiv = subdiv.iloc[centroids.index]
+
+        # If there are no centroids, then all we have is the modelling area
+        if subdiv.shape[0] == 0:
             return
 
-        divisions = data[data.level > 0]
+        subdiv["geom"] = subdiv["geometry"].to_wkb()
+        subdiv = subdiv[subdiv.level <= subdiv.level.unique()[:level].max()]
+        subdiv.sort_values(by=["level", "division_name"], ascending=True, inplace=True)
 
-        centers = self.__get_centroids(divisions)
-        data = divisions[divisions.index.isin(centers[centers.within(self._poly)].index + 1)]
-        if len(data) == 0:
-            pos = divisions.sindex.query(geometry=self._poly, predicate="intersects")
-            data = divisions.iloc[pos]
-
-        data = data[["country_name", "division_name", "level", "geom"]]
-        level = max(data.level) if level > max(data.level) else min(data.level) + level
-        data = data[data.level <= level]
-        data.sort_values(by="level", ascending=True, inplace=True)
+        subdiv = subdiv[["country_name", "division_name", "level", "geom"]]
 
         with self.project.db_connection as conn:
             if overwrite:
@@ -107,8 +108,8 @@ class ImportPoliticalSubdivisions:
                 conn.commit()
 
             qry = "INSERT INTO political_subdivisions (country_name, division_name, level, geometry) \
-                VALUES(?, ?, ?, CastToMulti(GeomFromWKB(?, 4326)));"
-            list_of_tuples = list(data.itertuples(index=False, name=None))
+                   VALUES(?, ?, ?, CastToMulti(GeomFromWKB(?, 4326)));"
+            list_of_tuples = list(subdiv.itertuples(index=False, name=None))
 
             conn.executemany(qry, list_of_tuples)
 
@@ -123,15 +124,15 @@ class ImportPoliticalSubdivisions:
                 id as ovm_id,
                 division_id,
                 subtype,
-                names.primary as name,
+                names.primary as division_name,
                 ST_AsText(geometry) as geometry
             FROM
-                read_parquet({}, hive_partitioning=1)
+                read_parquet('{}', hive_partitioning=1)
             WHERE
                 country = '{}' AND
                 class = 'land'
             """
-            qry = qry.format(url, self.project.about.country_code_2digit)
+            qry = qry.format(url, self.project.about.country_code_two_digit)
 
             # Load duckdb spatial
             conn = duckdb.connect()
@@ -139,9 +140,9 @@ class ImportPoliticalSubdivisions:
             conn.load_extension("spatial")
 
             adm_places = conn.execute(qry).df()
-            adm_places = gpd.GeoDataFrame(adm_places, geometry=adm_places['geometry'].apply(wkt.loads), crs="EPSG:4326")
-            adm_places["level"] = adm_places["subtype"].map(MAPPING_LOCATIONS)
-            adm_places["country_name"] = "Uruguay"
+            adm_places = gpd.GeoDataFrame(adm_places, geometry=adm_places["geometry"].apply(wkt.loads), crs="EPSG:4326")
+            adm_places["level"] = adm_places["subtype"].map(OVM_MAPPING)
+            adm_places["country_name"] = self.project.about.country_name
             adm_places = adm_places.sort_values(by=["level", "division_name"]).reset_index(drop=True)
 
             cols = ["level", "subtype", "ovm_id", "division_id", "country_name", "division_name", "geometry"]
@@ -149,7 +150,7 @@ class ImportPoliticalSubdivisions:
 
         else:
             url = "http://www.geoboundaries.org/api/current/gbOpen/{}/ALL/"
-            url = url.format(self.project.about.country_code_3digit)
+            url = url.format(self.project.about.country_code_three_digit)
             Place = namedtuple("Place", ["level", "fid", "geo_id", "country_name", "division_name", "geometry"])
 
             response = requests.get(url)
@@ -180,11 +181,13 @@ class ImportPoliticalSubdivisions:
                     )
 
             adm_places = pd.DataFrame(adm_places)
-            adm_places = gpd.GeoDataFrame(adm_places, geometry=gpd.GeoSeries.from_wkb(adm_places.geometry), crs="EPSG:4326")
-        
+            adm_places = gpd.GeoDataFrame(
+                adm_places, geometry=gpd.GeoSeries.from_wkb(adm_places.geometry), crs="EPSG:4326"
+            )
+
         adm_places.to_parquet(join(gettempdir(), f"{self.project.about.country_name}_cache_{self._source}.parquet"))
 
-        return adm_places[["country_name", "division_name", "level", "geom"]]
+        return adm_places
 
     def __geometry_type(self, geometry):
         """
@@ -231,7 +234,7 @@ class ImportPoliticalSubdivisions:
         # We add useful place info to the project about table
         country = pycountry.countries.lookup(res[0]["address"]["country"])
 
-        fields = ["model_place", "address_type", "country_name", "country_code_2digit", "country_code_3digit"]
+        fields = ["model_place", "address_type", "country_name", "country_code_two_digit", "country_code_three_digit"]
 
         about = self.project.about
         for field in fields:
@@ -240,8 +243,8 @@ class ImportPoliticalSubdivisions:
         about.model_place = self.__model_place
         about.address_type = res[0]["addresstype"]
         about.country_name = country.name
-        about.country_code_2digit = country.alpha_2
-        about.country_code_3digit = country.alpha_3
+        about.country_code_two_digit = country.alpha_2.upper()
+        about.country_code_three_digit = country.alpha_3.upper()
 
         if "ISO3166-2-lvl4" in res[0]["address"]:
             about.add_info_field("subdivision_code")
@@ -250,9 +253,9 @@ class ImportPoliticalSubdivisions:
         about.write_back()
 
         # Manipulate geometry data
-        polygon = self.__geometry_type(res[0]["geojson"])
+        self._poly = self.__geometry_type(res[0]["geojson"])
 
-        df = pd.DataFrame([[1, polygon.wkb]], columns=["fid", "geometry"], index=[0])
+        df = pd.DataFrame([[1, self._poly.wkb]], columns=["fid", "geometry"], index=[0])
         df = df.assign(level=-1, division_name="model_area", country_name=country.name)
 
         with self.project.db_connection as conn:
@@ -269,13 +272,16 @@ class ImportPoliticalSubdivisions:
         if self._source not in ["overture", "geoboundaries"]:
             raise ValueError("Source not available.")
 
-    def __get_subdivisions(self):
+    def __get_subdivisions(self, select_columns: list = []):
         """
         Returns the parquet file with political subdivisions.
         """
         file_name = join(gettempdir(), f"{self.project.about.country_name}_cache_{self._source}.parquet")
         if isfile(file_name):
-            return gpd.read_parquet(file_name, columns=["country_name", "division_name", "level", "geometry"])
+            if select_columns:
+                return gpd.read_parquet(file_name, columns=select_columns)
+            else:
+                return gpd.read_parquet(file_name)
         else:
             return self.__boundaries_import()
 
@@ -283,27 +289,31 @@ class ImportPoliticalSubdivisions:
     def model_place(self):
         """Returns the name of the place for which the model was build."""
         return self.__model_place
+    
+    @property
+    def area_polygon(self):
+        """"""
+        if not self._poly:
+            with self.project.db_connection as conn:
+                qry = "SELECT *, Hex(ST_AsBinary(geometry)) as geom FROM political_subdivisions WHERE level=-1"
+                model_area = gpd.GeoDataFrame.from_postgis(qry, conn, geom_col="geom", crs=4326)
+                return model_area.geom[0]
+        return self._poly
 
-    def __get_centroids(self, df):
+    def __get_centroids(self, gdf):
         """
         Returns a GeoSeries with geometries centroids.
         For geometries that are MultiPolygons, we consider the centroid of the largest shape.
 
         Parameters:
-            *df*(:obj:`geopandas.GeoDataFrame`): geopandas.GeoDataFrame
+            *gdf*(:obj:`geopandas.GeoDataFrame`): geopandas.GeoDataFrame
         """
-        centers = []
-        for _, row in df.iterrows():
-            place = row.geometry
-            if isinstance(place, MultiPolygon):
-                if len(place.geoms) == 1:
-                    centers.append(place.centroid)
-                else:
-                    areas = []
-                    for p in place.geoms:
-                        areas.append(p.area)
-                    centers.append(place.geoms[areas.index(max(areas))].centroid)
-            else:
-                centers.append(place.centroid)
+        subset = "ovm_id" if self._source == "overture" else "geo_id"
 
-        return gpd.GeoSeries(centers)
+        x = gdf.explode(index_parts=True).copy()
+        x["area"] = x.geometry.to_crs(3845).area
+        x = x.sort_values(by=["level", "division_name", "area"]).drop_duplicates(subset=[subset])
+
+        return gpd.GeoDataFrame(
+            x[subset], geometry=x["geometry"].to_crs(3845).centroid.to_crs(4326), crs=4326
+        ).reset_index(drop=True)
