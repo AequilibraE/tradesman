@@ -25,7 +25,7 @@ class Tradesman:
         network_path: str,
         model_place: str = None,
         pbf_path: str = None,
-        boundaries_source: str = "overture",
+        boundaries_source: str = "Overture",
         logger=None,
     ):
         # TODO: If the model exists, you would only tell where it is (network_path),
@@ -48,7 +48,7 @@ class Tradesman:
 
         self.import_model_area()
         self.add_country_borders()
-        self.import_subdivisions(2)
+        self.import_subdivisions()
         self.import_network()
         self.import_population()
         self.build_zoning()

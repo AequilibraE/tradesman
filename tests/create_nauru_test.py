@@ -20,7 +20,7 @@ def create_nauru_test(folder):
     with project.db_connection as conn:
         add_new_tables(conn)
 
-        data = ImportPoliticalSubdivisions(model_place="Nauru", project=project, source="GADM")
+        data = ImportPoliticalSubdivisions(model_place="Nauru", project=project)
         data.import_model_area()
         data.add_country_borders(overwrite=True)
 

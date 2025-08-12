@@ -161,7 +161,7 @@ class ImportPoliticalSubdivisions:
             res = response.json()
 
             for i, level in enumerate(res):
-                lvl_response = requests.get(level["gjDownloadURL"], timeout=30)
+                lvl_response = requests.get(level["gjDownloadURL"], timeout=self.__timeout, headers=http_headers)
                 if lvl_response.status_code != 200:
                     raise ValueError(f"Request failed with status code {response.status_code}")
                 inner_res = lvl_response.json()
@@ -200,7 +200,8 @@ class ImportPoliticalSubdivisions:
         if geometry["type"] == "Polygon":
             return Polygon(geometry["coordinates"][0])
         elif geometry["type"] == "MultiPolygon":
-            return MultiPolygon(geometry["coordinates"])
+            max = len(geometry["coordinates"])
+            return MultiPolygon([Polygon(geometry["coordinates"][i][0]) for i in range(max)])
 
     def import_model_area(self):
         """
@@ -210,14 +211,14 @@ class ImportPoliticalSubdivisions:
             if conn.execute("SELECT COUNT(*) FROM political_subdivisions WHERE level=-1;").fetchone()[0] > 0:
                 return
 
-        timeout = 30
+        self.__timeout = 30
         params = {"q": self.__search_place, "format": "json", "polygon_geojson": 1, "addressdetails": 1}
 
         url = "https://nominatim.openstreetmap.org/"
         url = url.rstrip("/") + "/search"
 
         try:
-            response = requests.get(url, params=params, timeout=timeout, headers=http_headers)
+            response = requests.get(url, params=params, timeout=self.__timeout, headers=http_headers)
             if response.status_code != 200:
                 raise ValueError(f"Request failed with status code {response.status_code}")
         except requests.exceptions.Timeout as e:
@@ -272,7 +273,7 @@ class ImportPoliticalSubdivisions:
         if self._source not in ["overture", "geoboundaries"]:
             raise ValueError("Source not available.")
 
-    def __get_subdivisions(self, select_columns: list = []):
+    def __get_subdivisions(self, select_columns: list = None):
         """
         Returns the parquet file with political subdivisions.
         """
@@ -289,7 +290,7 @@ class ImportPoliticalSubdivisions:
     def model_place(self):
         """Returns the name of the place for which the model was build."""
         return self.__model_place
-    
+
     @property
     def area_polygon(self):
         """"""

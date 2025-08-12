@@ -45,7 +45,7 @@ def nauru_test(create_path, tmp_path):
         os.path.join(tmp_path, "Nauru_cache_gadm.parquet"),
     )
 
-    data = ImportPoliticalSubdivisions(model_place="Nauru", project=prj, source="GADM")
+    data = ImportPoliticalSubdivisions(model_place="Nauru", project=prj)
     data.import_model_area()
     data.add_country_borders()
     data.import_subdivisions(2)

@@ -1,4 +1,3 @@
-import re
 from os.path import isfile, join
 from tempfile import gettempdir
 from urllib.request import urlretrieve
@@ -36,29 +35,32 @@ def get_maritime_boundaries(model_place: str):
     return
 
 
-def place_is_country(model_place: str):
+def place_is_country(model_place: str, project: Project = None):
     """
     Checks if model_place is a country.
 
     Parameters:
-         *model_place*(:obj:`str`): current model place
+        *model_place*(:obj:`str`): current model place
     """
-    search_place = model_place.lower().replace(" ", "+")
+    if not project:
+        search_place = model_place.lower().replace(" ", "+")
 
-    timeout = 30
-    params = {"q": search_place, "format": "json", "addressdetails": 1}
+        timeout = 30
+        params = {"q": search_place, "format": "json", "addressdetails": 1}
 
-    url = "https://nominatim.openstreetmap.org/"
-    url = url.rstrip("/") + "/search"
+        url = "https://nominatim.openstreetmap.org/"
+        url = url.rstrip("/") + "/search"
 
-    response = requests.get(url, params=params, timeout=timeout, headers=http_headers)
+        response = requests.get(url, params=params, timeout=timeout, headers=http_headers)
 
-    if response.status_code != 200:
-        raise ValueError("The desired model place is not available.")
+        if response.status_code != 200:
+            raise ValueError("The desired model place is not available.")
 
-    country_name = pycountry.countries.search_fuzzy(response.json()[0]["address"]["country"])[0].name
+        address_type = response.json()[0]["addresstype"]
+    else:
+        address_type = project.about.address_type
 
-    if re.search(model_place, country_name):
+    if address_type == "country":
         return True
     return False
 
@@ -111,9 +113,9 @@ def delete_links_and_nodes(model_place, project: Project):
         conn.commit()
 
         nodes_query = """DELETE FROM nodes
-        WHERE node_id NOT IN (SELECT a_node FROM links
-                            UNION ALL
-                                            SELECT b_node FROM links);
+                         WHERE node_id NOT IN (SELECT a_node FROM links
+                                               UNION ALL
+                                               SELECT b_node FROM links);
         """
 
         conn.execute(nodes_query)
