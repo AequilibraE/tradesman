@@ -3,6 +3,8 @@ import warnings
 from os.path import isfile, join
 from tempfile import gettempdir
 from urllib.request import urlretrieve
+import math
+from io import StringIO
 
 import geopandas as gpd
 import numpy as np
@@ -19,108 +21,111 @@ class ImportMicrosoftBuildingData:
     Triggers the import of building information from Microsoft Bing.
 
     Parameters:
-        *model_place*(:obj:`str`): current model place
-        *project*(:obj:`aequilibrae.project`): currently open project
+        **project**(:obj:`aequilibrae.project`): currently open project
     """
 
-    def __init__(self, model_place: str, project: Project):
-        self.__model_place = model_place
+    def __init__(self, project: Project):
         self._project = project
         self.__zones = load_zones(project)
-        self._available = True
-        self.__country_list = pd.read_csv(
-            "https://minedbuildings.z5.web.core.windows.net/global-buildings/dataset-links.csv"
+
+    def get_quadkey(lat, lng, zoom: int = 9):
+        """
+        Borrowed from https://medium.com/@biz.soing/generating-quadkeys-83aa2b8018b7
+        """
+        x = int((lng + 180) / 360 * (1 << zoom))
+        y = int(
+            (1 - math.log(math.tan(math.radians(lat)) + 1 / math.cos(math.radians(lat))) / math.pi) / 2 * (1 << zoom)
         )
-
-        self.__country_name = self.__nominatim_get_name().replace(" ", "")
-
-        self.__initialize()
-
-    def __nominatim_get_name(self):
-        search_place = self.__model_place.lower().replace(" ", "+")
-
-        timeout = 30
-        params = {"q": search_place, "format": "json", "polygon_geojson": 1, "addressdetails": 1}
-
-        url = "https://nominatim.openstreetmap.org/"
-        url = url.rstrip("/") + "/search"
-
-        try:
-            response = requests.get(url, params=params, timeout=timeout, headers=http_headers)
-            if response.status_code != 200:
-                raise ValueError(f"Request failed with status code {response.status_code}")
-        except requests.exceptions.Timeout as e:
-            raise TimeoutError("Request timed out") from e
-        except requests.exceptions.ConnectionError as e:
-            raise ConnectionError("Failed to connect") from e
-        except requests.exceptions.RequestException as e:
-            raise Exception(f"Request error: {e}") from e
-
-        res = response.json()
-        if not res:
-            raise ValueError("The desired model place is not available.")
-
-        return res[0]["address"]["country"]
-
-    def __initialize(self):
-        """
-        Checks if Microsoft Bing has any building information about the desired country.
-        """
-        if self.__country_name not in self.__country_list.Location.values:
-            warnings.warn("Microsoft Bing does not provide information about this region.")
-            self._available = False
+        quadkey = ""
+        for i in range(zoom, 0, -1):
+            digit = 0
+            mask = 1 << (i - 1)
+            if (x & mask) != 0:
+                digit += 1
+            if (y & mask) != 0:
+                digit += 2
+            quadkey += str(digit)
+        return int(quadkey)
 
     def microsoft_buildings(self):
         """
         Import building information from Microsoft Bing.
         """
-        if not self._available:
-            warnings.warn("Didn't I tell you it was not available?")
+        url = "https://minedbuildings.z5.web.core.windows.net/global-buildings/dataset-links.csv"
+
+        try:
+            # Make request with timeout and headers
+            response = requests.get(url, headers=http_headers, timeout=30)
+            response.raise_for_status()  # Raise exception for bad status codes
+
+            # Read CSV from response content
+            bld_list = pd.read_csv(StringIO(response.text))
+            bld_list.columns = [x.lower() for x in bld_list.columns]
+        except requests.exceptions.Timeout:
+            print("Request timed out after 30 seconds")
+            # Gotta raise errors instead
+        except requests.exceptions.RequestException as e:
+            print(f"Request failed: {e}")
+
+        bbox = []
+        key_list = [
+            self.get_quadkey(bbox[0], bbox[2]),
+            self.get_quadkey(bbox[1], bbox[2]),
+            self.get_quadkey(bbox[0], bbox[3]),
+            self.get_quadkey(bbox[1], bbox[3]),
+        ]
+
+        # Check if the bbox coordinates are within any QuadKey. If the DataFrame is empty, it means that
+        # there is no building data for the model area.
+        bld_list = bld_list[bld_list["quadkey"].isin(key_list)]
+        if bld_list.empty:
+            warnings.warn("There is no building footage available for the desired model area.")
             return
+
         url = self.__country_list[self.__country_list.Location == self.__country_name].Url.values
 
         frame_list = []
 
-        for i in range(len(url)):
-            dest_path = join(gettempdir(), f"{self.__country_name}_{i}_bing.gz")
-
+        for _, row in bld_list.iterrows():
+            dest_path = join(gettempdir(), f"building--footage--quadkey--{row["quadkey"]}.gz")
             if not isfile(dest_path):
-                urlretrieve(url[i], dest_path)
-
+                _, _ = urlretrieve(row["url"], dest_path)
             with gzip.open(dest_path, "rb") as file:
-                frame_list.append(gpd.read_file(file))
+                gdf = gpd.read_file(file)
+                gdf["quadkey"] = row["quadkey"]
+                frame_list.append(gdf)
 
-        model_gdf = pd.concat(frame_list)
+        buildings = pd.concat(frame_list)
+        buildings = gpd.sjoin(buildings, self.__zones)  # Join with the zones database
+        buildings["id"] = buildings.index + 1
+        buildings["geom"] = buildings.geometry.to_wkb()
+        buildings["area"] = buildings.geometry.to_crs(3857).area
 
-        model_gdf["area"] = model_gdf.to_crs(3857).geometry.area
-
-        buildings_by_zone = gpd.sjoin(model_gdf, self.__zones)
-
-        buildings_by_zone.drop(columns=["index_right"], inplace=True)
-
-        buildings_by_zone.insert(0, column="id", value=np.arange(1, len(buildings_by_zone) + 1))
-
-        buildings_by_zone["geom"] = buildings_by_zone.geometry.to_wkb()
+        cols = ["id", "quadkey", "zone_id", "area", "geom"]
+        buildings = buildings[cols]
 
         with self._project.db_connection as conn:
             # Create columns in zones' table with microsoft building information
-            conn.execute("ALTER TABLE zones ADD microsoft_building_count INT;")
+            conn.execute("ALTER TABLE zones ADD mcr_bld_count INT;")
+            conn.execute("ALTER TABLE zones ADD mcr_bld_area FLOAT;")
             conn.commit()
 
-            conn.execute("ALTER TABLE zones ADD microsoft_building_area FLOAT;")
-            conn.commit()
-
+            # Add
             conn.execute(
-                "UPDATE zones SET microsoft_building_area=ROUND(0,2), microsoft_building_count=0 WHERE microsoft_building_count IS NULL;"
+                """
+                    UPDATE zones 
+                    SET mcr_bld_area=ROUND(0,2), mcr_bld_count=0 
+                    WHERE mcr_bld_count IS NULL;
+                """
             )
             conn.commit()
 
-            qry = "UPDATE zones SET microsoft_building_count=?, microsoft_building_area=ROUND(?, 2) WHERE zone_id=?;"
+            qry = "UPDATE zones SET mcr_bld_count=?, mcr_bld_area=ROUND(?, 2) WHERE zone_id=?;"
             list_of_tuples = list(
                 zip(
-                    buildings_by_zone.groupby("zone_id").count().id.values,
-                    buildings_by_zone.groupby("zone_id").sum(numeric_only=True).area.values,
-                    np.arange(1, max(buildings_by_zone.zone_id) + 1),
+                    buildings.groupby("zone_id").count().id.values,
+                    buildings.groupby("zone_id").sum(numeric_only=True).area.values,
+                    np.arange(1, max(buildings.zone_id) + 1),
                     strict=False,
                 )
             )

@@ -58,21 +58,23 @@ class ImportPoliticalSubdivisions:
         data = self.__get_subdivisions()
         data = data[data.level == 0].copy()
         data["geom"] = data["geometry"].to_wkb()
-        data = data[["country_name", "division_name", "level", "geom"]]
+        data = data[["country_name", "division_name", "geom"]]
 
         with self.project.db_connection as conn:
+            # If the model area is a country, we update the model area to avoid creating useless zones in the future
+            if self.project.about.address_type == "country":
+                conn.execute("DELETE FROM political_subdivisions WHERE level=-1;")
+                sql = """INSERT INTO political_subdivisions(country_name, division_name, level, geometry)
+                         VALUES(?, ?, -1, CastToMulti(GeomFromWKB(?, 4326)));"""
+                conn.execute(sql, list(data.itertuples(index=False, name=None)))
+
             if overwrite:
                 conn.execute("DELETE FROM political_subdivisions WHERE level=0;")
                 conn.commit()
 
             sql = """INSERT INTO political_subdivisions(country_name, division_name, level, geometry)
-                     VALUES(?, ?, ?, CastToMulti(GeomFromWKB(?, 4326)));"""
-            conn.executemany(sql, list(data.itertuples(index=False, name=None)))
-
-            # If the model area is a country, we update the model area to avoid creating useless zones in the future
-            if self.project.about.address_type == "country":
-                sql = """UPDATE political_subdivisions SET geometry=CastToMulti(GeomFromWKB(?, 4326)) WHERE level=-1;"""
-                conn.execute(sql, data.geom.values)
+                     VALUES(?, ?, 0, CastToMulti(GeomFromWKB(?, 4326)));"""
+            conn.execute(sql, list(data.itertuples(index=False, name=None)))
 
     def import_subdivisions(self, level: int = 2, overwrite: bool = False):
         """
@@ -236,6 +238,7 @@ class ImportPoliticalSubdivisions:
         country = pycountry.countries.lookup(res[0]["address"]["country"])
 
         fields = ["model_place", "address_type", "country_name", "country_code_two_digit", "country_code_three_digit"]
+        fields.extend(["xmin", "ymin", "xmax", "ymax"])
 
         about = self.project.about
         for field in fields:
@@ -246,6 +249,10 @@ class ImportPoliticalSubdivisions:
         about.country_name = country.name
         about.country_code_two_digit = country.alpha_2.upper()
         about.country_code_three_digit = country.alpha_3.upper()
+        about.xmin = res[0]["boundingbox"][2]
+        about.ymin = res[0]["boundingbox"][0]
+        about.xmax = res[0]["boundingbox"][3]
+        about.ymax = res[0]["boundingbox"][1]
 
         if "ISO3166-2-lvl4" in res[0]["address"]:
             about.add_info_field("subdivision_code")
