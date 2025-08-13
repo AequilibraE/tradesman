@@ -18,7 +18,7 @@ def create_buckets(project: Project, folder: str, sample=0.02):
          *sample*(:obj:`float`): percentage of population one want to compose the seed.
     """
 
-    country_code = project.about.country_code
+    country_code = project.about.country_code_three_digit
 
     pth = dirname(__file__)
 

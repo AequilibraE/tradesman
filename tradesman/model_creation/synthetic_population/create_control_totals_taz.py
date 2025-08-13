@@ -15,7 +15,7 @@ def create_control_totals_taz(project: Project, dest_folder: str):
          *dest_folder*(:obj:`str`): folder containing population files
     """
 
-    country_code = project.about.country_code
+    country_code = project.about.country_code_three_digit
 
     pth = dirname(__file__)
 

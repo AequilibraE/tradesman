@@ -135,8 +135,8 @@ def run_populationsim(multithread: bool, project: Project, folder: str, thread_n
         )
         conn.commit()
 
-    user_change_validation_parameters(overwrite=False, model_place=project.about.model_name, dest_folder=pop_fldr)
+    user_change_validation_parameters(overwrite=False, model_place=project.about.model_place, dest_folder=pop_fldr)
 
-    validate_non_controlled_vars(project.about.country_code, pop_fldr)
+    validate_non_controlled_vars(project.about.country_code_three_digit, pop_fldr)
 
     validate_controlled_vars(pop_fldr)
