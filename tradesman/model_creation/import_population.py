@@ -14,10 +14,9 @@ from tradesman.utils.tqdm_download import TqdmUpTo
 
 
 class ImportPopulation:
-    def __init__(self, project: Project, source: str = "WorldPop", overwrite: bool = False):
+    def __init__(self, project: Project, source: str = "WorldPop"):
         self.project = project
         self.source = source.lower()
-        self.overwrite = overwrite
 
     def get_file_url(self):
         if self.source not in ["worldpop", "meta"]:
@@ -37,18 +36,18 @@ class ImportPopulation:
 
             return url.meta_link.tolist()[0]
 
-    def population_raster(self, data_link: str, field_name: str):
+    def population_raster(self, data_link: str, filename: str):
         """
         Reads the population raster.
 
         Parameters:
             *data_link*(:obj:`str`): URL link to download the file
-            *field_name*(:obj:`str`): desired filed name
-            *project*(:obj:`aequilibrae.project`): currently open project
+
+            *filename*(:obj:`str`): desired filed name
         """
-        dest_path = join(gettempdir(), f"{field_name}.tif")
+        dest_path = join(gettempdir(), f"{filename}.tif")
         if not isfile(dest_path):
-            with TqdmUpTo(unit="B", unit_scale=True, unit_divisor=1024, miniters=1, desc=f"{field_name}.tif") as t:
+            with TqdmUpTo(unit="B", unit_scale=True, unit_divisor=1024, miniters=1, desc=f"{filename}.tif") as t:
                 _, _ = urlretrieve(data_link, filename=dest_path, reporthook=t.update_to, data=None)
                 t.total = t.n
         model_area = self.get_model_area(True)
@@ -99,8 +98,14 @@ class ImportPopulation:
             return model_area
 
     def get_overall_population(self):
+        fields = self.project.zoning.fields
+        if "population" not in fields.all_fields():
+            fields.add("population", "Total population", "INTEGER")
+            fields.save()
+
         url = self.get_file_url()
-        df = self.population_raster(url, f"pop_{self.project.country_name}")
+        country_code = self.project.about.country_code_three_digit.lower()
+        df = self.population_raster(url, f"{country_code}--overall--population")
         population = gpd.GeoDataFrame(df, geometry=gpd.points_from_xy(df.longitude, df.latitude), crs=4326)
 
         model_area = self.get_model_area()
@@ -113,40 +118,34 @@ class ImportPopulation:
     def get_stratified_population(self):
         """
         Imports population by sex and age into the model.
-
-        Parameters:
-            *project*(:obj:`aequilibrae.project`): currently open project
-            *country_name*(:obj:`str`): model place country
         """
         url = "https://data.worldpop.org/GIS/AgeSex_structures/Global_2000_2020/2020/{}/{}_{}_{}_2020.tif"
-        sex = ["f", "m"]
+        sex = {"f": "fe", "m": ""}
         age = [0, 1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80]
         country_code = self.project.about.country_code_three_digit
 
         zoning = self.project.zoning
         fields = zoning.fields
+        zones = zoning.data[["zone_id", "geometry"]].copy()
 
-        zones = zoning.data
-
-        for s in sex:
+        for key in sex.keys():
             for idx, a in enumerate(age):
-                data_link = url.format(country_code, country_code.lower(), s, a)
-                field_name = f"POP{s.upper()}{a}"
+                data_link = url.format(country_code, country_code.lower(), key, a)
+                fname = f"{country_code.lower()}--{sex[key]}male--population--{a}"
 
-                df = self.population_raster(data_link, field_name=f"{country_code}_{field_name}")
+                df = self.population_raster(data_link, filename=fname)
 
                 population = gpd.GeoDataFrame(df, geometry=gpd.points_from_xy(df.longitude, df.latitude), crs=4326)
                 population = zones.sjoin(population).groupby("zone_id").sum(numeric_only=True).astype(int)
                 population.reset_index(inplace=True)
 
-                list_of_tuples = list(population[["population", "zone_id"]].itertuples(False, None))
-
-                preffix = "" if s == "m" else "fe"
+                field_name = f"{key}_pop_{a}"
                 if a < 80:
-                    fields.add(field_name, f"{preffix}male population {a} to {age[idx+1]} years old.", "INTEGER")
+                    fields.add(field_name, f"{sex[key]}male population {a} to {age[idx+1]} years old.", "INTEGER")
                 else:
-                    fields.add(field_name, f"{preffix}male population over {a} years old.", "INTEGER")
+                    fields.add(field_name, f"{sex[key]}male population over {a} years old.", "INTEGER")
 
+                list_of_tuples = list(population[["population", "zone_id"]].itertuples(False, None))
                 with self.project.db_connection as conn:
                     conn.executemany(f"UPDATE zones SET {field_name}=? WHERE zone_id=?;", list_of_tuples)
                     conn.execute(f"UPDATE zones SET {field_name}=0 WHERE {field_name} IS NULL;")

@@ -58,7 +58,7 @@ class ZoneBuilder:
             sql = "SELECT division_name, level, Hex(ST_AsBinary(geometry)) as geometry FROM political_subdivisions;"
             return gpd.GeoDataFrame.from_postgis(sql, conn, geom_col="geometry", crs="EPSG:4326")
 
-    def hex_builder(self, epsg: int = 3857):
+    def hex_builder(self):
         """
         Creates hexbins that covers all project area.
 
@@ -117,11 +117,11 @@ class ZoneBuilder:
                 if poly_id % threshold == 0:
                     print(f"{poly_id:,} --> ({round(perf_counter() - t, 1)} s)")
                     t = perf_counter()
-                    results.append(data_conversion(data, epsg))
+                    results.append(data_conversion(data, 3857))
                     data.clear()
 
         if data:
-            results.append(data_conversion(data, epsg))
+            results.append(data_conversion(data, 3857))
             data.clear()
 
         hexb = pd.concat(results)
@@ -138,8 +138,8 @@ class ZoneBuilder:
             hexb = hexb.clip(coverage_area.union_all(), keep_geom_type=True)
 
         hexb.hex_id = np.arange(hexb.shape[0]) + 1
-        hexb = gpd.GeoDataFrame(hexb[["hex_id"]], geometry=hexb["geometry"], crs=f"EPSG:{epsg}")
-        return hexb.to_crs("EPSG:4326", inplace=True)
+        hexbins = gpd.GeoDataFrame(hexb[["hex_id"]], geometry=hexb["geometry"], crs="EPSG:3857")
+        return hexbins.to_crs("EPSG:4326")
 
     def zones_with_location(self):
         """
@@ -372,14 +372,16 @@ class ZoneBuilder:
 
         clusters = self.create_clusters(zones_with_pop)
 
-        with self.project.db_connection as conn:
-            max_zone = clusters.index.max()
-
-            min_node = conn.execute("Select min(node_id) from nodes").fetchone()[0]
-
-            if min_node <= max_zone:
-                increment = conn.execute("Select max(node_id) from nodes").fetchone()[0] + 1
-                conn.execute("update nodes set node_id =node_id + ?", [increment])
+        # This if-clause allow us to save the zones even if there is no network in the model.
+        if not self.project.network.nodes.data.empty:
+            with self.project.db_connection as conn:
+                max_zone = clusters.index.max()
+                min_node = conn.execute("SELECT MIN(node_id) FROM nodes").fetchone()[0]
+                if min_node <= max_zone:
+                    increment = conn.execute("SELECT MAX(node_id) FROM nodes").fetchone()[0] + 1
+                    conn.execute("UPDATE nodes SET node_id=node_id + ?", [increment])
+        else:
+            warnings.warn("No nodes were renumbered because no network was found in the project.")
 
         zoning = self.project.zoning
         for zone_id, row in clusters.iterrows():

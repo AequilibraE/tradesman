@@ -12,9 +12,7 @@ from tradesman.data_retrieval.import_building import building_import
 from tradesman.model_creation.create_new_tables import add_new_tables
 from tradesman.model_creation.import_network import ImportNetwork
 from tradesman.model_creation.import_political_subdivisions import ImportPoliticalSubdivisions
-from tradesman.model_creation.import_population import import_population
-from tradesman.model_creation.pop_by_sex_and_age import get_pop_by_sex_age
-from tradesman.model_creation.set_source import set_political_boundaries_source, set_population_source
+from tradesman.model_creation.import_population import ImportPopulation
 from tradesman.model_creation.synthetic_population.create_synthetic_population import create_syn_pop, run_populationsim
 from tradesman.model_creation.zoning.zone_building import zone_builder
 
@@ -75,24 +73,6 @@ class Tradesman:
 
         self._boundaries.add_country_borders(overwrite)
 
-    def set_population_source(self, source="WorldPop"):
-        """
-        Sets the source for downloading population data
-
-        Parameters:
-            *source* (:obj:`str`): Can be 'WorldPop' or 'Meta'. Defaults to WorldPop
-        """
-        self.__population_source = set_population_source(source)
-
-    def set_political_boundaries_source(self, source="Overture"):
-        """
-        Sets the source for downloading geographic data.
-
-        Parameters:
-             *source*(:obj:`str`): Takes "Overture" or "GeoBoundaries". Defaults to Overture.
-        """
-        self._boundaries_source = set_political_boundaries_source(source)
-
     def import_network(self):
         """
         Triggers the import of the network from OSM and adds subdivisions into the model.
@@ -108,25 +88,17 @@ class Tradesman:
         Parameters:
             *subdivisions* (:obj:`int`): Number of subdivision levels to import. Defaults to 2
             *overwrite* (:obj:`bool`): Deletes pre-existing subdivisions. Defaults to False
-
         """
 
         self._boundaries.import_subdivisions(subdivision_levels, overwrite)
 
-    def import_population(self, overwrite=False):
+    def import_population(self):
         """
-        Triggers the import of population from raster into the model
-
-        Parameters:
-            *overwrite* (:obj:`bool`): Deletes pre-existing population_source_import. Defaults to False
+        Triggers the import of population from raster into the model.
         """
 
-        fields = self.project.zoning.fields
-        if "population" not in fields.all_fields():
-            fields.add("population", "Total population", "INTEGER")
-            fields.save()
-
-        import_population(self.project, self.project.about.country_name, self.__population_source, overwrite=overwrite)
+        population = ImportPopulation(self.project, self.__population_source)
+        population.get_overall_population()
 
     def build_zoning(self, hexbin_size=200, max_zone_pop=10000, min_zone_pop=500, save_hexbins=False, overwrite=False):
         """
@@ -169,7 +141,8 @@ class Tradesman:
         """
         Triggers the import of population pyramid from raster into the model.
         """
-        get_pop_by_sex_age(self.project, self.project.about.country_name)
+        population = ImportPopulation(self.project)
+        population.get_stratified_population()
 
     def import_amenities(self):
         """
