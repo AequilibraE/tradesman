@@ -13,8 +13,6 @@ import requests
 from aequilibrae.project import Project
 from aequilibrae.project.network.osm.osm_params import http_headers
 
-from tradesman.utils.load_zones import load_zones
-
 
 class ImportMicrosoftBuildingData:
     """
@@ -26,7 +24,6 @@ class ImportMicrosoftBuildingData:
 
     def __init__(self, project: Project):
         self._project = project
-        self.__zones = load_zones(project)
 
     def get_quadkey(lat, lng, zoom: int = 9):
         """
@@ -47,7 +44,7 @@ class ImportMicrosoftBuildingData:
             quadkey += str(digit)
         return int(quadkey)
 
-    def microsoft_buildings(self):
+    def get_buildings(self):
         """
         Import building information from Microsoft Bing.
         """
@@ -95,8 +92,11 @@ class ImportMicrosoftBuildingData:
                 gdf["quadkey"] = row["quadkey"]
                 frame_list.append(gdf)
 
+        zones = self.project.zoning.data.copy()
+        zones = zones[["zone_id", "geometry"]]
+
         buildings = pd.concat(frame_list)
-        buildings = gpd.sjoin(buildings, self.__zones)  # Join with the zones database
+        buildings = gpd.sjoin(buildings, zones)  # Join with the zones database
         buildings["id"] = buildings.index + 1
         buildings["geom"] = buildings.geometry.to_wkb()
         buildings["area"] = buildings.geometry.to_crs(3857).area
@@ -130,3 +130,5 @@ class ImportMicrosoftBuildingData:
                 )
             )
             conn.executemany(qry, list_of_tuples)
+
+        # TODO: save the data in the disk

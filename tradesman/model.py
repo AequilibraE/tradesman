@@ -14,7 +14,7 @@ from tradesman.model_creation.import_network import ImportNetwork
 from tradesman.model_creation.import_political_subdivisions import ImportPoliticalSubdivisions
 from tradesman.model_creation.import_population import ImportPopulation
 from tradesman.model_creation.synthetic_population.create_synthetic_population import create_syn_pop, run_populationsim
-from tradesman.model_creation.zoning.zone_building import zone_builder
+from tradesman.model_creation.build_zoning import ZoneBuilder
 
 
 class Tradesman:
@@ -79,14 +79,15 @@ class Tradesman:
         If the network already exists in the folder, it will be loaded, otherwise it will be created.
         """
 
-        self._network = ImportNetwork(self.project, self.__model_place, self.__pbf_path)
-        self._network.build_network()
+        network = ImportNetwork(self.project, self.__model_place, self.__pbf_path)
+        network.build_network()
 
-    def import_subdivisions(self, subdivision_levels=2, overwrite=False):
+    def import_subdivisions(self, subdivision_levels: int = 2, overwrite: bool = False):
         """Imports political subdivisions.
 
         Parameters:
             *subdivisions* (:obj:`int`): Number of subdivision levels to import. Defaults to 2
+
             *overwrite* (:obj:`bool`): Deletes pre-existing subdivisions. Defaults to False
         """
 
@@ -105,25 +106,28 @@ class Tradesman:
         Creates hexagonal bins, and then clusters it regarding the political subdivision.
 
         Parameters:
-             *hexbin_size*(:obj:`int`): size of the hexagonal bins to be created.
-             *max_zone_pop*(:obj:`int`): max population living within a zone.
-             *min_zone_pop*(:obj:`int`): min population living within a zone.
-             *save_hexbins*(:obj:`bool`): saves the hexagonal bins with population. Defaults to False.
-             *overwrite* (:obj:`bool`): Deletes pre-existing HexBins and Zones. Defaults to False
-        """
-        with self.project.db_connection as conn:
-            num_zones = conn.execute("Select count(*) from Zones").fetchone()
+            *hexbin_size*(:obj:`int`): size of the hexagonal bins to be created.
 
-        if not overwrite and sum(num_zones) > 0:
-            return
-        zone_builder(self.project, hexbin_size, max_zone_pop, min_zone_pop, save_hexbins)
+            *max_zone_pop*(:obj:`int`): max population living within a zone.
+
+            *min_zone_pop*(:obj:`int`): min population living within a zone.
+
+            *save_hexbins*(:obj:`bool`): saves the hexagonal bins with population. Defaults to False.
+
+            *overwrite* (:obj:`bool`): Deletes pre-existing HexBins and Zones. Defaults to False
+        """
+        if not overwrite and not self.project.zones.zoning.data.empty:
+            raise ValueError("Project zones is not empty. Set overwrite=True to proceed.")
+
+        zones = ZoneBuilder(self.project, hexbin_size, max_zone_pop, min_zone_pop, save_hexbins)
+        zones.execute()
 
     def get_political_subdivisions(self, level: int = None) -> gpd.GeoDataFrame:
         """
         Return political subdivisions from a country.
 
         Parameters:
-             *level*(:obj:`int`): Number of subdivision levels to import. Default imports all levels.
+            *level*(:obj:`int`): Number of subdivision levels to import. Default imports all levels.
         """
 
         subd = subdivisions(self.project)
@@ -152,29 +156,30 @@ class Tradesman:
 
         import_amenities(self.project, self.__osm_data)
 
-    def import_buildings(self, download_from_bing=True):
+    def import_buildings(self, download_from_mcr: bool = True):
         """
-        Triggers the import of buildings from both OSM and Microsoft Bing.
+        Triggers the import of buildings from both Overture and Microsoft Bing.
         Data will be exported as columns in zones file and as a separate SQL file.
 
         Parameters:
-            *download_from_bing(:obj:`bool`): downloads building data from Microsoft Bing. Defaults to True.
+            *download_from_mcr(:obj:`bool`): downloads building data from Microsoft Bing. Defaults to True.
         """
 
-        building_import(self.__model_place, self.project, self.__osm_data, download_from_bing)
+        building_import(self.__model_place, self.project, self.__osm_data, download_from_mcr)
 
-    def build_population_synthesizer_data(self, sample_size=0.01):
+    def build_population_synthesizer_data(self, sample_size: float = 0.01):
         """
         Triggers the import of data to create the synthetic population.
         """
         create_syn_pop(self.project, self.__folder, sample_size=sample_size)
 
-    def synthesize_population(self, thread_number=None, multithread=False):
+    def synthesize_population(self, thread_number: int = None, multithread: bool = False):
         """
         Triggers the creation of synthetic population.
 
         Parameters:
             *multithread*(:obj:`bool`): sets if one wants to use multiple threads or not. Defaults to False.
+
             *thread_number*(:obj:`int`): number of threads for multiprocessing
         """
 

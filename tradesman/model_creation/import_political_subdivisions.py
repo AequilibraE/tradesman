@@ -34,11 +34,13 @@ class ImportPoliticalSubdivisions:
 
     Parameters:
         *model_place*(:obj:`str`): current model place
-        *source*(:obj:`str`): database source to download geographic data. Defaults to GADM
+
         *project*(:obj:`aequilibrae.project`): currently open project
+
+        *source*(:obj:`str`): database source to download geographic data. Defaults to Overture
     """
 
-    def __init__(self, model_place: str, project: Project, source: str = "overture"):
+    def __init__(self, model_place: str, project: Project, source: str = "Overture"):
         self.__model_place = model_place
         self.__search_place = model_place.lower().replace(" ", "+")
         self.project = project

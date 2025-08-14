@@ -14,10 +14,9 @@ class ImportOsmData:
     Triggers the import of OSM data and saves it into the database.
 
     Parameters:
-         *tag*(:obj:`str`): data tag to download
-         *project*(:obj:`aequilibrae.project`): currently open project
-         *osm_data*(:obj:`dict`): dictionary to store downloaded data
-
+        *tag*(:obj:`str`): data tag to download
+        *project*(:obj:`aequilibrae.project`): currently open project
+        *osm_data*(:obj:`dict`): dictionary to store downloaded data
     """
 
     def __init__(self, tag: str, project: Project, osm_data: dict):
