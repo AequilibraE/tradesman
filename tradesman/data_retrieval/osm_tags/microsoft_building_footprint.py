@@ -13,7 +13,7 @@ import requests
 from aequilibrae.project import Project
 from aequilibrae.project.network.osm.osm_params import http_headers
 
-from tradesman.data.load_zones import load_zones
+from tradesman.utils.load_zones import load_zones
 
 
 class ImportMicrosoftBuildingData:
@@ -113,8 +113,8 @@ class ImportMicrosoftBuildingData:
             # Add
             conn.execute(
                 """
-                    UPDATE zones 
-                    SET mcr_bld_area=ROUND(0,2), mcr_bld_count=0 
+                    UPDATE zones
+                    SET mcr_bld_area=ROUND(0,2), mcr_bld_count=0
                     WHERE mcr_bld_count IS NULL;
                 """
             )

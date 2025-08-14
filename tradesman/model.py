@@ -26,12 +26,13 @@ class Tradesman:
         model_place: str = None,
         pbf_path: str = None,
         boundaries_source: str = "Overture",
+        population_source: str = "WorldPop",
         logger=None,
     ):
         # TODO: If the model exists, you would only tell where it is (network_path),
         # and the software would check and populate the model place.
         self.__model_place = model_place
-        self.__population_source = "WorldPop"
+        self.__population_source = population_source
         self.__folder = network_path
         self.project = Project()
         self.__osm_data = {}

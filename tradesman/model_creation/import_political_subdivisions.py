@@ -66,15 +66,14 @@ class ImportPoliticalSubdivisions:
                 conn.execute("DELETE FROM political_subdivisions WHERE level=-1;")
                 sql = """INSERT INTO political_subdivisions(country_name, division_name, level, geometry)
                          VALUES(?, ?, -1, CastToMulti(GeomFromWKB(?, 4326)));"""
-                conn.execute(sql, list(data.itertuples(index=False, name=None)))
+                conn.executemany(sql, list(data.itertuples(False, None)))
 
             if overwrite:
                 conn.execute("DELETE FROM political_subdivisions WHERE level=0;")
-                conn.commit()
 
             sql = """INSERT INTO political_subdivisions(country_name, division_name, level, geometry)
                      VALUES(?, ?, 0, CastToMulti(GeomFromWKB(?, 4326)));"""
-            conn.execute(sql, list(data.itertuples(index=False, name=None)))
+            conn.executemany(sql, list(data.itertuples(index=False, name=None)))
 
     def import_subdivisions(self, level: int = 2, overwrite: bool = False):
         """
@@ -263,16 +262,19 @@ class ImportPoliticalSubdivisions:
         # Manipulate geometry data
         self._poly = self.__geometry_type(res[0]["geojson"])
 
-        df = pd.DataFrame([[1, self._poly.wkb]], columns=["fid", "geometry"], index=[0])
-        df = df.assign(level=-1, division_name="model_area", country_name=country.name)
+        df = gpd.GeoDataFrame(
+            [[country.name, "model_area", -1]],
+            columns=["country_name", "division_name", "level"],
+            geometry=[self._poly],
+            crs="EPSG:4326",
+        )
+        df["geom"] = df["geometry"].to_wkb()
+        df.drop(["geometry"], axis=1, inplace=True)
 
         with self.project.db_connection as conn:
             qry = "INSERT INTO political_subdivisions (country_name, division_name, level, geometry) \
                     VALUES(?, ?, ?, CastToMulti(GeomFromWKB(?, 4326)));"
-            list_of_tuples = list(
-                df[["country_name", "division_name", "level", "geometry"]].itertuples(index=False, name=None)
-            )
-
+            list_of_tuples = list(df.itertuples(False, None))
             conn.executemany(qry, list_of_tuples)
 
     def __source_control(self):
@@ -301,12 +303,12 @@ class ImportPoliticalSubdivisions:
     @property
     def area_polygon(self):
         """"""
-        if not self._poly:
-            with self.project.db_connection as conn:
-                qry = "SELECT *, Hex(ST_AsBinary(geometry)) as geom FROM political_subdivisions WHERE level=-1"
-                model_area = gpd.GeoDataFrame.from_postgis(qry, conn, geom_col="geom", crs=4326)
-                return model_area.geom[0]
-        return self._poly
+        with self.project.db_connection as conn:
+            qry = "SELECT *, Hex(ST_AsBinary(geometry)) as geom FROM political_subdivisions WHERE level=-1"
+            model_area = gpd.GeoDataFrame.from_postgis(qry, conn, geom_col="geom", crs=4326)
+            if model_area.empty:
+                Warning.warn("No model_area found in project. Please check its import.")
+            return model_area.geom[0]
 
     def __get_centroids(self, gdf):
         """

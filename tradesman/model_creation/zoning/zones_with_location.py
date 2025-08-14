@@ -47,11 +47,8 @@ def zones_with_location(hexb, states):
         geom_colum = "geometry_x"
 
     gdf = gpd.GeoDataFrame(data_complete[["hex_id", "division_name"]], geometry=data_complete[geom_colum])
-
     gdf = gdf.explode(index_parts=True).drop_duplicates()
-
     gdf.reset_index(drop=True, inplace=True)
-
     gdf["hex_id"] = np.arange(1, len(gdf) + 1)
 
     return gdf

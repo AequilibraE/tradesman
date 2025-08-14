@@ -4,7 +4,7 @@ import pandas as pd
 from aequilibrae.project import Project
 from shapely.geometry import Point, Polygon, box
 
-from tradesman.data.load_zones import load_zones
+from tradesman.utils.load_zones import load_zones
 from tradesman.data_retrieval.osm_tags.generic_tag import generic_tag
 from tradesman.data_retrieval.osm_tags.osm_tag_values import amenity_values, building_values
 

@@ -15,11 +15,15 @@ def load_osm_data(tag: str, osm_data: dict, tile_size, queries, project: Project
     Loads data from OSM or cached to disk.
 
     Parameters:
-         *tag*(:obj:`str`): download objects from Open Street Maps. Takes amenity or buildings.
-         *osm_data*(:obj:`dict`): store downloaded data.
-         *tile_size*(:obj:`float`): The size of the tile we want to split our area in. Defaults to 25km side.
-         *queries*(:obj:`str`): SQL queries to request Overpass API.
-         *project*(:obj:`aequilibrae.project): current project.
+        **tag**(:obj:`str`): download objects from Open Street Maps. Takes amenity or buildings.
+
+        **osm_data**(:obj:`dict`): store downloaded data.
+
+        **tile_size**(:obj:`float`): The size of the tile we want to split our area in. Defaults to 25km side.
+
+        **queries**(:obj:`str`): SQL queries to request Overpass API.
+
+        **project**(:obj:`aequilibrae.project): current project.
     """
 
     if osm_data.get(tag, {}):
@@ -66,8 +70,9 @@ def __cache_name(element: str, project: Project):
     Create memory cache to store data.
 
     Parameters:
-         *element*(:obj:`str`): objects downloaded from Open Street Maps. Takes amenity or buildings.
-         *project*(:obj:`aequilibrae.project): current project.
+        **element**(:obj:`str`): objects downloaded from Open Street Maps. Takes amenity or buildings.
+
+        **project**(:obj:`aequilibrae.project): current project
     """
     with project.db_connection as conn:
         sql_coverage = "SELECT Hex(ST_AsBinary(geometry)) as geometry FROM political_subdivisions where level=0;"

@@ -1,6 +1,6 @@
 import pandas as pd
 import geopandas as gpd
-from tradesman.data.load_zones import load_zones
+from tradesman.utils.load_zones import load_zones
 from geopandas import sjoin_nearest
 
 from tradesman.data_retrieval.rural_access_index.population_data import population_data

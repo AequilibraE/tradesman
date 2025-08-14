@@ -1,8 +1,9 @@
-import geopandas as gpd
-import sqlite3
+from geopandas import GeoDataFrame
+
+from aequilibrae.project import Project
 
 
-def load_zones(project):
+def load_zones(project: Project) -> GeoDataFrame:
     """
     Returns the model's Traffic Analysis Zones.
 
@@ -11,5 +12,4 @@ def load_zones(project):
     """
     with project.db_connection as conn:
         sql = "SELECT zone_id, Hex(ST_AsBinary(GEOMETRY)) geometry FROM zones;"
-        zones = gpd.GeoDataFrame.from_postgis(sql, conn, geom_col="geometry", crs=4326)
-    return zones
+        return GeoDataFrame.from_postgis(sql, conn, geom_col="geometry", crs=4326)
