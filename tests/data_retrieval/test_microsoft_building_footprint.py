@@ -7,7 +7,7 @@ from uuid import uuid4
 import pandas as pd
 
 from tests.create_nauru_test import create_nauru_test
-from tradesman.data_retrieval.osm_tags.microsoft_building_footprint import ImportMicrosoftBuildingData
+from tradesman.data_retrieval.microsoft_building_data import ImportMicrosoftBuildingData
 
 
 class TestMicrosoftBuildingFootprint(unittest.TestCase):

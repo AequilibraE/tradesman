@@ -7,8 +7,8 @@ from aequilibrae.context import get_logger
 from aequilibrae.project import Project
 
 from tradesman.data_retrieval import subdivisions
-from tradesman.data_retrieval.import_amenities import import_amenities
-from tradesman.data_retrieval.import_building import building_import
+from tradesman.data_retrieval.import_build_and_places import ImportBuildPlaces
+from tradesman.data_retrieval.microsoft_building_data import ImportMicrosoftBuildingData
 from tradesman.model_creation.create_new_tables import add_new_tables
 from tradesman.model_creation.import_network import ImportNetwork
 from tradesman.model_creation.import_political_subdivisions import ImportPoliticalSubdivisions
@@ -101,7 +101,14 @@ class Tradesman:
         population = ImportPopulation(self.project, self.__population_source)
         population.get_overall_population()
 
-    def build_zoning(self, hexbin_size=200, max_zone_pop=10000, min_zone_pop=500, save_hexbins=False, overwrite=False):
+    def build_zoning(
+        self,
+        hexbin_size: int = 200,
+        max_zone_pop: int = 10000,
+        min_zone_pop: int = 500,
+        save_hexbins: bool = False,
+        overwrite: bool = False,
+    ):
         """
         Creates hexagonal bins, and then clusters it regarding the political subdivision.
 
@@ -112,9 +119,9 @@ class Tradesman:
 
             *min_zone_pop*(:obj:`int`): min population living within a zone.
 
-            *save_hexbins*(:obj:`bool`): saves the hexagonal bins with population. Defaults to False.
+            *save_hexbins*(:obj:`bool`): saves the hexagonal bins with population. Defaults to ``False``.
 
-            *overwrite* (:obj:`bool`): Deletes pre-existing HexBins and Zones. Defaults to False
+            *overwrite* (:obj:`bool`): Deletes pre-existing HexBins and Zones. Defaults to ``False``.
         """
         if not overwrite and not self.project.zones.zoning.data.empty:
             raise ValueError("Project zones is not empty. Set overwrite=True to proceed.")
@@ -148,24 +155,33 @@ class Tradesman:
         population = ImportPopulation(self.project)
         population.get_stratified_population()
 
-    def import_amenities(self):
+    def import_amenities(self, box_side: int = 25):
         """
         Triggers the import of amenities from OSM.
-        Data will be exported as columns in zones file and as a separate SQL file.
-        """
-
-        import_amenities(self.project, self.__osm_data)
-
-    def import_buildings(self, download_from_mcr: bool = True):
-        """
-        Triggers the import of buildings from both Overture and Microsoft Bing.
-        Data will be exported as columns in zones file and as a separate SQL file.
+        Data will be exported as columns in zones file and as a separate parquet file.
 
         Parameters:
-            *download_from_mcr(:obj:`bool`): downloads building data from Microsoft Bing. Defaults to True.
+            **box_size**(:obj:`int`): size of the box to be created (in km)
         """
+        ovm = ImportBuildPlaces(self.project, box_side)
+        ovm.import_places()
 
-        building_import(self.__model_place, self.project, self.__osm_data, download_from_mcr)
+    def import_buildings(self, box_side: int = 25, download_from_mcr: bool = True):
+        """
+        Triggers the import of buildings from both Overture and Microsoft Bing.
+        Data will be exported as columns in zones file and as a separate parquet file.
+
+        Parameters:
+            **box_size**(:obj:`int`): size of the box to be created (in km)
+
+            **download_from_mcr**(:obj:`bool`): downloads building data from Microsoft Bing. Defaults to ``True``.
+        """
+        if download_from_mcr:
+            mcr_bld = ImportMicrosoftBuildingData(self.project)
+            mcr_bld.get_buildings()
+
+        ovm = ImportBuildPlaces(self.project, box_side)
+        ovm.import_building()
 
     def build_population_synthesizer_data(self, sample_size: float = 0.01):
         """
