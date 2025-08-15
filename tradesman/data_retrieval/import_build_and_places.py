@@ -1,10 +1,10 @@
-from os import mkdir
-from os.path import dirname, isdir, join
-from math import ceil, sqrt
+import duckdb
 import geopandas as gpd
 import pandas as pd
-import duckdb
 from aequilibrae.project import Project
+from math import ceil, sqrt
+from os import mkdir
+from os.path import dirname, isdir, join
 from shapely import box, wkt
 
 

@@ -1,20 +1,19 @@
+import geopandas as gpd
 import logging
 import sys
-from os.path import isdir
-
-import geopandas as gpd
 from aequilibrae.context import get_logger
 from aequilibrae.project import Project
+from os.path import isdir
 
 from tradesman.data_retrieval import subdivisions
 from tradesman.data_retrieval.import_build_and_places import ImportBuildPlaces
 from tradesman.data_retrieval.microsoft_building_data import ImportMicrosoftBuildingData
+from tradesman.model_creation.build_zoning import ZoneBuilder
 from tradesman.model_creation.create_new_tables import add_new_tables
 from tradesman.model_creation.import_network import ImportNetwork
 from tradesman.model_creation.import_political_subdivisions import ImportPoliticalSubdivisions
 from tradesman.model_creation.import_population import ImportPopulation
 from tradesman.model_creation.synthetic_population.create_synthetic_population import create_syn_pop, run_populationsim
-from tradesman.model_creation.build_zoning import ZoneBuilder
 
 
 class Tradesman:
@@ -33,7 +32,6 @@ class Tradesman:
         self.__population_source = population_source
         self.__folder = network_path
         self.project = Project()
-        self.__osm_data = {}
         self.__pbf_path = pbf_path
         self.logger = logger or get_logger()
 

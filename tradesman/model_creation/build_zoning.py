@@ -1,23 +1,19 @@
-from aequilibrae.project import Project
-
-from math import floor
-from time import perf_counter
-import multiprocessing as mp
-
+import gc
 import geopandas as gpd
+import importlib.util as iutil
+import libpysal
+import multiprocessing as mp
 import numpy as np
 import pandas as pd
-import importlib.util as iutil
-from shapely.geometry import Polygon
-from tqdm import tqdm
-import gc
-
 import warnings
+from aequilibrae.project import Project
+from math import floor
 from math import sqrt, ceil
-
-import libpysal
-from sklearn.cluster import KMeans
+from shapely.geometry import Polygon
 from shapely.geometry import box
+from sklearn.cluster import KMeans
+from time import perf_counter
+from tqdm import tqdm
 
 has_dask_geopandas = iutil.find_spec("dask_geopandas") is not None
 

@@ -1,17 +1,18 @@
-import gzip
-import warnings
-from os.path import isfile, join
-from tempfile import gettempdir
-from urllib.request import urlretrieve
-import math
-from io import StringIO
-
 import geopandas as gpd
+import gzip
+import math
 import numpy as np
 import pandas as pd
 import requests
+import warnings
 from aequilibrae.project import Project
 from aequilibrae.project.network.osm.osm_params import http_headers
+from io import StringIO
+from os.path import isfile, join
+from shapely import box
+from tempfile import gettempdir
+from typing import Tuple, Set
+from urllib.request import urlretrieve
 
 
 class ImportMicrosoftBuildingData:
@@ -25,24 +26,71 @@ class ImportMicrosoftBuildingData:
     def __init__(self, project: Project):
         self._project = project
 
-    def get_quadkey(lat, lng, zoom: int = 9):
-        """
-        Borrowed from https://medium.com/@biz.soing/generating-quadkeys-83aa2b8018b7
-        """
-        x = int((lng + 180) / 360 * (1 << zoom))
-        y = int(
-            (1 - math.log(math.tan(math.radians(lat)) + 1 / math.cos(math.radians(lat))) / math.pi) / 2 * (1 << zoom)
-        )
+    def lat_lon_to_tile(self, lat: float, lon: float, zoom: int = 9) -> Tuple[int, int]:
+        """Convert lat/lon to tile coordinates."""
+        lat_rad = math.radians(lat)
+        n = 2.0**zoom
+        x = int((lon + 180.0) / 360.0 * n)
+        y = int((1.0 - math.asinh(math.tan(lat_rad)) / math.pi) / 2.0 * n)
+        return x, y
+
+    def tile_to_lat_lon(self, x: int, y: int, zoom: int = 9) -> Tuple[float, float, float, float]:
+        """Convert tile to bounding box (west, south, east, north)."""
+        n = 2.0**zoom
+        west = x / n * 360.0 - 180.0
+        east = (x + 1) / n * 360.0 - 180.0
+        north = math.degrees(math.atan(math.sinh(math.pi * (1 - 2 * y / n))))
+        south = math.degrees(math.atan(math.sinh(math.pi * (1 - 2 * (y + 1) / n))))
+        return west, south, east, north
+
+    def tile_to_quadkey(self, x: int, y: int, zoom: int = 9) -> str:
+        """Convert tile coordinates to quadkey."""
         quadkey = ""
         for i in range(zoom, 0, -1):
             digit = 0
             mask = 1 << (i - 1)
-            if (x & mask) != 0:
+            if x & mask:
                 digit += 1
-            if (y & mask) != 0:
+            if y & mask:
                 digit += 2
             quadkey += str(digit)
-        return int(quadkey)
+        return quadkey
+
+    def get_quadkeys_in_bbox(
+        self, xmin: float, ymin: float, xmax: float, ymax: float, zoom: int = 9
+    ) -> Set[str]:
+        """
+        Get all quadkeys that intersect with a bounding box.
+
+        Args:
+            xmin, ymin, xmax, ymax: Bounding box coordinates
+            zoom: Quadkey zoom level
+
+        Returns:
+            Set of quadkey strings
+        """
+        # Create bounding box
+        bbox = box(xmin, ymin, xmax, ymax)
+
+        # Get tile bounds
+        min_x, max_y = self.lat_lon_to_tile(ymin, xmin, zoom)
+        max_x, min_y = self.lat_lon_to_tile(ymax, xmax, zoom)
+
+        quadkeys = set()
+
+        # Check each tile
+        for x in range(min_x, max_x + 1):
+            for y in range(min_y, max_y + 1):
+                # Create tile bounding box
+                west, south, east, north = self.tile_to_lat_lon(x, y, zoom)
+                tile_box = box(west, south, east, north)
+
+                # Check intersection
+                if bbox.intersects(tile_box):
+                    quadkey = self.tile_to_quadkey(x, y, zoom)
+                    quadkeys.add(quadkey)
+
+        return quadkeys
 
     def get_buildings(self):
         """
@@ -60,26 +108,20 @@ class ImportMicrosoftBuildingData:
             bld_list.columns = [x.lower() for x in bld_list.columns]
         except requests.exceptions.Timeout:
             print("Request timed out after 30 seconds")
-            # Gotta raise errors instead
+            # TODO: Gotta raise errors instead
         except requests.exceptions.RequestException as e:
             print(f"Request failed: {e}")
 
         bbox = []
-        key_list = [
-            self.get_quadkey(bbox[0], bbox[2]),
-            self.get_quadkey(bbox[1], bbox[2]),
-            self.get_quadkey(bbox[0], bbox[3]),
-            self.get_quadkey(bbox[1], bbox[3]),
-        ]
+        key_list = list(self.get_quadkeys_in_bbox(bbox))
 
         # Check if the bbox coordinates are within any QuadKey. If the DataFrame is empty, it means that
         # there is no building data for the model area.
         bld_list = bld_list[bld_list["quadkey"].isin(key_list)]
+        bld_list = bld_list[bld_list["location"] == self.project.about.country_name]
         if bld_list.empty:
             warnings.warn("There is no building footage available for the desired model area.")
             return
-
-        url = self.__country_list[self.__country_list.Location == self.__country_name].Url.values
 
         frame_list = []
 
@@ -98,17 +140,18 @@ class ImportMicrosoftBuildingData:
         buildings = pd.concat(frame_list)
         buildings = gpd.sjoin(buildings, zones)  # Join with the zones database
         buildings["id"] = buildings.index + 1
-        buildings["geom"] = buildings.geometry.to_wkb()
         buildings["area"] = buildings.geometry.to_crs(3857).area
 
         cols = ["id", "quadkey", "zone_id", "area", "geom"]
         buildings = buildings[cols]
 
+        # TODO: save the data in the disk
+
+
         with self._project.db_connection as conn:
             # Create columns in zones' table with microsoft building information
             conn.execute("ALTER TABLE zones ADD mcr_bld_count INT;")
             conn.execute("ALTER TABLE zones ADD mcr_bld_area FLOAT;")
-            conn.commit()
 
             # Add
             conn.execute(
@@ -131,4 +174,3 @@ class ImportMicrosoftBuildingData:
             )
             conn.executemany(qry, list_of_tuples)
 
-        # TODO: save the data in the disk

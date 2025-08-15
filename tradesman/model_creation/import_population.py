@@ -1,15 +1,13 @@
 import geopandas as gpd
+import numpy as np
 import pandas as pd
-from os.path import dirname, isfile, join
 from aequilibrae import Project
+from os.path import dirname, isfile, join
 from scipy.sparse import coo_matrix
+from tempfile import gettempdir
+from urllib.request import urlretrieve
 
 from tradesman.utils.mask_raster import mask_raster
-
-from urllib.request import urlretrieve
-from tempfile import gettempdir
-
-import numpy as np
 from tradesman.utils.tqdm_download import TqdmUpTo
 
 

@@ -1,14 +1,13 @@
-import gc
 import csv
-from time import sleep
-from aequilibrae import Project, Parameters
-from pathlib import Path
-
+import gc
 import pandas as pd
 import requests
+from aequilibrae import Project, Parameters
+from pathlib import Path
+from time import sleep
+from tradesman.data_retrieval.osm_tags.set_bounding_boxes import bounding_boxes
 
 from tradesman.model_creation.extra_data_fields import extra_fields
-from tradesman.data_retrieval.osm_tags.set_bounding_boxes import bounding_boxes
 
 
 class ImportNetwork:

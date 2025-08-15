@@ -1,15 +1,14 @@
-from os.path import isfile, join
-from tempfile import gettempdir
-from urllib.request import urlretrieve
-
 import geopandas as gpd
 import pandas as pd
 import pycountry
 import requests
 from aequilibrae.project import Project
-from aequilibrae.project.project_creation import add_triggers, remove_triggers
 from aequilibrae.project.network.osm.osm_params import http_headers
+from aequilibrae.project.project_creation import add_triggers, remove_triggers
+from os.path import isfile, join
 from shapely.geometry import Polygon
+from tempfile import gettempdir
+from urllib.request import urlretrieve
 
 
 def get_maritime_boundaries(model_place: str):

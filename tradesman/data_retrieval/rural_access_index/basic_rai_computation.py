@@ -1,6 +1,4 @@
-import pandas as pd
 import geopandas as gpd
-from tradesman.utils.load_zones import load_zones
 from geopandas import sjoin_nearest
 
 from tradesman.data_retrieval.rural_access_index.population_data import population_data
@@ -38,7 +36,8 @@ def basic_RAI_data(project):
 
     # Add zone data
     # print('Obtaining model zones')
-    zones = load_zones(project)[["zone_id", "geometry"]]
+    zones = project.zoning.zones.copy()
+    zones = zones[["zone_id", "geometry"]]
     gdf = gpd.sjoin(df, zones)
     gdf.drop(columns=["index_right", "distance_to_link", "link_id"], inplace=True)
 
