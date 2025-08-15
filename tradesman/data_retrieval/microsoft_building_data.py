@@ -1,14 +1,14 @@
 import geopandas as gpd
 import gzip
 import math
-import numpy as np
 import pandas as pd
 import requests
 import warnings
 from aequilibrae.project import Project
 from aequilibrae.project.network.osm.osm_params import http_headers
 from io import StringIO
-from os.path import isfile, join
+from os import mkdir
+from os.path import isdir, isfile, join
 from shapely import box
 from tempfile import gettempdir
 from typing import Tuple, Set
@@ -24,7 +24,8 @@ class ImportMicrosoftBuildingData:
     """
 
     def __init__(self, project: Project):
-        self._project = project
+        self.project = project
+        self.about = self.project.about
 
     def lat_lon_to_tile(self, lat: float, lon: float, zoom: int = 9) -> Tuple[int, int]:
         """Convert lat/lon to tile coordinates."""
@@ -56,9 +57,7 @@ class ImportMicrosoftBuildingData:
             quadkey += str(digit)
         return quadkey
 
-    def get_quadkeys_in_bbox(
-        self, xmin: float, ymin: float, xmax: float, ymax: float, zoom: int = 9
-    ) -> Set[str]:
+    def get_quadkeys_in_bbox(self, xmin: float, ymin: float, xmax: float, ymax: float, zoom: int = 9) -> Set[str]:
         """
         Get all quadkeys that intersect with a bounding box.
 
@@ -106,18 +105,20 @@ class ImportMicrosoftBuildingData:
             # Read CSV from response content
             bld_list = pd.read_csv(StringIO(response.text))
             bld_list.columns = [x.lower() for x in bld_list.columns]
-        except requests.exceptions.Timeout:
-            print("Request timed out after 30 seconds")
-            # TODO: Gotta raise errors instead
+        except requests.exceptions.Timeout as e:
+            raise TimeoutError("Request timed out") from e
         except requests.exceptions.RequestException as e:
             print(f"Request failed: {e}")
 
-        bbox = []
-        key_list = list(self.get_quadkeys_in_bbox(bbox))
+        quadkeys = self.get_quadkeys_in_bbox(
+            float(self.about.xmin), float(self.about.ymin), float(self.about.xmax), float(self.about.ymax)
+        )
+        quadkeys = [int(x) for x in quadkeys]
 
-        # Check if the bbox coordinates are within any QuadKey. If the DataFrame is empty, it means that
-        # there is no building data for the model area.
-        bld_list = bld_list[bld_list["quadkey"].isin(key_list)]
+        # Check if the quadkeys where the model area is has any data to be downloaded.
+        # We also check if the quadkey location matches the country_name to avoid downloading
+        # unnecessary data (one quadkey can represent more than one country).
+        bld_list = bld_list[bld_list["quadkey"].isin(quadkeys)]
         bld_list = bld_list[bld_list["location"] == self.project.about.country_name]
         if bld_list.empty:
             warnings.warn("There is no building footage available for the desired model area.")
@@ -126,7 +127,8 @@ class ImportMicrosoftBuildingData:
         frame_list = []
 
         for _, row in bld_list.iterrows():
-            dest_path = join(gettempdir(), f"building--footage--quadkey--{row["quadkey"]}.gz")
+            file_name = f"mcr--building--footage--{self.about.country_name.lower()}--quadkey--{row["quadkey"]}.gz"
+            dest_path = join(gettempdir(), file_name)
             if not isfile(dest_path):
                 _, _ = urlretrieve(row["url"], dest_path)
             with gzip.open(dest_path, "rb") as file:
@@ -139,38 +141,33 @@ class ImportMicrosoftBuildingData:
 
         buildings = pd.concat(frame_list)
         buildings = gpd.sjoin(buildings, zones)  # Join with the zones database
+        buildings.reset_index(drop=True, inplace=True)
         buildings["id"] = buildings.index + 1
         buildings["area"] = buildings.geometry.to_crs(3857).area
 
-        cols = ["id", "quadkey", "zone_id", "area", "geom"]
+        cols = ["id", "quadkey", "zone_id", "area", "geometry"]
         buildings = buildings[cols]
 
-        # TODO: save the data in the disk
+        if not isdir(self.project.project_base_path / "data_download"):
+            mkdir(self.project.project_base_path / "data_download")
+        buildings.to_parquet(self.project.project_base_path / "data_download" / "mcr_buildings.parquet")
 
+        bld_count = buildings[["zone_id", "id"]].groupby("zone_id").count()
+        bld_area = buildings[["zone_id", "area"]].groupby("zone_id").sum()
 
-        with self._project.db_connection as conn:
+        with self.project.db_connection as conn:
             # Create columns in zones' table with microsoft building information
             conn.execute("ALTER TABLE zones ADD mcr_bld_count INT;")
             conn.execute("ALTER TABLE zones ADD mcr_bld_area FLOAT;")
 
-            # Add
-            conn.execute(
-                """
-                    UPDATE zones
-                    SET mcr_bld_area=ROUND(0,2), mcr_bld_count=0
-                    WHERE mcr_bld_count IS NULL;
-                """
-            )
-            conn.commit()
+            if not bld_count.empty:
+                for zone_id, row in bld_count.iterrows():
+                    count_qry = "UPDATE zones SET mcr_bld_count={} WHERE zone_id={}".format(row["id"], zone_id)
+                    conn.execute(count_qry)
 
-            qry = "UPDATE zones SET mcr_bld_count=?, mcr_bld_area=ROUND(?, 2) WHERE zone_id=?;"
-            list_of_tuples = list(
-                zip(
-                    buildings.groupby("zone_id").count().id.values,
-                    buildings.groupby("zone_id").sum(numeric_only=True).area.values,
-                    np.arange(1, max(buildings.zone_id) + 1),
-                    strict=False,
-                )
-            )
-            conn.executemany(qry, list_of_tuples)
+            if not bld_area.empty:
+                for zone_id, row in bld_area.iterrows():
+                    area_qry = "UPDATE zones SET mcr_bld_area={} WHERE zone_id={}".format(row["area"], zone_id)
+                    conn.execute(area_qry)
 
+            conn.execute("UPDATE zones SET mcr_bld_area=0, mcr_bld_count=0 WHERE mcr_bld_area IS NULL;")
