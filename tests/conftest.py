@@ -6,8 +6,6 @@ from aequilibrae.project import Project
 import geopandas as gpd
 
 from aequilibrae.utils.create_example import create_example
-from tradesman.data.population_file_address import link_source
-from tradesman.data.population_raster import population_raster
 from tradesman.model_creation.create_new_tables import add_new_tables
 from tradesman.model_creation.import_political_subdivisions import ImportPoliticalSubdivisions
 

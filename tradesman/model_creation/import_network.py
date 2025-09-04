@@ -5,9 +5,9 @@ import requests
 from aequilibrae import Project, Parameters
 from pathlib import Path
 from time import sleep
-from tradesman.data_retrieval.osm_tags.set_bounding_boxes import bounding_boxes
 
 from tradesman.model_creation.extra_data_fields import extra_fields
+from tradesman.utils import set_bbox
 
 
 class ImportNetwork:
@@ -16,7 +16,9 @@ class ImportNetwork:
 
     Parameters:
         *project*(:obj:`aequilibrae.project.Project`): currently open project
+
         *model_place*(:obj:`str`): current model place
+        
         *pbf_path*(:obj:`str`): path to osm or pbf file. Optional.
 
     """
@@ -106,18 +108,21 @@ class ImportNetwork:
             quoting=csv.QUOTE_NONNUMERIC,
         )
 
-    def __download_osm_data(self, model_place: str, tile_size: int = 25):
+    def __download_osm_data(self, tile_size: int = 25):
         """
         Loads data from OSM.
 
         Parameters:
-             *model_place*(:obj:`str`):
              *tile_size*(:obj:`int`):
         """
         url = self.project.parameters["osm"]["overpass_endpoint"]
 
         # We won't download any area bigger than 25km by 25km
-        bboxes = bounding_boxes(self.project, tile_size)
+        xmin = float(self.project.about.xmin)
+        xmax = float(self.project.about.xmax)
+        ymin = float(self.project.about.ymin)
+        ymax = float(self.project.about.ymax)
+        bboxes = set_bbox(xmin, xmax, ymin, ymax, tile_size)
 
         http_headers = requests.utils.default_headers()
         http_headers.update({"Accept-Language": "en", "format": "json"})

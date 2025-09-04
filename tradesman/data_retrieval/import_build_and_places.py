@@ -2,10 +2,11 @@ import duckdb
 import geopandas as gpd
 import pandas as pd
 from aequilibrae.project import Project
-from math import ceil, sqrt
 from os import mkdir
 from os.path import dirname, isdir, join
-from shapely import box, wkt
+from shapely import wkt
+
+from tradesman.utils import set_bbox
 
 
 class ImportBuildPlaces:
@@ -21,35 +22,6 @@ class ImportBuildPlaces:
         zones = self.project.zoning.data.copy()
         self.zones = zones[["zone_id", "geometry"]]
 
-    def set_bbox(self):
-        """Split the model area into different bounding boxes
-        Will now return ['xmin', 'ymin', 'xmax', 'ymax']
-        """
-        bbox = box(self.__xmin, self.__ymin, self.__xmax, self.__ymax)
-
-        geo = gpd.GeoDataFrame([1], columns=["fid"], geometry=[bbox], crs="EPSG:4326")
-        area_bounds = geo.bounds.values.tolist()
-        parts = ceil(sqrt(geo.to_crs("EPSG:3857").area.sum() / (self.box_side * self.box_side * 1000 * 1000)))
-
-        if parts == 1:
-            return area_bounds
-        else:
-            bboxes = []
-            xmin, ymin, xmax, ymax = area_bounds[0]
-            ymin_global = ymin
-            delta_x = (xmax - xmin) / parts
-            delta_y = (ymax - ymin) / parts
-            for i in range(parts):
-                xmax = xmin + delta_x
-                for j in range(parts):
-                    ymax = ymin + delta_y
-                    bboxes.append([xmin, ymin, xmax, ymax])
-                    ymin = ymax
-                xmin = xmax
-                ymin = ymin_global
-
-            return bboxes
-
     def building_parser(self, bbox, conn):
         qry = """
             SELECT
@@ -62,10 +34,10 @@ class ImportBuildPlaces:
             FROM
                 read_parquet('s3://overturemaps-us-west-2/release/2025-07-23.0/theme=buildings/type=building/*')
             WHERE
-                bbox.xmin >= {} AND
                 bbox.ymin >= {} AND
-                bbox.xmax <= {} AND
-                bbox.ymax <= {};
+                bbox.xmin >= {} AND
+                bbox.ymax <= {} AND
+                bbox.xmax <= {};
             """
         qry = qry.format(*bbox)
 
@@ -87,10 +59,10 @@ class ImportBuildPlaces:
         FROM
             read_parquet('s3://overturemaps-us-west-2/release/2025-07-23.0/theme=places/type=place/*')
         WHERE
-            bbox.xmin >= {} AND
             bbox.ymin >= {} AND
-            bbox.xmax <= {} AND
-            bbox.ymax <= {};
+            bbox.xmin >= {} AND
+            bbox.ymax <= {} AND
+            bbox.xmax <= {};
         """
         qry = qry.format(*bbox)
 
@@ -114,7 +86,7 @@ class ImportBuildPlaces:
         con.install_extension("spatial")
         con.load_extension("spatial")
 
-        bboxes = self.set_bbox()
+        bboxes = set_bbox(self.__xmin, self.__ymin, self.__xmax, self.__ymax, self.box_side)
 
         blds = []
         for bbox in bboxes:

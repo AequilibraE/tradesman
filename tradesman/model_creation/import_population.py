@@ -18,7 +18,7 @@ class ImportPopulation:
 
     def get_file_url(self):
         if self.source not in ["worldpop", "meta"]:
-            raise ValueError(f"Population source {self.source} is not available. Try one of 'WorldPop' or 'Meta'.")
+            raise ValueError(f"Population source {self.source} is not available. Try one of 'WorldPop' or 'Meta'")
 
         country_code = self.project.about.country_code_three_digit
 

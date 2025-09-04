@@ -58,7 +58,7 @@ jobs:
 
     - name: Runs unit tests
       run: |
-        python -m pytest -v
+        python -m pytest --cov-report term-missing --cov=tradesman tests
 
   build_documentation:
     needs: linting
