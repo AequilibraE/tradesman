@@ -13,8 +13,8 @@ class TestPopBySexAndAge(unittest.TestCase):
         self.country_name = "Nauru"
         self.fldr = join(gettempdir(), uuid4().hex)
         self.project = create_nauru_test(self.fldr)
-        self.mock_raster = mock.patch("tradesman.model_creation.pop_by_sex_and_age.population_raster")
-        self.mock_sjoin = mock.patch("tradesman.model_creation.pop_by_sex_and_age.gpd.sjoin")
+        self.mock_raster = mock.patch("tradesman.model_creation.import_population.ImportPopulation.population_raster")
+        self.mock_sjoin = mock.patch("tradesman.model_creation.import_population.gpd.sjoin")
 
         self.mock_raster.start()
         self.mock_sjoin.start()
@@ -29,16 +29,16 @@ class TestPopBySexAndAge(unittest.TestCase):
         population.get_stratified_population()
 
         with self.project.db_connection as conn:
-            f_10_pop = conn.execute("SELECT SUM(POPF10) FROM zones;").fetchone()[0]
+            f_10_pop = conn.execute("SELECT SUM(f_pop_10) FROM zones;").fetchone()[0]
             self.assertEqual(f_10_pop, 0)
 
-            f_4_pop = conn.execute("SELECT SUM(POPF4) FROM zones;").fetchone()[0]
+            f_4_pop = conn.execute("SELECT SUM(f_pop_40) FROM zones;").fetchone()[0]
             self.assertEqual(f_4_pop, 0)
 
-            m_5_pop = conn.execute("SELECT SUM(POPM5) FROM zones;").fetchone()[0]
+            m_5_pop = conn.execute("SELECT SUM(m_pop_5) FROM zones;").fetchone()[0]
             self.assertEqual(m_5_pop, 0)
 
-            m_7_pop = conn.execute("SELECT SUM(POPM7) FROM zones;").fetchone()[0]
+            m_7_pop = conn.execute("SELECT SUM(m_pop_70) FROM zones;").fetchone()[0]
             self.assertEqual(m_7_pop, 0)
 
 

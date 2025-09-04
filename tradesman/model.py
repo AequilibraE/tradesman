@@ -34,6 +34,7 @@ class Tradesman:
         self.__folder = network_path
         self.project = Project()
         self.__pbf_path = pbf_path
+        self.box_side = box_side
         self.logger = logger or get_logger()
 
         self.__initialize_model()

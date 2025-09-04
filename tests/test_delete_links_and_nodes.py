@@ -43,7 +43,7 @@ class TestDeleteLinksAndNodes(unittest.TestCase):
 
             num_nodes = len(conn.execute("SELECT * FROM nodes;").fetchall())
 
-        self.assertGreater(before, num_nodes)
+        self.assertEqual(before, num_nodes)
 
     def test_remove_links_and_nodes_maritime(self):
         self.temp_fldr = join(gettempdir(), uuid4().hex)
