@@ -18,15 +18,16 @@ class ImportNetwork:
         *project*(:obj:`aequilibrae.project.Project`): currently open project
 
         *model_place*(:obj:`str`): current model place
-        
+
         *pbf_path*(:obj:`str`): path to osm or pbf file. Optional.
 
     """
 
-    def __init__(self, project: Project, model_place: str, pbf_path: str = None):
+    def __init__(self, project: Project, model_place: str, pbf_path: str = None, box_side: int = 25):
         self.project = project
         self.model_place = model_place
         self.pbf_path = pbf_path
+        self.box_side = box_side
         self.json = []
         self.par = Parameters()
         self.new_link_fields = {
@@ -77,7 +78,7 @@ class ImportNetwork:
             print(" ")
             print("Download OSM data for bridges, tolls and tunnels ...")
             print(" ")
-            self.__download_osm_data(model_place=self.model_place)
+            self.__download_osm_data()
 
             print("Add new columns ...")
             print(" ")
@@ -122,7 +123,7 @@ class ImportNetwork:
         xmax = float(self.project.about.xmax)
         ymin = float(self.project.about.ymin)
         ymax = float(self.project.about.ymax)
-        bboxes = set_bbox(xmin, xmax, ymin, ymax, tile_size)
+        bboxes = set_bbox(xmin, xmax, ymin, ymax, self.box_side)
 
         http_headers = requests.utils.default_headers()
         http_headers.update({"Accept-Language": "en", "format": "json"})

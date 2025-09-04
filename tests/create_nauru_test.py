@@ -17,6 +17,7 @@ def create_nauru_test(folder):
     df["geom"] = gpd.GeoSeries.to_wkb(df["geometry"])
 
     project = create_example(folder, "nauru")
+
     with project.db_connection as conn:
         add_new_tables(conn)
 

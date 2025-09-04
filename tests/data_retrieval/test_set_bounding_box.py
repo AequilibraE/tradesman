@@ -4,7 +4,7 @@ import unittest
 from uuid import uuid4
 
 from tests.create_nauru_test import create_nauru_test
-from tradesman.data_retrieval.osm_tags.set_bounding_boxes import bounding_boxes
+from tradesman.utils import set_bbox
 
 
 class TestSetBoundingBoxes(unittest.TestCase):
@@ -13,7 +13,12 @@ class TestSetBoundingBoxes(unittest.TestCase):
         self.project = create_nauru_test(self.fldr)
 
     def test_set_bounding_boxes(self):
-        self.assertEqual(type(bounding_boxes(self.project, km_side=25)), list)
+        xmin = float(self.project.about.xmin)
+        xmax = float(self.project.about.xmax)
+        ymin = float(self.project.about.ymin)
+        ymax = float(self.project.about.ymax)
+
+        self.assertEqual(type(set_bbox(xmin, ymin, xmax, ymax, box_side=25)), list)
 
 
 if __name__ == "__name__":

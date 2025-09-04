@@ -1,7 +1,7 @@
 import geopandas as gpd
 
 
-def subdivisions(project):
+def get_subdivisions(project):
     """
     Returns the model's subdivisions.
 

@@ -1,6 +1,6 @@
 from tradesman.data_retrieval.rural_access_index.urban_areas import select_urban_areas
 
-from tradesman.data_retrieval.load_vectorized_pop import load_vectorized_pop
+from tradesman.utils import load_vectorized_pop
 
 
 def population_data(project):

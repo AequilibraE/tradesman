@@ -18,6 +18,8 @@ class TestImportNetwork(unittest.TestCase):
         self.project = Project()
         self.project.new(self.fldr)
 
+        # TODO: add xmin etc in about file
+
         self.pbf_path = join(abspath(dirname("tests")), "tests/data/monaco/monaco-latest.osm.pbf")
         self.model_place = "Monaco"
 
@@ -43,7 +45,7 @@ class TestImportNetwork(unittest.TestCase):
         self.assertIn("toll", links.columns)
         self.assertIn("tunnel", links.columns)
 
-    @mock.patch("tradesman.model_creation.import_network.bounding_boxes")
+    @mock.patch("tradesman.utils.set_bbox")
     def test_import_from_gmns(self, patch_box):
         network = ImportNetwork(self.project, self.model_place, self.pbf_path)
         network.build_network()

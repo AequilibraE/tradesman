@@ -5,7 +5,7 @@ from unittest import mock
 from uuid import uuid4
 
 from tests.create_nauru_test import create_nauru_test
-from tradesman.model_creation.pop_by_sex_and_age import get_pop_by_sex_age
+from tradesman.model_creation.import_population import ImportPopulation
 
 
 class TestPopBySexAndAge(unittest.TestCase):
@@ -25,7 +25,8 @@ class TestPopBySexAndAge(unittest.TestCase):
         self.mock_sjoin.stop()
 
     def test_get_pop_by_sex_age(self):
-        get_pop_by_sex_age(self.project, self.country_name)
+        population = ImportPopulation(self.project)
+        population.get_stratified_population()
 
         with self.project.db_connection as conn:
             f_10_pop = conn.execute("SELECT SUM(POPF10) FROM zones;").fetchone()[0]

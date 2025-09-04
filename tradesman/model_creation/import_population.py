@@ -6,9 +6,10 @@ from os.path import dirname, isfile, join
 from scipy.sparse import coo_matrix
 from tempfile import gettempdir
 from urllib.request import urlretrieve
+from pathlib import Path
 
-from tradesman.utils.mask_raster import mask_raster
-from tradesman.utils.tqdm_download import TqdmUpTo
+from tradesman.utils import mask_raster
+from tradesman.utils import TqdmUpTo
 
 
 class ImportPopulation:
@@ -26,7 +27,8 @@ class ImportPopulation:
             url = "https://data.worldpop.org/GIS/Population/Global_2000_2020/2020/{}/{}_ppp_2020.tif"
             return url.format(country_code, country_code.lower())
         else:
-            url = pd.read_csv(join(dirname(__file__), "population/all_raster_pop_source.csv"))
+            folder = Path(dirname(__file__)).parent
+            url = pd.read_csv(folder / "data/population/all_raster_pop_source.csv")
             url = url[url.iso_country == country_code]
 
             if url.empty:

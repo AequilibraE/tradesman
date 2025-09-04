@@ -5,7 +5,6 @@ from aequilibrae.context import get_logger
 from aequilibrae.project import Project
 from os.path import isdir
 
-from tradesman.data_retrieval import subdivisions
 from tradesman.data_retrieval.import_build_and_places import ImportBuildPlaces
 from tradesman.data_retrieval.microsoft_building_data import ImportMicrosoftBuildingData
 from tradesman.model_creation.build_zoning import ZoneBuilder
@@ -14,6 +13,7 @@ from tradesman.model_creation.import_network import ImportNetwork
 from tradesman.model_creation.import_political_subdivisions import ImportPoliticalSubdivisions
 from tradesman.model_creation.import_population import ImportPopulation
 from tradesman.model_creation.synthetic_population.create_synthetic_population import create_syn_pop, run_populationsim
+from tradesman.utils import get_subdivisions
 
 
 class Tradesman:
@@ -22,6 +22,7 @@ class Tradesman:
         network_path: str,
         model_place: str = None,
         pbf_path: str = None,
+        box_side: int = 25,
         boundaries_source: str = "Overture",
         population_source: str = "WorldPop",
         logger=None,
@@ -77,7 +78,7 @@ class Tradesman:
         If the network already exists in the folder, it will be loaded, otherwise it will be created.
         """
 
-        network = ImportNetwork(self.project, self.__model_place, self.__pbf_path)
+        network = ImportNetwork(self.project, self.__model_place, self.__pbf_path, self.box_side)
         network.build_network()
 
     def import_subdivisions(self, subdivision_levels: int = 2, overwrite: bool = False):
@@ -135,7 +136,7 @@ class Tradesman:
             *level*(:obj:`int`): Number of subdivision levels to import. Default imports all levels.
         """
 
-        subd = subdivisions(self.project)
+        subd = get_subdivisions(self.project)
         if level is not None:
             subd = subd[subd.level == level]
         return subd

@@ -3,7 +3,7 @@ import urllib.request
 from os.path import join, isfile
 from tempfile import gettempdir
 
-from tradesman.data_retrieval.country_main_area import country_border_from_model
+from tradesman.utils import country_border_from_model
 
 
 def select_urban_areas(project):

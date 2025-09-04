@@ -16,18 +16,16 @@ class TestMicrosoftBuildingFootprint(unittest.TestCase):
         self.project = create_nauru_test(self.fldr)
 
     def test_initialize(self):
-        loc = ImportMicrosoftBuildingData(model_place="Eswatini", project=self.project)
+        loc = ImportMicrosoftBuildingData(project=self.project)
         self.assertFalse(loc._available, "Should not have for Eswatini")
 
-        loc = ImportMicrosoftBuildingData(model_place="Brazil", project=self.project)
+        loc = ImportMicrosoftBuildingData(project=self.project)
         self.assertTrue(loc._available, "Should have for Brazil")
 
-    # @unittest.skip
     @mock.patch("tradesman.data_retrieval.osm_tags.microsoft_building_footprint.max")
     def test_microsoft_buildings(self, mock_max):
-        buildings = ImportMicrosoftBuildingData(model_place="Vatican City", project=self.project)
-
-        buildings.microsoft_buildings()
+        buildings = ImportMicrosoftBuildingData(project=self.project)
+        buildings.get_buildings()
 
         with self.project.db_connection as conn:
             df = pd.read_sql("SELECT microsoft_building_count, microsoft_building_area FROM zones;", con=conn)
