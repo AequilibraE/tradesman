@@ -1,72 +1,53 @@
-import unittest
-from os.path import join, abspath, dirname
-from tempfile import gettempdir
-from unittest import mock
-from uuid import uuid4
-
-import pandas as pd
 import pytest
-from aequilibrae import Project
+import shutil
+from os.path import join, abspath, dirname
 
+from aequilibrae.project import Project
 from tradesman.model_creation.import_network import ImportNetwork
 
 
-@pytest.mark.skip("Still need to fix this test")
-class TestImportNetwork(unittest.TestCase):
-    def setUp(self) -> None:
-        self.fldr = join(gettempdir(), uuid4().hex)
+@pytest.mark.skip("Parameters GMNS is not working")
+def test_import_from_gmns(empty_aequilibrae_model):
+    fields = ["model_place", "address_type", "country_name", "country_code_two_digit", "country_code_three_digit"]
+    fields.extend(["xmin", "ymin", "xmax", "ymax"])
 
-        self.project = Project()
-        self.project.new(self.fldr)
+    about = empty_aequilibrae_model.about
+    for field in fields:
+        about.add_info_field(field)
 
-        fields = ["model_place", "address_type", "country_name", "country_code_two_digit", "country_code_three_digit"]
-        fields.extend(["xmin", "ymin", "xmax", "ymax"])
+    about.model_place = "Monaco"
+    about.address_type = "country"
+    about.country_name = "Monaco"
+    about.country_code_two_digit = "MC"
+    about.country_code_three_digit = "MCO"
+    about.xmin = 7.4037113
+    about.ymin = 43.7196129
+    about.xmax = 7.4876594
+    about.ymax = 43.7574357
 
-        about = self.project.about
-        for field in fields:
-            about.add_info_field(field)
+    pbf_path = join(abspath(dirname("tests")), "tests/data/monaco/monaco-latest.osm.pbf")
 
-        about.model_place = "Monaco"
-        about.address_type = "country"
-        about.country_name = "Monaco"
-        about.country_code_two_digit = "MC"
-        about.country_code_three_digit = "MCO"
-        about.xmin = 7.4037113
-        about.ymin = 43.7196129
-        about.xmax = 7.4876594
-        about.ymax = 43.7574357
+    network = ImportNetwork(empty_aequilibrae_model, pbf_path=pbf_path)
+    network.build_network()
 
-        self.pbf_path = join(abspath(dirname("tests")), "tests/data/monaco/monaco-latest.osm.pbf")
-        self.model_place = "Monaco"
+    links = empty_aequilibrae_model.network.links.data
 
-    def tearDown(self) -> None:
-        self.project.close()
-
-    def test_import_from_osm(self):
-        network = ImportNetwork(self.project, self.model_place)
-        network.build_network()
-
-        with self.project.db_connection as conn:
-            links = pd.read_sql("SELECT * FROM links;", con=conn)
-
-        self.assertGreater(len(links), 0)
-        self.assertIn("bridge", links.columns)
-        self.assertIn("toll", links.columns)
-        self.assertIn("tunnel", links.columns)
-
-    @mock.patch("tradesman.utils.set_bbox")
-    def test_import_from_gmns(self, patch_box):
-        network = ImportNetwork(self.project, self.model_place, self.pbf_path)
-        network.build_network()
-
-        with self.project.db_connection as conn:
-            links = pd.read_sql("SELECT * FROM links;", con=conn)
-
-        self.assertGreater(len(links), 0)
-        self.assertIn("bridge", links.columns)
-        self.assertIn("toll", links.columns)
-        self.assertIn("tunnel", links.columns)
+    assert links.shape[0] > 0
+    for i in ["bridge", "toll", "tunnel"]:
+        assert i in links.columns
 
 
-if __name__ == "__name__":
-    unittest.main()
+def test_import_from_osm(empty_aequilibrae_model):
+    about = empty_aequilibrae_model.about
+    about.add_info_field("model_place")
+
+    about.model_place = "Monaco"
+
+    network = ImportNetwork(empty_aequilibrae_model)
+    network.build_network()
+
+    links = empty_aequilibrae_model.network.links.data
+
+    assert links.shape[0] > 0
+    for i in ["bridge", "toll", "tunnel"]:
+        assert i in links.columns

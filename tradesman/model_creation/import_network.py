@@ -1,11 +1,11 @@
 import csv
 import gc
-from pathlib import Path
 from time import sleep
 
 import pandas as pd
 import requests
-from aequilibrae import Project, Parameters
+from aequilibrae import Parameters
+from aequilibrae.project import Project
 
 from tradesman.model_creation.extra_data_fields import extra_fields
 from tradesman.utils import set_bbox
@@ -18,38 +18,32 @@ class ImportNetwork:
     Parameters:
         *project*(:obj:`aequilibrae.project.Project`): currently open project
 
-        *model_place*(:obj:`str`): current model place
-
         *pbf_path*(:obj:`str`): path to osm or pbf file. Optional.
 
     """
 
-    def __init__(self, project: Project, model_place: str, pbf_path: str = None, box_side: int = 25):
+    def __init__(self, project: Project, pbf_path: str = None, box_side: int = 25):
         self.project = project
-        self.model_place = model_place
         self.pbf_path = pbf_path
         self.box_side = box_side
         self.json = []
-        self.par = Parameters()
-        self.new_link_fields = {
-            "osm_way_id": {"description": "osm_id", "type": "text", "required": False},
-        }
-        self.new_node_fields = {"osm_node_id": {"description": "osm_id", "type": "text", "required": False}}
 
     def build_network(self):
         """
         Builds the network.
         """
+        par = Parameters()
         try:
             requests.get("https://lz4.overpass-api.de/api/interpreter")
         except requests.exceptions.ConnectionError:
-            self.par.parameters["osm"]["overpass_endpoint"] = "https://overpass.kumi.systems/api/interpreter"
-            self.par.write_back()
+            par.parameters["osm"]["overpass_endpoint"] = "https://overpass.kumi.systems/api/interpreter"
+            par.write_back()
 
         if not self.pbf_path:
-            self.par.parameters["network"]["links"]["fields"]["one-way"].extend(extra_fields)
-            self.par.write_back()
-            self.project.network.create_from_osm(place_name=self.model_place)
+            par.parameters["network"]["links"]["fields"]["one-way"].extend(extra_fields)
+            par.write_back()
+
+            self.project.network.create_from_osm(place_name=self.project.about.model_place)
             return
 
         else:
@@ -63,17 +57,22 @@ class ImportNetwork:
             print(" ")
             print("Adjust GMNS files ...")
             print(" ")
-            self.__adjust_link_file(Path(self.project.project_base_path) / "link.csv")
+            self.__adjust_link_file(self.project.project_base_path / "link.csv")
 
-            self.par.parameters["network"]["gmns"]["link"]["fields"].update(self.new_link_fields)
-            self.par.parameters["network"]["gmns"]["node"]["fields"].update(self.new_node_fields)
-            self.par.write_back()
+            link_fields = {
+            "osm_way_id": {"description": "osm_id", "type": "text", "required": False},
+                }
+            node_fields = {"osm_node_id": {"description": "osm_id", "type": "text", "required": False}}
+
+            par.parameters["network"]["gmns"]["link"]["fields"].update(link_fields)
+            par.parameters["network"]["gmns"]["node"]["fields"].update(node_fields)
+            par.write_back()
 
             print("Create network from GMNS ...")
             print(" ")
             self.project.network.create_from_gmns(
-                link_file_path=Path(self.project.project_base_path) / "link.csv",
-                node_file_path=Path(self.project.project_base_path) / "node.csv",
+                link_file_path=self.project.project_base_path / "link.csv",
+                node_file_path=self.project.project_base_path / "node.csv",
             )
 
             print(" ")
@@ -103,14 +102,14 @@ class ImportNetwork:
         df["allowed_uses"] = rename_list
 
         df.to_csv(
-            Path(self.project.project_base_path) / "link.csv",
+            self.project.project_base_path / "link.csv",
             sep=",",
             encoding="utf-8",
             index=False,
             quoting=csv.QUOTE_NONNUMERIC,
         )
 
-    def __download_osm_data(self, tile_size: int = 25):
+    def __download_osm_data(self):
         """
         Loads data from OSM.
 

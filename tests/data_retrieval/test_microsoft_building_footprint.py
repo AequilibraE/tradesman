@@ -21,8 +21,8 @@ def mock_url_response():
     return mock_response
 
 
-def test_microsoft_buildings_no_bld(create_path, mock_url_response):
-    project = create_nauru_test(create_path)
+def test_microsoft_buildings_no_bld(folder_path, mock_url_response):
+    project = create_nauru_test(folder_path)
 
     buildings = ImportMicrosoftBuildingData(project)
     with patch("tradesman.data_retrieval.microsoft_building_data.requests.get", return_value=mock_url_response):
