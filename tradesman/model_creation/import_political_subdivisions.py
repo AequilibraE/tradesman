@@ -1,3 +1,7 @@
+from collections import namedtuple
+from os.path import isfile, join
+from tempfile import gettempdir
+
 import duckdb
 import geopandas as gpd
 import pandas as pd
@@ -5,11 +9,8 @@ import pycountry
 import requests
 from aequilibrae.project import Project
 from aequilibrae.project.network.osm.osm_params import http_headers
-from collections import namedtuple
-from os.path import isfile, join
 from shapely import wkt
 from shapely.geometry import MultiPolygon, Polygon
-from tempfile import gettempdir
 
 OVM_MAPPING = {
     "country": 0,

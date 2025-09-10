@@ -1,18 +1,19 @@
-import geopandas as gpd
 import gzip
 import math
-import pandas as pd
-import requests
 import warnings
-from aequilibrae.project import Project
-from aequilibrae.project.network.osm.osm_params import http_headers
 from io import StringIO
 from os import mkdir
 from os.path import isdir, isfile, join
-from shapely import box
 from tempfile import gettempdir
 from typing import Tuple, Set
 from urllib.request import urlretrieve
+
+import geopandas as gpd
+import pandas as pd
+import requests
+from aequilibrae.project import Project
+from aequilibrae.project.network.osm.osm_params import http_headers
+from shapely import box
 
 
 class ImportMicrosoftBuildingData:

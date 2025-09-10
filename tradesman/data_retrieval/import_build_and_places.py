@@ -1,9 +1,10 @@
+from os import mkdir
+from os.path import dirname, isdir, join
+
 import duckdb
 import geopandas as gpd
 import pandas as pd
 from aequilibrae.project import Project
-from os import mkdir
-from os.path import dirname, isdir, join
 from shapely import wkt
 
 from tradesman.utils import set_bbox

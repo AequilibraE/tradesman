@@ -1,18 +1,19 @@
 import gc
-import geopandas as gpd
 import importlib.util as iutil
-import libpysal
 import multiprocessing as mp
-import numpy as np
-import pandas as pd
 import warnings
-from aequilibrae.project import Project
 from math import floor
 from math import sqrt, ceil
+from time import perf_counter
+
+import geopandas as gpd
+import libpysal
+import numpy as np
+import pandas as pd
+from aequilibrae.project import Project
 from shapely.geometry import Polygon
 from shapely.geometry import box
 from sklearn.cluster import KMeans
-from time import perf_counter
 from tqdm import tqdm
 
 has_dask_geopandas = iutil.find_spec("dask_geopandas") is not None
@@ -211,7 +212,7 @@ class ZoneBuilder:
         """
         pop_per_zone = gdf.copy()
         pop_per_zone["geo_wkt"] = pop_per_zone.geometry.to_wkt()
-        pop_per_zone = pop_per_zone[pop_per_zone[["hex_id", "division_name", "population", "geo_wkt"]]]
+        pop_per_zone = pop_per_zone[["hex_id", "division_name", "population", "geo_wkt"]]
 
         with self.project.db_connection as conn:
             pop_per_zone.to_sql("hex_pop", conn, if_exists="append", index=False)

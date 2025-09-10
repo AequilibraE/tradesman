@@ -2,7 +2,6 @@ from os.path import dirname, join
 
 import geopandas as gpd
 import pandas as pd
-import pycountry
 from aequilibrae.project import Project
 
 

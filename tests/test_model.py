@@ -6,8 +6,8 @@ from tradesman.model import Tradesman
 
 @pytest.mark.skip("Temporary skip running this test")
 @pytest.mark.skipif(bool(environ.get("CI")), reason="Does not run in GitHub Action")
-def test_create_model(create_path):
-    proj = Tradesman(create_path, model_place="San Marino")
+def test_create_model(folder_path):
+    proj = Tradesman(folder_path, model_place="San Marino")
     proj.create()
 
     with proj.project.db_connection as conn:

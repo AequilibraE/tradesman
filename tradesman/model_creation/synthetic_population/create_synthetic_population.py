@@ -1,13 +1,14 @@
-from math import floor
 import multiprocessing as mp
 import subprocess
-import warnings
-import yaml
-from os.path import join, isfile
-import pandas as pd
 import sys
+import warnings
+from math import floor
+from os.path import join, isfile
 
+import pandas as pd
+import yaml
 from aequilibrae.project import Project
+
 from tradesman.model_creation.synthetic_population.create_control_totals_meta import create_control_totals_meta
 from tradesman.model_creation.synthetic_population.create_control_totals_taz import create_control_totals_taz
 from tradesman.model_creation.synthetic_population.create_geo_crosswalk import create_geo_cross_walk

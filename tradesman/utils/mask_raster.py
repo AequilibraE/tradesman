@@ -1,6 +1,6 @@
-import rasterio.mask
-import rasterio
 import geopandas as gpd
+import rasterio
+import rasterio.mask
 from shapely.geometry import box
 
 

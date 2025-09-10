@@ -1,7 +1,8 @@
-import geopandas as gpd
 import urllib.request
 from os.path import join, isfile
 from tempfile import gettempdir
+
+import geopandas as gpd
 
 from tradesman.utils import country_border_from_model
 

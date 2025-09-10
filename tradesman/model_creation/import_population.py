@@ -1,15 +1,16 @@
+from os.path import dirname, isfile, join
+from pathlib import Path
+from tempfile import gettempdir
+from urllib.request import urlretrieve
+
 import geopandas as gpd
 import numpy as np
 import pandas as pd
 from aequilibrae import Project
-from os.path import dirname, isfile, join
 from scipy.sparse import coo_matrix
-from tempfile import gettempdir
-from urllib.request import urlretrieve
-from pathlib import Path
 
-from tradesman.utils import mask_raster
 from tradesman.utils import TqdmUpTo
+from tradesman.utils import mask_raster
 
 
 class ImportPopulation:

@@ -3,16 +3,16 @@ from tradesman.model import Tradesman
 from tradesman.model_creation.import_political_subdivisions import ImportPoliticalSubdivisions
 
 
-def test_import_model_exception(create_path):
-    model = Tradesman(network_path=create_path, model_place="Charlie and the chocolate factory")
+def test_import_model_exception(folder_path):
+    model = Tradesman(network_path=folder_path, model_place="Charlie and the chocolate factory")
 
     with pytest.raises(ValueError):
         model.import_model_area()
 
 
-def test_unexistent_source(create_path):
+def test_unexistent_source(folder_path):
     with pytest.raises(ValueError):
-        Tradesman(network_path=create_path, model_place="Coquimbo, Chile", boundaries_source="Cencosud")
+        Tradesman(network_path=folder_path, model_place="Coquimbo, Chile", boundaries_source="Cencosud")
 
 
 @pytest.mark.parametrize("source", ["Overture", "geoBoundaries"])

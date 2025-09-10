@@ -1,5 +1,6 @@
-import geopandas as gpd
 from math import ceil, sqrt
+
+import geopandas as gpd
 from shapely import box
 
 

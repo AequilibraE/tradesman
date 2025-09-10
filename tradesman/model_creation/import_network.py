@@ -1,10 +1,11 @@
 import csv
 import gc
+from pathlib import Path
+from time import sleep
+
 import pandas as pd
 import requests
 from aequilibrae import Project, Parameters
-from pathlib import Path
-from time import sleep
 
 from tradesman.model_creation.extra_data_fields import extra_fields
 from tradesman.utils import set_bbox
