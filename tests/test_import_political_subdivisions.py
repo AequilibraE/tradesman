@@ -1,4 +1,5 @@
 import pytest
+
 from tradesman.model import Tradesman
 from tradesman.model_creation.import_political_subdivisions import ImportPoliticalSubdivisions
 

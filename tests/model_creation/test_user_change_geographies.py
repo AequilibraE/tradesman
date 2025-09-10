@@ -1,8 +1,9 @@
+import unittest
 from os import rename
 from os.path import join
 from shutil import rmtree
 from tempfile import gettempdir, mkdtemp
-import unittest
+
 import yaml
 
 from tradesman.model_creation.synthetic_population.user_control_import import user_change_geographies

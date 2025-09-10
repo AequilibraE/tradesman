@@ -1,11 +1,10 @@
-import pytest
 from unittest.mock import Mock, patch
 
 import pandas as pd
+import pytest
 
 from tests.create_nauru_test import create_nauru_test
 from tradesman.data_retrieval.microsoft_building_data import ImportMicrosoftBuildingData
-
 
 CSV_DATA = """Location,QuadKey,Url,Size,UploadDate
 Monaco,120223030,https://minedbuildings.z5.web.core.windows.net/global-buildings/2025-02-25/global-buildings.geojsonl/RegionName=Monaco/quadkey=120223030/part-00016-5cf70943-9c5f-4fc6-94fb-43ce5feefa56.c000.csv.gz,148.0KB,2025-02-28

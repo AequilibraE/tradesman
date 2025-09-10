@@ -1,5 +1,5 @@
-import pytest
 import pandas as pd
+import pytest
 
 from tradesman.model_creation.import_population import ImportPopulation
 

@@ -5,9 +5,9 @@ import geopandas as gpd
 import shapely.wkb
 from aequilibrae.utils.create_example import create_example
 from shapely.geometry import Point
-from tradesman.model_creation.import_political_subdivisions import ImportPoliticalSubdivisions
 
 from tradesman.model_creation.create_new_tables import add_new_tables
+from tradesman.model_creation.import_political_subdivisions import ImportPoliticalSubdivisions
 
 
 def create_nauru_test(folder):

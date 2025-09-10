@@ -1,6 +1,7 @@
 import os
 import shutil
 from uuid import uuid4
+
 import pytest
 from aequilibrae.project import Project
 

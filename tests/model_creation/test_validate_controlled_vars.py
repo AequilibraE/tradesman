@@ -1,8 +1,8 @@
 import unittest
-from tempfile import mkdtemp, gettempdir
-from os.path import join, abspath, dirname, exists
 from os import rename
+from os.path import join, abspath, dirname, exists
 from shutil import copy, copytree, rmtree
+from tempfile import mkdtemp, gettempdir
 
 from tradesman.model_creation.synthetic_population.syn_pop_validation import validate_controlled_vars
 from tradesman.model_creation.synthetic_population.user_control_import import user_change_validation_parameters

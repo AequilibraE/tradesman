@@ -1,13 +1,12 @@
+import unittest
 from os.path import join, abspath, dirname
 from tempfile import gettempdir
-import requests
-import unittest
 from unittest import mock
 from uuid import uuid4
-from aequilibrae import Project, Parameters
-import pytest
 
 import pandas as pd
+import pytest
+from aequilibrae import Project
 
 from tradesman.model_creation.import_network import ImportNetwork
 

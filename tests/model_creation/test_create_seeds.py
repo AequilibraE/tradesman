@@ -1,11 +1,13 @@
-from os.path import join, abspath, dirname
-from os import rename
-from shutil import copy
-from tempfile import gettempdir, mkdtemp
 import unittest
-from uuid import uuid4
-import pandas as pd
+from os import rename
+from os.path import join, abspath, dirname
+from shutil import copy
 from shutil import rmtree
+from tempfile import gettempdir, mkdtemp
+from uuid import uuid4
+
+import pandas as pd
+
 from tests.create_nauru_test import create_nauru_test
 from tradesman.model_creation.synthetic_population.create_seeds import create_buckets
 

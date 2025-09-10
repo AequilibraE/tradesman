@@ -1,9 +1,9 @@
 import unittest
-from shutil import copy
-from os.path import join, exists, abspath, dirname
 from os import rename
-from tempfile import gettempdir, mkdtemp
+from os.path import join, exists, abspath, dirname
+from shutil import copy
 from shutil import rmtree
+from tempfile import gettempdir, mkdtemp
 
 from tradesman.model_creation.synthetic_population.create_control_totals_meta import create_control_totals_meta
 

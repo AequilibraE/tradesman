@@ -1,4 +1,5 @@
 from os import environ
+
 import pytest
 
 from tradesman.model import Tradesman

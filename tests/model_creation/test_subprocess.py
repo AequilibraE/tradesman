@@ -1,7 +1,7 @@
 import unittest
-from tempfile import gettempdir
 from os.path import join, abspath, dirname, exists
 from shutil import copytree, rmtree
+from tempfile import gettempdir
 from uuid import uuid4
 
 from tests.create_nauru_test import create_nauru_test

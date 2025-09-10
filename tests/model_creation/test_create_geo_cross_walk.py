@@ -1,10 +1,11 @@
-import unittest
-from shutil import rmtree
-from os.path import join, exists
-from os import rename
-from tempfile import gettempdir
 import tempfile
+import unittest
+from os import rename
+from os.path import join, exists
+from shutil import rmtree
+from tempfile import gettempdir
 from uuid import uuid4
+
 from tests.create_nauru_test import create_nauru_test
 from tradesman.model_creation.synthetic_population.create_geo_crosswalk import create_geo_cross_walk
 

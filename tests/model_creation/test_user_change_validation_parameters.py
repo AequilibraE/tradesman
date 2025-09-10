@@ -1,8 +1,9 @@
-from os import remove
 import unittest
-import yaml
+from os import remove
 from os.path import join
 from tempfile import gettempdir
+
+import yaml
 
 from tradesman.model_creation.synthetic_population.user_control_import import user_change_validation_parameters
 

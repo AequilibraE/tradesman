@@ -2,8 +2,9 @@ import uuid
 from os.path import join
 from tempfile import gettempdir
 from unittest import TestCase
-from aequilibrae.utils.create_example import create_example
+
 import pandas as pd
+from aequilibrae.utils.create_example import create_example
 
 from tradesman.model_creation.create_new_tables import add_new_tables
 
