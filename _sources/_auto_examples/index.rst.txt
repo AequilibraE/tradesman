@@ -10,10 +10,11 @@ A series of different workflows using Tradesman's main features
 
     <div class="sphx-glr-thumbnails">
 
+.. thumbnail-parent-div-open
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we show how to run a complete Tradesman model for Nauru, an insular country in...">
+    <div class="sphx-glr-thumbcontainer" tooltip="In this example, we show how to run a complete Tradesman model for Nauru, an insular country in Oceania.">
 
 .. only:: html
 
@@ -44,6 +45,8 @@ A series of different workflows using Tradesman's main features
       <div class="sphx-glr-thumbnail-title">Plotting Data</div>
     </div>
 
+
+.. thumbnail-parent-div-close
 
 .. raw:: html
 
