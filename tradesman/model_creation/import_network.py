@@ -1,6 +1,7 @@
 import csv
 import gc
 from time import sleep
+from pathlib import Path
 
 import pandas as pd
 import requests
@@ -54,14 +55,13 @@ class ImportNetwork:
             net = og.getNetFromFile(self.pbf_path)
             og.outputNetToCSV(net, output_folder=str(self.project.project_base_path))
 
-            print(" ")
             print("Adjust GMNS files ...")
             print(" ")
             self.__adjust_link_file(self.project.project_base_path / "link.csv")
 
             link_fields = {
-            "osm_way_id": {"description": "osm_id", "type": "text", "required": False},
-                }
+                "osm_way_id": {"description": "osm_id", "type": "text", "required": False},
+            }
             node_fields = {"osm_node_id": {"description": "osm_id", "type": "text", "required": False}}
 
             par.parameters["network"]["gmns"]["link"]["fields"].update(link_fields)
@@ -88,12 +88,12 @@ class ImportNetwork:
             print(" ")
             self.__update_links()
 
-    def __adjust_link_file(self, file_path: str):
+    def __adjust_link_file(self, file_path: Path):
         """
         Fix files created from osm2gmns to fit AequilibraE create_from_gmns.
 
         Parameters:
-             *file_path*(:obj:`str`):
+            *file_path*(:obj:`Path`):
         """
         df = pd.read_csv(file_path, sep=",", encoding="utf-8")
 
@@ -101,21 +101,10 @@ class ImportNetwork:
         rename_list = [element.replace("auto", "car").replace("bike", "bicycle") for element in all_values]
         df["allowed_uses"] = rename_list
 
-        df.to_csv(
-            self.project.project_base_path / "link.csv",
-            sep=",",
-            encoding="utf-8",
-            index=False,
-            quoting=csv.QUOTE_NONNUMERIC,
-        )
+        df.to_csv(file_path, sep=",", encoding="utf-8", index=False, quoting=csv.QUOTE_NONNUMERIC)
 
     def __download_osm_data(self):
-        """
-        Loads data from OSM.
-
-        Parameters:
-             *tile_size*(:obj:`int`):
-        """
+        """Loads data from OSM"""
         url = self.project.parameters["osm"]["overpass_endpoint"]
 
         # We won't download any area bigger than 25km by 25km

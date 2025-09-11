@@ -49,7 +49,7 @@ model.build_zoning(min_zone_pop=100, max_zone_pop=500)
 model.import_pop_by_sex_and_age()
 
 # %%
-# We can also import amenity and building information from OSM.
+# We can also import amenity and building information from Overture Maps.
 model.import_amenities()
 model.import_buildings(False)
 

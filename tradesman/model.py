@@ -79,7 +79,7 @@ class Tradesman:
         If the network already exists in the folder, it will be loaded, otherwise it will be created.
         """
 
-        network = ImportNetwork(self.project, self.__model_place, self.__pbf_path, self.box_side)
+        network = ImportNetwork(self.project, self.__pbf_path, self.box_side)
         network.build_network()
 
     def import_subdivisions(self, subdivision_levels: int = 2, overwrite: bool = False):
@@ -104,7 +104,7 @@ class Tradesman:
     def build_zoning(
         self,
         hexbin_size: int = 200,
-        max_zone_pop: int = 10000,
+        max_zone_pop: int = 10_000,
         min_zone_pop: int = 500,
         save_hexbins: bool = False,
         overwrite: bool = False,
@@ -123,7 +123,7 @@ class Tradesman:
 
             *overwrite* (:obj:`bool`): Deletes pre-existing HexBins and Zones. Defaults to ``False``.
         """
-        if not overwrite and not self.project.zones.zoning.data.empty:
+        if not overwrite and not self.project.zoning.data.empty:
             raise ValueError("Project zones is not empty. Set overwrite=True to proceed.")
 
         zones = ZoneBuilder(self.project, hexbin_size, max_zone_pop, min_zone_pop, save_hexbins)

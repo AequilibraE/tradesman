@@ -70,11 +70,7 @@ class ImportBuildPlaces:
         places = conn.execute(qry).df()
 
         # TODO: add a prepared file to be read as csv
-        categories = pd.read_csv(join(dirname(__file__), "ovm_categories.csv"), sep=";")
-        categories["main_category"] = (
-            categories["taxonomy"].str.replace("[", "").str.replace("]", "").str.split(",", expand=True)[0]
-        )
-        categories.drop(["taxonomy"], axis=1, inplace=True)
+        categories = pd.read_csv(join(dirname(__file__), "ovm_tags/ovm_categories.csv"), sep=",")
 
         cols = ["ovm_id", "source_dataset", "source_id", "tags", "secondary_tags", "main_category", "geometry"]
         places = places.merge(categories, on="tags")
@@ -102,9 +98,9 @@ class ImportBuildPlaces:
         cols = ["ovm_id", "source_id", "source_dataset", "subtype", "class", "zone_id", "area", "geometry"]
         buildings = buildings[cols]
 
-        if not isdir(self.project.project_base_path / "data_download"):
-            mkdir(self.project.project_base_path / "data_download")
-        buildings.to_parquet(self.project.project_base_path / "data_download" / "ovm_buildings.parquet")
+        if not isdir(self.project.project_base_path / "ovm_data"):
+            mkdir(self.project.project_base_path / "ovm_data")
+        buildings.to_parquet(self.project.project_base_path / "ovm_data" / "ovm_buildings.parquet")
 
         bld_count = buildings[["zone_id", "ovm_id"]].groupby("zone_id").count()
         bld_area = buildings[["zone_id", "area"]].groupby("zone_id").sum()
@@ -130,7 +126,7 @@ class ImportBuildPlaces:
         con.install_extension("spatial")
         con.load_extension("spatial")
 
-        bboxes = self.set_bbox()
+        bboxes = set_bbox(self.__xmin, self.__ymin, self.__xmax, self.__ymax, self.box_side)
 
         places = []
         for bbox in bboxes:
@@ -142,12 +138,12 @@ class ImportBuildPlaces:
         all_places.reset_index(drop=True, inplace=True)
 
         cols = ["ovm_id", "source_id", "source_dataset", "main_category", "tags", "secondary_tags", "zone_id"]
-        cols.extend("geometry")
+        cols.extend(["geometry"])
         all_places = all_places[cols]
 
-        if not isdir(self.project.project_base_path / "data_download"):
-            mkdir(self.project.project_base_path / "data_download")
-        all_places.to_parquet(self.project.project_base_path / "data_download" / "ovm_points_of_interest.parquet")
+        if not isdir(self.project.project_base_path / "ovm_data"):
+            mkdir(self.project.project_base_path / "ovm_data")
+        all_places.to_parquet(self.project.project_base_path / "ovm_data" / "ovm_points_of_interest.parquet")
 
         poi_count = all_places[["ovm_id", "zone_id"]].groupby("zone_id").count()
 

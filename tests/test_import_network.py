@@ -1,12 +1,12 @@
 import pytest
-import shutil
+from os import environ
 from os.path import join, abspath, dirname
 
-from aequilibrae.project import Project
 from tradesman.model_creation.import_network import ImportNetwork
 
 
-@pytest.mark.skip("Parameters GMNS is not working")
+@pytest.mark.skip("Takes too long")
+@pytest.mark.skipif(bool(environ.get("CI")), reason="Does not run in GitHub Action")
 def test_import_from_gmns(empty_aequilibrae_model):
     fields = ["model_place", "address_type", "country_name", "country_code_two_digit", "country_code_three_digit"]
     fields.extend(["xmin", "ymin", "xmax", "ymax"])
@@ -37,6 +37,7 @@ def test_import_from_gmns(empty_aequilibrae_model):
         assert i in links.columns
 
 
+@pytest.mark.skipif(bool(environ.get("CI")), reason="Does not run in GitHub Action")
 def test_import_from_osm(empty_aequilibrae_model):
     about = empty_aequilibrae_model.about
     about.add_info_field("model_place")

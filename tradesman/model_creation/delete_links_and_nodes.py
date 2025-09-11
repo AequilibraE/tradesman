@@ -9,7 +9,6 @@ import requests
 from aequilibrae.project import Project
 from aequilibrae.project.network.osm.osm_params import http_headers
 from aequilibrae.project.project_creation import add_triggers, remove_triggers
-from aequilibrae.project.network.osm.osm_params import http_headers
 from shapely.geometry import Polygon
 
 
