@@ -3,7 +3,6 @@ from os.path import abspath, dirname, join
 from shutil import copytree
 from tempfile import gettempdir
 from uuid import uuid4
-import fiona
 from aequilibrae.project import Project
 
 from tradesman.model_creation.delete_links_and_nodes import (
@@ -37,11 +36,12 @@ class TestDeleteLinksAndNodes(unittest.TestCase):
         self.project = Project()
         self.project.open(join(self.temp_fldr, "tests/data/vatican city"))
 
-        before = len(self.project.conn.execute("SELECT * FROM nodes;").fetchall())
+        with self.project.db_connection as conn:
+            before = len(conn.execute("SELECT * FROM nodes;").fetchall())
 
-        delete_links_and_nodes("Vatican City", self.project)
+            delete_links_and_nodes("Vatican City", self.project)
 
-        num_nodes = len(self.project.conn.execute("SELECT * FROM nodes;").fetchall())
+            num_nodes = len(conn.execute("SELECT * FROM nodes;").fetchall())
 
         self.assertGreater(before, num_nodes)
 
@@ -56,11 +56,12 @@ class TestDeleteLinksAndNodes(unittest.TestCase):
         self.project = Project()
         self.project.open(join(self.temp_fldr, "tests/data/monaco"))
 
-        before = len(self.project.conn.execute("SELECT * FROM nodes;").fetchall())
+        with self.project.db_connection as conn:
+            before = len(conn.execute("SELECT * FROM nodes;").fetchall())
 
-        delete_links_and_nodes("Monaco", self.project)
+            delete_links_and_nodes("Monaco", self.project)
 
-        num_nodes = len(self.project.conn.execute("SELECT * FROM nodes;").fetchall())
+            num_nodes = len(conn.execute("SELECT * FROM nodes;").fetchall())
 
         self.assertGreater(before, num_nodes)
 

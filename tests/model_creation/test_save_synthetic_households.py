@@ -14,13 +14,14 @@ class TestSaveSyntheticHouseholds(unittest.TestCase):
         self.pop_fldr = join(abspath(dirname("tests")), "tests/data/nauru/population")
 
     def test_save_synthetic_households(self):
-        pd.read_csv(join(self.pop_fldr, "output/synthetic_households.csv")).to_sql(
-            "synthetic_households", con=self.project.conn, if_exists="replace"
-        )
+        with self.project.db_connection as conn:
+            pd.read_csv(join(self.pop_fldr, "output/synthetic_households.csv")).to_sql(
+                "synthetic_households", con=conn, if_exists="replace"
+            )
 
-        df = pd.read_sql("SELECT name FROM sqlite_master WHERE type='table'", self.project.conn)
+            df = pd.read_sql("SELECT name FROM sqlite_master WHERE type='table'", conn)
 
-        self.assertIn("synthetic_households", list(df.name))
+            self.assertIn("synthetic_households", list(df.name))
 
 
 if __name__ == "__name__":

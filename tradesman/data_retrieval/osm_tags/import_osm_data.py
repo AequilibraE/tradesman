@@ -45,9 +45,10 @@ class ImportOsmData:
                 "field_type": ', "area" FLOAT',
             },
         }
-        self.__all_tables = [
-            x[0] for x in project.conn.execute("SELECT name FROM sqlite_master WHERE type ='table'").fetchall()
-        ]
+        with project.db_connection as conn:
+            self.__all_tables = [
+                x[0] for x in conn.execute("SELECT name FROM sqlite_master WHERE type ='table'").fetchall()
+            ]
 
         self.__initialize()
 
@@ -87,62 +88,63 @@ class ImportOsmData:
 
         # Save count and area information within the project's zones database
         counting_table = tag_by_zone.groupby("zone_id").count()[[self.__tag]].fillna(0)
-        counting_table["zone_id"] = [i for i in counting_table.index]
+        counting_table["zone_id"] = list(counting_table.index)
 
-        exp = f"ALTER TABLE zones ADD osm_{self.__tag}_count INT;"
-        self._project.conn.execute(exp)
-        self._project.conn.commit()
+        with self._project.db_connection as conn:
 
-        # For small geographical regions, some zones can have zero buildings and/or amenities
-        # So we execute the following query to replace NaN values in zones table by zeros
-        zero_counts = [i for i in np.arange(1, len(self.__zones) + 1) if i not in counting_table.zone_id.values]
-        count_qry = f"UPDATE zones SET osm_{self.__tag}_count=0 WHERE zone_id=?;"
-        self._project.conn.executemany(count_qry, list((x,) for x in zero_counts))
-        self._project.conn.commit()
+            exp = f"ALTER TABLE zones ADD osm_{self.__tag}_count INT;"
+            conn.execute(exp)
+            conn.commit()
 
-        count_qry = f"UPDATE zones SET osm_{self.__tag}_count=? WHERE zone_id=?;"
-        self._project.conn.executemany(count_qry, list(counting_table.itertuples(index=False, name=None)))
-        self._project.conn.commit()
+            # For small geographical regions, some zones can have zero buildings and/or amenities
+            # So we execute the following query to replace NaN values in zones table by zeros
+            zero_counts = [i for i in np.arange(1, len(self.__zones) + 1) if i not in counting_table.zone_id.values]
+            count_qry = f"UPDATE zones SET osm_{self.__tag}_count=0 WHERE zone_id=?;"
+            conn.executemany(count_qry, [(x,) for x in zero_counts])
+            conn.commit()
 
-        if self.__tag == "building":
-            tag_by_zone["area"] = tag_by_zone.to_crs(3857).area
+            count_qry = f"UPDATE zones SET osm_{self.__tag}_count=? WHERE zone_id=?;"
+            conn.executemany(count_qry, list(counting_table.itertuples(index=False, name=None)))
+            conn.commit()
 
-            area_table = tag_by_zone.groupby("zone_id").sum(numeric_only=True)[["area"]].fillna(0)
-            area_table["zone_id"] = [i for i in area_table.index]
+            if self.__tag == "building":
+                tag_by_zone["area"] = tag_by_zone.to_crs(3857).area
 
-            self._project.conn.execute("ALTER TABLE zones ADD osm_building_area FLOAT;")
-            self._project.conn.commit()
+                area_table = tag_by_zone.groupby("zone_id").sum(numeric_only=True)[["area"]].fillna(0)
+                area_table["zone_id"] = list(area_table.index)
 
-            zero_area = [i for i in np.arange(1, len(self.__zones) + 1) if i not in area_table.zone_id.values]
-            # area_qry = area_query(area_table, func="set_zero")
-            area_qry = "UPDATE zones SET osm_building_area=0 WHERE zone_id=?"
-            self._project.conn.executemany(area_qry, list((x,) for x in zero_area))
-            self._project.conn.commit()
+                conn.execute("ALTER TABLE zones ADD osm_building_area FLOAT;")
+                conn.commit()
 
-            # area_qry = area_query(area_table)
-            area_qry = "UPDATE zones SET osm_building_area=ROUND(?,2) WHERE zone_id=?;"
-            self._project.conn.executemany(area_qry, list(area_table.itertuples(index=False, name=None)))
-            self._project.conn.commit()
+                zero_area = [i for i in np.arange(1, len(self.__zones) + 1) if i not in area_table.zone_id.values]
+                # area_qry = area_query(area_table, func="set_zero")
+                area_qry = "UPDATE zones SET osm_building_area=0 WHERE zone_id=?"
+                conn.executemany(area_qry, [(x,) for x in zero_area])
+                conn.commit()
 
-        # Create a database to store the data
-        key = self.__query_fields[self.__tag]
+                # area_qry = area_query(area_table)
+                area_qry = "UPDATE zones SET osm_building_area=ROUND(?,2) WHERE zone_id=?;"
+                conn.executemany(area_qry, list(area_table.itertuples(index=False, name=None)))
+                conn.commit()
 
-        if f"osm_{self.__tag}" not in self.__all_tables:
-            self._project.conn.execute(
-                f'CREATE TABLE IF NOT EXISTS osm_{key["tag_value"]}("type" TEXT, "id" INTEGER, "{key["tag_value"]}" TEXT, "zone_id" INTEGER{key["field_type"]});'
-            )
-            self._project.conn.execute(
-                f"SELECT AddGeometryColumn('osm_{key['tag_value']}', 'geometry', 4326, '{key['geom_type'].upper()}', 'XY' );"
-            )
-            self._project.conn.execute(f"SELECT CreateSpatialIndex('osm_{key['tag_value']}', 'geometry' );")
-            self._project.conn.commit()
+            # Create a database to store the data
+            key = self.__query_fields[self.__tag]
 
-        qry = f"INSERT INTO osm_{key['tag_value']}(type, id, {key['tag_value']}, zone_id, {key['field_name']}geometry) VALUES(?, ?, ?, ?, {key['field_value']}CastTo{key['geom_type']}(ST_GeomFromWKB(?, 4326)));"
+            if f"osm_{self.__tag}" not in self.__all_tables:
+                conn.execute(
+                    f'CREATE TABLE IF NOT EXISTS osm_{key["tag_value"]}("type" TEXT, "id" INTEGER, "{key["tag_value"]}" TEXT, "zone_id" INTEGER{key["field_type"]});'
+                )
+                conn.execute(
+                    f"SELECT AddGeometryColumn('osm_{key['tag_value']}', 'geometry', 4326, '{key['geom_type'].upper()}', 'XY' );"
+                )
+                conn.execute(f"SELECT CreateSpatialIndex('osm_{key['tag_value']}', 'geometry' );")
+                conn.commit()
 
-        list_of_tuples = list(tag_by_zone[self.__columns[self.__tag]].fillna(0).itertuples(index=False, name=None))
+            qry = f"INSERT INTO osm_{key['tag_value']}(type, id, {key['tag_value']}, zone_id, {key['field_name']}geometry) VALUES(?, ?, ?, ?, {key['field_value']}CastTo{key['geom_type']}(ST_GeomFromWKB(?, 4326)));"
 
-        self._project.conn.executemany(qry, list_of_tuples)
-        self._project.conn.commit()
+            list_of_tuples = list(tag_by_zone[self.__columns[self.__tag]].fillna(0).itertuples(index=False, name=None))
+
+            conn.executemany(qry, list_of_tuples)
 
         return tag_by_zone
 

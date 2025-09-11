@@ -7,7 +7,7 @@ sys.dont_write_bytecode = True
 
 here = os.path.dirname(os.path.realpath(__file__))
 
-pkgs = [pkg for pkg in find_packages()]
+pkgs = list(find_packages())
 
 pkg_data = {
     "tradesman.data": ["population/*.csv"],
@@ -17,18 +17,14 @@ loose_modules = ["__version__"]
 
 if __name__ == "__main__":
     reqs = [
-        "shapely>=2.0",
-        "geopandas",
-        "openmatrix",
         "rasterio",
         "matplotlib",
         "pycountry",
         "aequilibrae",
         "tabulate",
-        "tqdm",
-        "pysal",
+        "libpysal",
     ]
-    extra_reqs = {"all_features": ["osm2gmns >= 0.6.8", "populationsim >= 0.5.1", "dask_geopandas"]}
+    extra_reqs = {"all_features": ["osm2gmns", "dask_geopandas"]}
     setup(
         name="tradesman",
         version="0.2",
@@ -40,15 +36,14 @@ if __name__ == "__main__":
         package_data=pkg_data,
         zip_safe=True,
         description="A friendly model builder for transportation models",
-        author="Pedro Camargo, Renata Akemii",
+        author="Pedro Camargo, Renata Akemi",
         author_email="pedro@outerloop.io",
         url="https://github.com/AequilibraE/tradesman",
         classifiers=[
             "Programming Language :: Python",
-            "Programming Language :: Python :: 3.7",
-            "Programming Language :: Python :: 3.8",
-            "Programming Language :: Python :: 3.9",
             "Programming Language :: Python :: 3.10",
+            "Programming Language :: Python :: 3.11",
+            "Programming Language :: Python :: 3.12",
         ],
         cmdclass={},
         ext_modules=[],

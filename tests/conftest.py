@@ -22,20 +22,23 @@ def empty_aequilibrae_model(create_path):
     prj = Project()
     prj.new(create_path)
 
-    add_new_tables(prj.conn)
+    with prj.db_connection as conn:
+        add_new_tables(conn)
     yield prj
     prj.close()
 
 
 @pytest.fixture
 def network_connection(empty_aequilibrae_model):
-    yield empty_aequilibrae_model.conn
+    with empty_aequilibrae_model.db_connection as conn:
+        yield conn
 
 
 @pytest.fixture
 def nauru_test(create_path, tmp_path):
     prj = create_example(create_path, "nauru")
-    add_new_tables(prj.conn)
+    with prj.db_connection as conn:
+        add_new_tables(conn)
 
     shutil.copy(
         os.path.join(os.path.dirname(__file__), "data/nauru/Nauru_cache_gadm.parquet"),
@@ -52,7 +55,7 @@ def nauru_test(create_path, tmp_path):
 
 
 @pytest.fixture
-def nauru_pop_test(nauru_test, create_path, tmp_path):
+def nauru_pop_test(nauru_test, tmp_path):
     shutil.copy(
         os.path.join(os.path.dirname(__file__), "data/nauru/pop_Nauru.tif"),
         os.path.join(tmp_path, "pop_Nauru.tif"),
@@ -63,14 +66,15 @@ def nauru_pop_test(nauru_test, create_path, tmp_path):
     df = population_raster(url, "pop_Nauru", nauru_test)
     gdf = gpd.GeoDataFrame(df, geometry=gpd.points_from_xy(df.longitude, df.latitude), crs=4326)
 
-    model_area = gpd.read_postgis(
-        "SELECT ST_AsBinary(geometry) as geom FROM political_subdivisions WHERE level=-1", con=nauru_test.conn, crs=4326
-    )
+    with nauru_test.db_connection as conn:
+        model_area = gpd.read_postgis(
+            "SELECT ST_AsBinary(geometry) as geom FROM political_subdivisions WHERE level=-1", con=conn, crs=4326
+        )
 
     select_pop = gdf.clip(model_area, keep_geom_type=True)[["longitude", "latitude", "population"]]
 
-    select_pop.to_sql("raw_population", nauru_test.conn, if_exists="append", index=False)
-    nauru_test.conn.execute("UPDATE raw_population SET Geometry=MakePoint(longitude, latitude, 4326)")
-    nauru_test.conn.commit()
+    with nauru_test.db_connection as conn:
+        select_pop.to_sql("raw_population", conn, if_exists="append", index=False)
+        conn.execute("UPDATE raw_population SET Geometry=MakePoint(longitude, latitude, 4326)")
 
     yield nauru_test

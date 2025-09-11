@@ -1,9 +1,8 @@
 import gc
 import csv
-from tempfile import gettempdir
 from time import sleep
 from aequilibrae import Project, Parameters
-from os.path import join
+from pathlib import Path
 
 import pandas as pd
 import requests
@@ -55,15 +54,13 @@ class ImportNetwork:
 
             print("Convert to GMNS ...")
             print(" ")
-            net = og.getNetFromFile(self.pbf_path, network_types=("auto"))
-            og.outputNetToCSV(net, output_folder=gettempdir(), prefix=f"{self.model_place}-gmns-", encoding="utf-8")
+            net = og.getNetFromFile(self.pbf_path)
+            og.outputNetToCSV(net, output_folder=str(self.project.project_base_path))
 
             print(" ")
             print("Adjust GMNS files ...")
             print(" ")
-            self.__adjust_link_file(
-                file_path=join(gettempdir(), f"{self.model_place}-gmns-link.csv"), model_place=self.model_place
-            )
+            self.__adjust_link_file(Path(self.project.project_base_path) / "link.csv")
 
             self.par.parameters["network"]["gmns"]["link"]["fields"].update(self.new_link_fields)
             self.par.parameters["network"]["gmns"]["node"]["fields"].update(self.new_node_fields)
@@ -72,8 +69,8 @@ class ImportNetwork:
             print("Create network from GMNS ...")
             print(" ")
             self.project.network.create_from_gmns(
-                link_file_path=join(gettempdir(), f"{self.model_place}-gmns-link.csv"),
-                node_file_path=join(gettempdir(), f"{self.model_place}-gmns-node.csv"),
+                link_file_path=Path(self.project.project_base_path) / "link.csv",
+                node_file_path=Path(self.project.project_base_path) / "node.csv",
             )
 
             print(" ")
@@ -89,34 +86,21 @@ class ImportNetwork:
             print(" ")
             self.__update_links()
 
-    def __adjust_link_file(self, file_path: str, model_place: str):
+    def __adjust_link_file(self, file_path: str):
         """
         Fix files created from osm2gmns to fit AequilibraE create_from_gmns.
 
         Parameters:
              *file_path*(:obj:`str`):
-             *model_place*(:obj:`str`):
         """
         df = pd.read_csv(file_path, sep=",", encoding="utf-8")
-        # Rename directions
-        directions_dict = {1: "forward", -1: "backward", 0: "bidirectional"}
-        df["dir_flag"] = df["dir_flag"].apply(lambda x: directions_dict.get(x))
-        # Drop link_type column
-        df.drop(columns=["link_type"], inplace=True)
-        # Rename link_type_name column to link_type
-        df.rename(columns={"link_type_name": "link_type", "dir_flag": "directed"}, inplace=True)
 
         all_values = df.allowed_uses.str.replace(";", ", ")
-
-        rename_list = []
-        for element in all_values:
-            element = element.replace("auto", "car").replace("bike", "bicycle")
-            rename_list.append(element)
-
+        rename_list = [element.replace("auto", "car").replace("bike", "bicycle") for element in all_values]
         df["allowed_uses"] = rename_list
 
         df.to_csv(
-            join(gettempdir(), f"{model_place}-gmns-link.csv"),
+            Path(self.project.project_base_path) / "link.csv",
             sep=",",
             encoding="utf-8",
             index=False,
@@ -164,13 +148,10 @@ class ImportNetwork:
         """
         Creates the missing columns when importing data from GMNS.
         """
-        self.project.conn.execute("ALTER TABLE links RENAME COLUMN osm_way_id TO osm_id;")
-
-        self.project.conn.execute("ALTER TABLE links ADD COLUMN bridge text;")
-        self.project.conn.execute("ALTER TABLE links ADD COLUMN toll text;")
-        self.project.conn.execute("ALTER TABLE links ADD COLUMN tunnel text;")
-
-        self.project.conn.commit()
+        with self.project.db_connection as conn:
+            conn.execute("ALTER TABLE links ADD COLUMN bridge text;")
+            conn.execute("ALTER TABLE links ADD COLUMN toll text;")
+            conn.execute("ALTER TABLE links ADD COLUMN tunnel text;")
 
     def __update_links(self):
         """
@@ -194,7 +175,7 @@ class ImportNetwork:
         toll_list = [(x,) for x in toll_list]
         tunnel_list = [(x,) for x in tunnel_list]
 
-        self.project.conn.executemany("UPDATE links SET bridge='yes' WHERE osm_id=?;", bridge_list)
-        self.project.conn.executemany("UPDATE links SET toll='yes' WHERE osm_id=?;", toll_list)
-        self.project.conn.executemany("UPDATE links SET tunnel='yes' WHERE osm_id=?;", tunnel_list)
-        self.project.conn.commit()
+        with self.project.db_connection as conn:
+            conn.executemany("UPDATE links SET bridge='yes' WHERE osm_way_id=?;", bridge_list)
+            conn.executemany("UPDATE links SET toll='yes' WHERE osm_way_id=?;", toll_list)
+            conn.executemany("UPDATE links SET tunnel='yes' WHERE osm_way_id=?;", tunnel_list)

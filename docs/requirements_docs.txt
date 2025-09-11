@@ -1,8 +1,0 @@
-Sphinx<6.0.0
-pydata-sphinx-theme
-sphinx_autodoc_annotation
-nbsphinx
-folium
-sphinx-gallery
-ipython_genutils
-contextily

@@ -25,7 +25,8 @@ def create_control_totals_taz(project: Project, dest_folder: str):
 
     un_hh_size.reset_index(drop=True, inplace=True)
 
-    df = pd.read_sql("SELECT * FROM zones;", con=project.conn)
+    with project.db_connection as conn:
+        df = pd.read_sql("SELECT * FROM zones;", con=conn)
 
     selected_fields = [field for field in df.columns.tolist() if "POP" in field]
 
@@ -47,13 +48,14 @@ def create_control_totals_taz(project: Project, dest_folder: str):
 
     df.insert(0, "TAZ", list(range(1, len(df) + 1)))
 
-    sql = "SELECT country_name, division_name, level, Hex(ST_AsBinary(GEOMETRY)) as geom FROM political_subdivisions WHERE level=1;"
+    with project.db_connection as conn:
+        sql = "SELECT country_name, division_name, level, Hex(ST_AsBinary(GEOMETRY)) as geom FROM political_subdivisions WHERE level=1;"
 
-    subdivisions = gpd.GeoDataFrame.from_postgis(sql, project.conn, geom_col="geom", crs=4326)
+        subdivisions = gpd.GeoDataFrame.from_postgis(sql, conn, geom_col="geom", crs=4326)
 
-    sql = "SELECT zone_id, Hex(ST_AsBinary(geometry)) as geom FROM zones;"
+        sql = "SELECT zone_id, Hex(ST_AsBinary(geometry)) as geom FROM zones;"
 
-    zones = gpd.GeoDataFrame.from_postgis(sql, con=project.conn, geom_col="geom", crs=4326)
+        zones = gpd.GeoDataFrame.from_postgis(sql, con=conn, geom_col="geom", crs=4326)
 
     zones["centroid"] = zones.to_crs(3857).centroid.to_crs(4326)
 

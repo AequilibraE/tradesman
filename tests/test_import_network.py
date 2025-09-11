@@ -35,7 +35,8 @@ class TestImportNetwork(unittest.TestCase):
         network = ImportNetwork(self.project, self.model_place)
         network.build_network()
 
-        links = pd.read_sql("SELECT * FROM links;", con=self.project.conn)
+        with self.project.db_connection as conn:
+            links = pd.read_sql("SELECT * FROM links;", con=conn)
 
         self.assertGreater(len(links), 0)
         self.assertIn("bridge", links.columns)
@@ -47,7 +48,8 @@ class TestImportNetwork(unittest.TestCase):
         network = ImportNetwork(self.project, self.model_place, self.pbf_path)
         network.build_network()
 
-        links = pd.read_sql("SELECT * FROM links;", con=self.project.conn)
+        with self.project.db_connection as conn:
+            links = pd.read_sql("SELECT * FROM links;", con=conn)
 
         self.assertGreater(len(links), 0)
         self.assertIn("bridge", links.columns)

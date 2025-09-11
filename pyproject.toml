@@ -1,17 +1,104 @@
-[tool.black]
-line-length = 120
-target-version = ['py37', 'py38', 'py39', 'py310']
-include = '\.pyi?$'
-
 [project]
 name = "tradesman"
 version = "0.2"
 description = "A Python package for building complete AequilibraE models from open data"
 authors = [
     {name = "Pedro Camargo", email = "pedro@outerloop.io"},
-    {name = "Renata Akemii", email = "renata@outerloop.io"}
+    {name = "Renata Akemi", email = "renata@outerloop.io"}
 ]
 maintainers = [
     {name = "Pedro Camargo", email = "pedro@outerloop.io"},
 ]
-license = {text = "MIT"}
+dependencies = [
+    "aequilibrae<2.0.0",
+    "matplotlib",
+    "pycountry",
+    "libpysal",
+    "rasterio",
+    "tabulate"
+]
+license = "MIT"
+license-files = ["LICENSE.TXT"]
+
+[project.optional-dependencies]
+
+docs = [
+    "folium",
+    "mapclassify",
+    "nbsphinx",
+    "pydata-sphinx-theme",
+    "sphinx-gallery",
+    "sphinx_autodoc_annotation"
+]
+
+tests = [
+    "setuptools",
+    "pytest",
+    "ruff==0.9.10",
+    "black==25.1.0",
+    "wheel"
+]
+
+build = [
+    "setuptools",
+    "twine",
+    "wheel"
+]
+
+optional = [
+    "dask_geopandas",
+    "jupyterlab",
+    "osm2gmns"
+]
+
+dev = ['tradesman[build, tests, docs, optional]']
+
+[tool.black]
+line-length = 120
+target-version = ['py310', 'py311', 'py312']
+include = '\.pyi?$'
+
+[tool.ruff]
+lint.select = ["B", "C", "E", "F", "W"]
+lint.ignore = ["E501", "F401", "F403", "B028", "B007", "B017", "C901"]
+exclude = [
+    ".idea",
+    "__pycache__",
+    "sphinx",
+    ".ipynb_checkpoints",
+    "tradesman.egg-info",
+    "docs/*",
+    "notebooks",
+    "bin/hpc",
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+    ".venv",
+    ".venv310",
+    ".venv311",
+    ".venv312",
+]
+line-length = 120
+lint.dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+target-version = "py310"
+
+[tool.setuptools.package-dir]
+tradesman = "tradesman"

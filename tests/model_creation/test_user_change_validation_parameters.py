@@ -14,7 +14,13 @@ class TestUserChangeValidationParameters(unittest.TestCase):
 
         with open(join(self.fldr, "verification.yaml"), mode="w") as file:
             yaml.dump(
-                dict(popsim_dir="", region="", validation_dir="", aggregate_summaries="", group_geographies=""),
+                {
+                    "popsim_dir": "",
+                    "region": "",
+                    "validation_dir": "",
+                    "aggregate_summaries": "",
+                    "group_geographies": "",
+                },
                 file,
                 default_flow_style=False,
             )

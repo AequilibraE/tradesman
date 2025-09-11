@@ -28,7 +28,8 @@ def create_buckets(project: Project, folder: str, sample=0.02):
 
     household_info.reset_index(drop=True, inplace=True)
 
-    population = int(project.conn.execute("SELECT ROUND(SUM(population),0) FROM zones;").fetchone()[0])
+    with project.db_connection as conn:
+        population = int(conn.execute("SELECT ROUND(SUM(population),0) FROM zones;").fetchone()[0])
 
     # Set the sample proportion
     sort_number = int((population * sample) / household_info.AVGSIZE[0])

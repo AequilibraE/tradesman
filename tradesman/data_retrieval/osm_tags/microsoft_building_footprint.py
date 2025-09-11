@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 import requests
 from aequilibrae.project import Project
+from aequilibrae.project.network.osm.osm_params import http_headers
 
 from tradesman.data.load_zones import load_zones
 
@@ -28,7 +29,7 @@ class ImportMicrosoftBuildingData:
         self.__zones = load_zones(project)
         self._available = True
         self.__country_list = pd.read_csv(
-            "https://minedbuildings.blob.core.windows.net/global-buildings/dataset-links.csv"
+            "https://minedbuildings.z5.web.core.windows.net/global-buildings/dataset-links.csv"
         )
 
         self.__country_name = self.__nominatim_get_name().replace(" ", "")
@@ -37,11 +38,29 @@ class ImportMicrosoftBuildingData:
 
     def __nominatim_get_name(self):
         search_place = self.__model_place.lower().replace(" ", "+")
-        nom_url = f"https://nominatim.openstreetmap.org/search?q={search_place}&format=json&polygon_geojson=1&addressdetails=1&accept-language=en"
 
-        r = requests.get(nom_url)
+        timeout = 30
+        params = {"q": search_place, "format": "json", "polygon_geojson": 1, "addressdetails": 1}
 
-        return r.json()[0]["address"]["country"]
+        url = "https://nominatim.openstreetmap.org/"
+        url = url.rstrip("/") + "/search"
+
+        try:
+            response = requests.get(url, params=params, timeout=timeout, headers=http_headers)
+            if response.status_code != 200:
+                raise ValueError(f"Request failed with status code {response.status_code}")
+        except requests.exceptions.Timeout as e:
+            raise TimeoutError("Request timed out") from e
+        except requests.exceptions.ConnectionError as e:
+            raise ConnectionError("Failed to connect") from e
+        except requests.exceptions.RequestException as e:
+            raise Exception(f"Request error: {e}") from e
+
+        res = response.json()
+        if not res:
+            raise ValueError("The desired model place is not available.")
+
+        return res[0]["address"]["country"]
 
     def __initialize(self):
         """
@@ -83,25 +102,26 @@ class ImportMicrosoftBuildingData:
 
         buildings_by_zone["geom"] = buildings_by_zone.geometry.to_wkb()
 
-        # Create columns in zones' table with microsoft building information
-        self._project.conn.execute("ALTER TABLE zones ADD microsoft_building_count INT;")
-        self._project.conn.commit()
+        with self._project.db_connection as conn:
+            # Create columns in zones' table with microsoft building information
+            conn.execute("ALTER TABLE zones ADD microsoft_building_count INT;")
+            conn.commit()
 
-        self._project.conn.execute("ALTER TABLE zones ADD microsoft_building_area FLOAT;")
-        self._project.conn.commit()
+            conn.execute("ALTER TABLE zones ADD microsoft_building_area FLOAT;")
+            conn.commit()
 
-        self._project.conn.execute(
-            "UPDATE zones SET microsoft_building_area=ROUND(0,2), microsoft_building_count=0 WHERE microsoft_building_count IS NULL;"
-        )
-        self._project.conn.commit()
-
-        qry = "UPDATE zones SET microsoft_building_count=?, microsoft_building_area=ROUND(?, 2) WHERE zone_id=?;"
-        list_of_tuples = list(
-            zip(
-                buildings_by_zone.groupby("zone_id").count().id.values,
-                buildings_by_zone.groupby("zone_id").sum(numeric_only=True).area.values,
-                np.arange(1, max(buildings_by_zone.zone_id) + 1),
+            conn.execute(
+                "UPDATE zones SET microsoft_building_area=ROUND(0,2), microsoft_building_count=0 WHERE microsoft_building_count IS NULL;"
             )
-        )
-        self._project.conn.executemany(qry, list_of_tuples)
-        self._project.conn.commit()
+            conn.commit()
+
+            qry = "UPDATE zones SET microsoft_building_count=?, microsoft_building_area=ROUND(?, 2) WHERE zone_id=?;"
+            list_of_tuples = list(
+                zip(
+                    buildings_by_zone.groupby("zone_id").count().id.values,
+                    buildings_by_zone.groupby("zone_id").sum(numeric_only=True).area.values,
+                    np.arange(1, max(buildings_by_zone.zone_id) + 1),
+                    strict=False,
+                )
+            )
+            conn.executemany(qry, list_of_tuples)

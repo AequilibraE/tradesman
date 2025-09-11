@@ -16,22 +16,15 @@ class TestModel(unittest.TestCase):
     def test_create(self):
         self.proj.create()
 
-        self.assertGreater(
-            self.proj._project.conn.execute("SELECT COUNT(*) FROM political_subdivisions;").fetchone()[0], 0
-        )
-        self.assertGreater(self.proj._project.conn.execute("SELECT SUM(population) FROM zones;").fetchone()[0], 1000)
-        self.assertGreater(self.proj._project.conn.execute("SELECT SUM(POPF13) FROM zones;").fetchone()[0], 10)
-        self.assertGreater(self.proj._project.conn.execute("SELECT SUM(POPM18) FROM zones;").fetchone()[0], 10)
-        self.assertEqual(self.proj._project.conn.execute("SELECT COUNT(zone_id) FROM zones;").fetchone()[0], 8)
-        self.assertGreater(
-            self.proj._project.conn.execute("SELECT SUM(osm_amenity_count) FROM zones;").fetchone()[0], 10
-        )
-        self.assertGreater(
-            self.proj._project.conn.execute("SELECT SUM(microsoft_building_count) FROM zones;").fetchone()[0], 10
-        )
-        self.assertGreater(
-            self.proj._project.conn.execute("SELECT SUM(osm_building_area) FROM zones;").fetchone()[0], 100_000
-        )
+        with self.proj._project.db_connection as conn:
+            self.assertGreater(conn.execute("SELECT COUNT(*) FROM political_subdivisions;").fetchone()[0], 0)
+            self.assertGreater(conn.execute("SELECT SUM(population) FROM zones;").fetchone()[0], 1000)
+            self.assertGreater(conn.execute("SELECT SUM(POPF13) FROM zones;").fetchone()[0], 10)
+            self.assertGreater(conn.execute("SELECT SUM(POPM18) FROM zones;").fetchone()[0], 10)
+            self.assertEqual(conn.execute("SELECT COUNT(zone_id) FROM zones;").fetchone()[0], 8)
+            self.assertGreater(conn.execute("SELECT SUM(osm_amenity_count) FROM zones;").fetchone()[0], 10)
+            self.assertGreater(conn.execute("SELECT SUM(microsoft_building_count) FROM zones;").fetchone()[0], 10)
+            self.assertGreater(conn.execute("SELECT SUM(osm_building_area) FROM zones;").fetchone()[0], 100_000)
 
     # def test_set_population_source(self):
     #     self.fail()

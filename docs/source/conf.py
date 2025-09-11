@@ -26,7 +26,6 @@ except ImportError as e:
 
 # -- Project information -----------------------------------------------------
 
-
 project = "Tradesman"
 copyright = "2022, Pedro Camargo"
 author = "Pedro Camargo, Ph.D."
@@ -54,7 +53,6 @@ extensions = [
     "sphinx_autodoc_annotation",
     "sphinx.ext.autosummary",
     "sphinx.ext.githubpages",
-    # 'rst2pdf.pdfbuilder',
 ]
 
 sphinx_gallery_conf = {
@@ -65,9 +63,6 @@ sphinx_gallery_conf = {
 templates_path = ["_templates"]
 
 # The suffix(es) of source filenames.
-# You can specify multiple suffix as a list of string:
-#
-# source_suffix = ['.rst', '.md']
 source_suffix = ".rst"
 
 # The master toctree document.
@@ -78,7 +73,7 @@ master_doc = "index"
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = "en"
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.

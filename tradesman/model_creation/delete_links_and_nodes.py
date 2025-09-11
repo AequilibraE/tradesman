@@ -9,6 +9,7 @@ import pycountry
 import requests
 from aequilibrae.project import Project
 from aequilibrae.project.project_creation import add_triggers, remove_triggers
+from aequilibrae.project.network.osm.osm_params import http_headers
 from shapely.geometry import Polygon
 
 
@@ -44,13 +45,18 @@ def place_is_country(model_place: str):
     """
     search_place = model_place.lower().replace(" ", "+")
 
-    nom_url = (
-        f"https://nominatim.openstreetmap.org/search?q={search_place}&format=json&addressdetails=1&accept-language=en"
-    )
+    timeout = 30
+    params = {"q": search_place, "format": "json", "addressdetails": 1}
 
-    r = requests.get(nom_url)
+    url = "https://nominatim.openstreetmap.org/"
+    url = url.rstrip("/") + "/search"
 
-    country_name = pycountry.countries.search_fuzzy(r.json()[0]["address"]["country"])[0].name
+    response = requests.get(url, params=params, timeout=timeout, headers=http_headers)
+
+    if response.status_code != 200:
+        raise ValueError("The desired model place is not available.")
+
+    country_name = pycountry.countries.search_fuzzy(response.json()[0]["address"]["country"])[0].name
 
     if re.search(model_place, country_name):
         return True
@@ -73,7 +79,8 @@ def delete_links_and_nodes(model_place, project: Project):
 
     sql = "SELECT country_name, division_name, level, Hex(ST_AsBinary(GEOMETRY)) geometry FROM political_subdivisions WHERE level=0;"
 
-    borders = gpd.GeoDataFrame.from_postgis(sql, project.conn, geom_col="geometry", crs=4326).explode(index_parts=True)
+    with project.db_connection as conn:
+        borders = gpd.GeoDataFrame.from_postgis(sql, conn, geom_col="geometry", crs=4326).explode(index_parts=True)
 
     if coast is None:
         gdf_country_boundary = borders.copy()
@@ -91,24 +98,25 @@ def delete_links_and_nodes(model_place, project: Project):
 
     links_query = "SELECT link_id, Hex(ST_AsBinary(GEOMETRY)) geometry FROM links;"
 
-    links = gpd.GeoDataFrame.from_postgis(links_query, project.conn, geom_col="geometry", crs=4326)
+    with project.db_connection as conn:
+        links = gpd.GeoDataFrame.from_postgis(links_query, conn, geom_col="geometry", crs=4326)
 
-    inner_gdf = gpd.sjoin(gdf_country_boundary, links, how="inner")
+        inner_gdf = gpd.sjoin(gdf_country_boundary, links, how="inner")
 
-    del_links = list(links[~links.link_id.isin(inner_gdf.link_id)][["link_id"]].itertuples(index=False, name=None))
+        del_links = list(links[~links.link_id.isin(inner_gdf.link_id)][["link_id"]].itertuples(index=False, name=None))
 
-    remove_triggers(project.conn, project.logger, "network")
+        remove_triggers(conn, project.logger, "network")
 
-    project.conn.executemany("DELETE FROM links WHERE link_id=?", del_links)
-    project.conn.commit()
+        conn.executemany("DELETE FROM links WHERE link_id=?", del_links)
+        conn.commit()
 
-    nodes_query = """DELETE FROM nodes
-    WHERE node_id NOT IN (SELECT a_node FROM links
-                        UNION ALL
-                                        SELECT b_node FROM links);
-    """
+        nodes_query = """DELETE FROM nodes
+        WHERE node_id NOT IN (SELECT a_node FROM links
+                            UNION ALL
+                                            SELECT b_node FROM links);
+        """
 
-    project.conn.execute(nodes_query)
-    project.conn.commit()
+        conn.execute(nodes_query)
+        conn.commit()
 
-    add_triggers(project.conn, project.logger, "network")
+        add_triggers(conn, project.logger, "network")

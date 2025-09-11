@@ -11,7 +11,8 @@ def country_border_from_model(project: Project):
          *project*(:obj:`aequilibrae.project`): currently open project
 
     """
-    country_wkb = project.conn.execute("Select asBinary(geometry) from political_subdivisions where level=0").fetchone()
+    with project.db_connection as conn:
+        country_wkb = conn.execute("Select asBinary(geometry) from political_subdivisions where level=0").fetchone()
     if not country_wkb:
         return MultiPolygon([])
     country_geo = shapely.wkb.loads(country_wkb[0])
@@ -26,9 +27,8 @@ def model_borders(project: Project):
          *project*(:obj:`aequilibrae.project`): currently open project
 
     """
-    country_wkb = project.conn.execute(
-        "Select asBinary(geometry) from political_subdivisions where level=-1"
-    ).fetchone()
+    with project.db_connection as conn:
+        country_wkb = conn.execute("Select asBinary(geometry) from political_subdivisions where level=-1").fetchone()
     if not country_wkb:
         return MultiPolygon([])
     country_geo = shapely.wkb.loads(country_wkb[0])

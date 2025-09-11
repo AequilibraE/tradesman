@@ -93,7 +93,8 @@ def run_populationsim(multithread: bool, project: Project, folder: str, thread_n
     """
     pop_fldr = join(folder, "population")
 
-    num_zones = project.conn.execute("SELECT COUNT(*) FROM zones;").fetchone()[0]
+    with project.db_connection as conn:
+        num_zones = conn.execute("SELECT COUNT(*) FROM zones;").fetchone()[0]
 
     if multithread or num_zones > 100:
         update_thread_number(pop_fldr, thread_number)
@@ -110,28 +111,29 @@ def run_populationsim(multithread: bool, project: Project, folder: str, thread_n
         )
         return
 
-    pd.read_csv(join(pop_fldr, "output/synthetic_persons.csv"))[["hh_id", "TAZ", "AGEP", "SEX"]].to_sql(
-        "synthetic_persons", con=project.conn, if_exists="replace"
-    )
+    with project.db_connection as conn:
+        pd.read_csv(join(pop_fldr, "output/synthetic_persons.csv"))[["hh_id", "TAZ", "AGEP", "SEX"]].to_sql(
+            "synthetic_persons", con=conn, if_exists="replace"
+        )
 
-    pd.read_csv(join(pop_fldr, "output/synthetic_households.csv"))[["hh_id", "TAZ", "NP"]].to_sql(
-        "synthetic_households", con=project.conn, if_exists="replace"
-    )
+        pd.read_csv(join(pop_fldr, "output/synthetic_households.csv"))[["hh_id", "TAZ", "NP"]].to_sql(
+            "synthetic_households", con=conn, if_exists="replace"
+        )
 
-    fields = [
-        ("synthetic_persons", "hh_id", "household id"),
-        ("synthetic_persons", "TAZ", "Unique Traffic Analysis Zones id"),
-        ("synthetic_persons", "AGEP", "synthetic person age"),
-        ("synthetic_persons", "SEX", "synthetic person sex"),
-        ("synthetic_households", "hh_id", "household id"),
-        ("synthetic_households", "TAZ", "Unique Traffic Analysis Zones id"),
-        ("synthetic_households", "NP", "number of persons in the household"),
-    ]
+        fields = [
+            ("synthetic_persons", "hh_id", "household id"),
+            ("synthetic_persons", "TAZ", "Unique Traffic Analysis Zones id"),
+            ("synthetic_persons", "AGEP", "synthetic person age"),
+            ("synthetic_persons", "SEX", "synthetic person sex"),
+            ("synthetic_households", "hh_id", "household id"),
+            ("synthetic_households", "TAZ", "Unique Traffic Analysis Zones id"),
+            ("synthetic_households", "NP", "number of persons in the household"),
+        ]
 
-    project.conn.executemany(
-        "INSERT INTO 'attributes_documentation' (name_table, attribute, description) VALUES (?, ?, ?);", fields
-    )
-    project.conn.commit()
+        conn.executemany(
+            "INSERT INTO 'attributes_documentation' (name_table, attribute, description) VALUES (?, ?, ?);", fields
+        )
+        conn.commit()
 
     user_change_validation_parameters(overwrite=False, model_place=project.about.model_name, dest_folder=pop_fldr)
 

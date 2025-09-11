@@ -23,7 +23,7 @@ def hex_builder(coverage_area, hex_height, epsg=3857):
     """
     # Function adapted from http://michaelminn.com/linux/mmqgis/
 
-    x_left, y_bottom, x_right, y_top = coverage_area.unary_union.bounds
+    x_left, y_bottom, x_right, y_top = coverage_area.union_all().bounds
 
     results = []
     data = []
@@ -82,12 +82,12 @@ def hex_builder(coverage_area, hex_height, epsg=3857):
         import dask_geopandas
 
         ddf = dask_geopandas.from_geopandas(hexb, npartitions=5 * mp.cpu_count())
-        ddf = ddf.clip(coverage_area.unary_union, keep_geom_type=True)
+        ddf = ddf.clip(coverage_area.union_all(), keep_geom_type=True)
         hexb = gpd.GeoDataFrame(ddf)
         hexb.columns = ddf.columns
 
     else:
-        hexb = hexb.clip(coverage_area.unary_union, keep_geom_type=True)
+        hexb = hexb.clip(coverage_area.union_all(), keep_geom_type=True)
 
     hexb.hex_id = np.arange(hexb.shape[0]) + 1
     return gpd.GeoDataFrame(hexb[["hex_id"]], geometry=hexb["geometry"], crs=f"epsg:{epsg}")

@@ -27,17 +27,18 @@ class TestPopBySexAndAge(unittest.TestCase):
     def test_get_pop_by_sex_age(self):
         get_pop_by_sex_age(self.project, self.country_name)
 
-        f_10_pop = self.project.conn.execute("SELECT SUM(POPF10) FROM zones;").fetchone()[0]
-        self.assertEqual(f_10_pop, 0)
+        with self.project.db_connection as conn:
+            f_10_pop = conn.execute("SELECT SUM(POPF10) FROM zones;").fetchone()[0]
+            self.assertEqual(f_10_pop, 0)
 
-        f_4_pop = self.project.conn.execute("SELECT SUM(POPF4) FROM zones;").fetchone()[0]
-        self.assertEqual(f_4_pop, 0)
+            f_4_pop = conn.execute("SELECT SUM(POPF4) FROM zones;").fetchone()[0]
+            self.assertEqual(f_4_pop, 0)
 
-        m_5_pop = self.project.conn.execute("SELECT SUM(POPM5) FROM zones;").fetchone()[0]
-        self.assertEqual(m_5_pop, 0)
+            m_5_pop = conn.execute("SELECT SUM(POPM5) FROM zones;").fetchone()[0]
+            self.assertEqual(m_5_pop, 0)
 
-        m_7_pop = self.project.conn.execute("SELECT SUM(POPM7) FROM zones;").fetchone()[0]
-        self.assertEqual(m_7_pop, 0)
+            m_7_pop = conn.execute("SELECT SUM(POPM7) FROM zones;").fetchone()[0]
+            self.assertEqual(m_7_pop, 0)
 
 
 if __name__ == "__name__":

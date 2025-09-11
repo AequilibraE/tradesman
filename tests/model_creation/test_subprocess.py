@@ -35,11 +35,12 @@ class TestSubprocess(unittest.TestCase):
     def __dochecks(self):
         self.assertTrue(exists(join(self.fldr, "output/synthetic_households.csv")))
 
-        hh_sql = "SELECT COUNT(*) FROM attributes_documentation WHERE name_table='synthetic_households';"
-        self.assertEqual(self.project.conn.execute(hh_sql).fetchone()[0], 3)
+        with self.project.db_connection as conn:
+            hh_sql = "SELECT COUNT(*) FROM attributes_documentation WHERE name_table='synthetic_households';"
+            self.assertEqual(conn.execute(hh_sql).fetchone()[0], 3)
 
-        person_hh = "SELECT COUNT(*) FROM attributes_documentation WHERE name_table='synthetic_persons';"
-        self.assertEqual(self.project.conn.execute(person_hh).fetchone()[0], 4)
+            person_hh = "SELECT COUNT(*) FROM attributes_documentation WHERE name_table='synthetic_persons';"
+            self.assertEqual(conn.execute(person_hh).fetchone()[0], 4)
 
 
 if __name__ == "__name__":

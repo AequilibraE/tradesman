@@ -6,10 +6,11 @@ import geopandas as gpd
 import pandas as pd
 import pycountry
 import requests
+import shapely
 from aequilibrae.project import Project
+from aequilibrae.project.network.osm.osm_params import http_headers
 from numpy import arange
 from shapely.geometry import MultiPolygon, Polygon
-from shapely.ops import unary_union
 
 
 class ImportPoliticalSubdivisions:
@@ -41,20 +42,19 @@ class ImportPoliticalSubdivisions:
 
         data = data[data.level == 0]
 
-        if overwrite:
-            self._project.conn.execute("DELETE FROM political_subdivisions WHERE level=0;")
-            self._project.conn.commit()
+        with self._project.db_connection as conn:
+            if overwrite:
+                conn.execute("DELETE FROM political_subdivisions WHERE level=0;")
+                conn.commit()
 
-        sql = """INSERT INTO political_subdivisions(country_name, division_name, level, geometry)
-                    VALUES(?, ?, ?, CastToMulti(GeomFromWKB(?, 4326)));"""
-        self._project.conn.executemany(sql, list(data.itertuples(index=False, name=None)))
+            sql = """INSERT INTO political_subdivisions(country_name, division_name, level, geometry)
+                        VALUES(?, ?, ?, CastToMulti(GeomFromWKB(?, 4326)));"""
+            conn.executemany(sql, list(data.itertuples(index=False, name=None)))
 
-        # If the model area is a country, we update the model area to avoid creating useless zones in the future
-        if re.search(self.__model_place, self._project.about.country_name):
-            sql = """UPDATE political_subdivisions SET geometry=CastToMulti(GeomFromWKB(?, 4326)) WHERE level=-1;"""
-            self._project.conn.execute(sql, data.geom.values)
-
-        self._project.conn.commit()
+            # If the model area is a country, we update the model area to avoid creating useless zones in the future
+            if re.search(self.__model_place, self._project.about.country_name):
+                sql = """UPDATE political_subdivisions SET geometry=CastToMulti(GeomFromWKB(?, 4326)) WHERE level=-1;"""
+                conn.execute(sql, data.geom.values)
 
     def import_subdivisions(self, level: int, overwrite: bool = False):
         """
@@ -84,16 +84,16 @@ class ImportPoliticalSubdivisions:
         data = data[data.level <= level]
         data.sort_values(by="level", ascending=True, inplace=True)
 
-        if overwrite:
-            self._project.conn.execute("DELETE FROM political_subdivisions WHERE level>0;")
-            self._project.conn.commit()
+        with self._project.db_connection as conn:
+            if overwrite:
+                conn.execute("DELETE FROM political_subdivisions WHERE level>0;")
+                conn.commit()
 
-        qry = "INSERT INTO political_subdivisions (country_name, division_name, level, geometry) \
-            VALUES(?, ?, ?, CastToMulti(GeomFromWKB(?, 4326)));"
-        list_of_tuples = list(data.itertuples(index=False, name=None))
+            qry = "INSERT INTO political_subdivisions (country_name, division_name, level, geometry) \
+                VALUES(?, ?, ?, CastToMulti(GeomFromWKB(?, 4326)));"
+            list_of_tuples = list(data.itertuples(index=False, name=None))
 
-        self._project.conn.executemany(qry, list_of_tuples)
-        self._project.conn.commit()
+            conn.executemany(qry, list_of_tuples)
 
     def __boundaries_import(self):
         """
@@ -182,40 +182,54 @@ class ImportPoliticalSubdivisions:
         """
         Add model area into project database.
         """
+        with self._project.db_connection as conn:
+            if conn.execute("SELECT COUNT(*) FROM political_subdivisions WHERE level=-1;").fetchone()[0] > 0:
+                return
 
-        if self._project.conn.execute("SELECT COUNT(*) FROM political_subdivisions WHERE level=-1;").fetchone()[0] > 0:
-            return
+        timeout = 30
+        params = {"q": self.__search_place, "format": "json", "polygon_geojson": 1, "addressdetails": 1}
 
-        nom_url = f"https://nominatim.openstreetmap.org/search?q={self.__search_place}&format=json&polygon_geojson=1&addressdetails=1&accept-language=en"
+        url = "https://nominatim.openstreetmap.org/"
+        url = url.rstrip("/") + "/search"
 
-        r = requests.get(nom_url)
+        try:
+            response = requests.get(url, params=params, timeout=timeout, headers=http_headers)
+            if response.status_code != 200:
+                raise ValueError(f"Request failed with status code {response.status_code}")
+        except requests.exceptions.Timeout as e:
+            raise TimeoutError("Request timed out") from e
+        except requests.exceptions.ConnectionError as e:
+            raise ConnectionError("Failed to connect") from e
+        except requests.exceptions.RequestException as e:
+            raise Exception(f"Request error: {e}") from e
 
-        if len(r.json()) == 0:
+        res = response.json()
+        if not res:
             raise ValueError("The desired model place is not available.")
 
-        self._poly = self.__geometry_type(r.json()[0]["geojson"])
+        self._poly = self.__geometry_type(response.json()[0]["geojson"])
 
-        self._country_code = pycountry.countries.search_fuzzy(r.json()[0]["address"]["country"])[0].alpha_3
-        self._country_name = pycountry.countries.search_fuzzy(r.json()[0]["address"]["country"])[0].name
+        self._country_code = pycountry.countries.search_fuzzy(response.json()[0]["address"]["country"])[0].alpha_3
+        self._country_name = pycountry.countries.search_fuzzy(response.json()[0]["address"]["country"])[0].name
 
         df = (
             pd.DataFrame([self._poly.wkt], columns=["geometry"])
-            if type(self._poly) == Polygon
-            else pd.DataFrame([unary_union(list(self._poly.geoms)).wkt], columns=["geometry"])
+            if isinstance(self._poly, Polygon)
+            else pd.DataFrame([shapely.union_all(list(self._poly.geoms)).wkt], columns=["geometry"])
         )
 
         gdf = gpd.GeoDataFrame(df, geometry=gpd.GeoSeries.from_wkt(df.geometry), crs=4326)
         gdf = gdf.assign(level=-1, division_name="model_area", country_name=f"{self._country_name}")
         gdf["geom"] = gdf.geometry.to_wkb()
 
-        qry = "INSERT INTO political_subdivisions (country_name, division_name, level, geometry) \
-                VALUES(?, ?, ?, CastToMulti(GeomFromWKB(?, 4326)));"
-        list_of_tuples = list(
-            gdf[["country_name", "division_name", "level", "geom"]].itertuples(index=False, name=None)
-        )
+        with self._project.db_connection as conn:
+            qry = "INSERT INTO political_subdivisions (country_name, division_name, level, geometry) \
+                    VALUES(?, ?, ?, CastToMulti(GeomFromWKB(?, 4326)));"
+            list_of_tuples = list(
+                gdf[["country_name", "division_name", "level", "geom"]].itertuples(index=False, name=None)
+            )
 
-        self._project.conn.executemany(qry, list_of_tuples)
-        self._project.conn.commit()
+            conn.executemany(qry, list_of_tuples)
 
         self.__add_model_place_info_to_db()
 
@@ -264,7 +278,7 @@ class ImportPoliticalSubdivisions:
         centers = []
         for _, row in df.iterrows():
             place = row.geometry
-            if type(place) == MultiPolygon:
+            if isinstance(place, MultiPolygon):
                 if len(place.geoms) == 1:
                     centers.append(place.centroid)
                 else:
