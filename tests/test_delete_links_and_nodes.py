@@ -3,7 +3,6 @@ from os.path import abspath, dirname, join
 from shutil import copytree
 from tempfile import gettempdir
 from uuid import uuid4
-
 from aequilibrae.project import Project
 
 from tradesman.model_creation.delete_links_and_nodes import (

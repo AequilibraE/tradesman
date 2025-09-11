@@ -7,6 +7,7 @@ import geopandas as gpd
 import pandas as pd
 import pycountry
 import requests
+import shapely
 from aequilibrae.project import Project
 from aequilibrae.project.network.osm.osm_params import http_headers
 from shapely import wkt
