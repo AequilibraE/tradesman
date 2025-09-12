@@ -59,9 +59,7 @@ class ImportNetwork:
             print(" ")
             self.__adjust_link_file(self.project.project_base_path / "link.csv")
 
-            link_fields = {
-                "osm_way_id": {"description": "osm_id", "type": "text", "required": False},
-            }
+            link_fields = {"osm_way_id": {"description": "osm_id", "type": "text", "required": False}}
             node_fields = {"osm_node_id": {"description": "osm_id", "type": "text", "required": False}}
 
             par.parameters["network"]["gmns"]["link"]["fields"].update(link_fields)
@@ -112,7 +110,7 @@ class ImportNetwork:
         xmax = float(self.project.about.xmax)
         ymin = float(self.project.about.ymin)
         ymax = float(self.project.about.ymax)
-        bboxes = set_bbox(xmin, xmax, ymin, ymax, self.box_side)
+        bboxes = set_bbox(xmin, ymin, xmax, ymax, self.box_side)
 
         http_headers = requests.utils.default_headers()
         http_headers.update({"Accept-Language": "en", "format": "json"})

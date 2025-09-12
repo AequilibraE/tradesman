@@ -41,6 +41,7 @@ class Tradesman:
 
         self._boundaries_source = boundaries_source
         self._boundaries = ImportPoliticalSubdivisions(self.__model_place, self.project, self._boundaries_source)
+        self._ovm = None
 
     def create(self):
         """Creates the entire model"""
@@ -163,8 +164,9 @@ class Tradesman:
         Parameters:
             **box_size**(:obj:`int`): size of the box to be created (in km)
         """
-        ovm = ImportBuildPlaces(self.project, box_side)
-        ovm.import_places()
+        if not self._ovm:
+            self._ovm = ImportBuildPlaces(self.project, box_side)
+        self._ovm.import_places()
 
     def import_buildings(self, box_side: int = 25, download_from_mcr: bool = True):
         """
@@ -180,8 +182,9 @@ class Tradesman:
             mcr_bld = ImportMicrosoftBuildingData(self.project)
             mcr_bld.get_buildings()
 
-        ovm = ImportBuildPlaces(self.project, box_side)
-        ovm.import_building()
+        if not self._ovm:
+            self._ovm = ImportBuildPlaces(self.project, box_side)
+        self._ovm.import_buildings()
 
     def build_population_synthesizer_data(self, sample_size: float = 0.01):
         """
@@ -214,15 +217,15 @@ class Tradesman:
         """Returns the name of the place for which this model was made"""
         return self.__model_place
 
-    # @staticmethod
-    # def __starts_logging():
-    #     logger = logging.getLogger("tradesman")
-    #     stdout_handler = logging.StreamHandler(sys.stdout)
-    #     formatter = logging.Formatter("%(asctime)s;%(name)s;%(message)s")
-    #     stdout_handler.setFormatter(formatter)
-    #     stdout_handler.name = "terminal"
+    @staticmethod
+    def __starts_logging():
+        logger = logging.getLogger("tradesman")
+        stdout_handler = logging.StreamHandler(sys.stdout)
+        formatter = logging.Formatter("%(asctime)s;%(name)s;%(message)s")
+        stdout_handler.setFormatter(formatter)
+        stdout_handler.name = "terminal"
 
-    #     for handler in logger.handlers:
-    #         if handler.name == "terminal":
-    #             return
-    #     logger.addHandler(stdout_handler)
+        for handler in logger.handlers:
+            if handler.name == "terminal":
+                return
+        logger.addHandler(stdout_handler)

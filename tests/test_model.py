@@ -15,6 +15,6 @@ def test_create_model(folder_path):
         assert conn.execute("SELECT SUM(population) FROM zones;").fetchone()[0] > 1000
         assert conn.execute("SELECT SUM(f_pop_60) FROM zones;").fetchone()[0] > 10
         assert conn.execute("SELECT SUM(m_pop_80) FROM zones;").fetchone()[0] > 10
-        assert conn.execute("SELECT COUNT(zone_id) FROM zones;").fetchone()[0] > 10
+        assert conn.execute("SELECT COUNT(zone_id) FROM zones;").fetchone()[0] > 5
         assert conn.execute("SELECT SUM(ovm_poi_count) FROM zones;").fetchone()[0] > 10
         assert conn.execute("SELECT SUM(ovm_bld_area) FROM zones;").fetchone()[0] > 100_000

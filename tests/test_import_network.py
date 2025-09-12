@@ -5,7 +5,6 @@ from os.path import join, abspath, dirname
 from tradesman.model_creation.import_network import ImportNetwork
 
 
-@pytest.mark.skip("Takes too long")
 @pytest.mark.skipif(bool(environ.get("CI")), reason="Does not run in GitHub Action")
 def test_import_from_gmns(empty_aequilibrae_model):
     fields = ["model_place", "address_type", "country_name", "country_code_two_digit", "country_code_three_digit"]
@@ -20,10 +19,10 @@ def test_import_from_gmns(empty_aequilibrae_model):
     about.country_name = "Monaco"
     about.country_code_two_digit = "MC"
     about.country_code_three_digit = "MCO"
-    about.xmin = 7.4037113
-    about.ymin = 43.7196129
-    about.xmax = 7.4876594
-    about.ymax = 43.7574357
+    about.xmin = 7.4064
+    about.ymin = 43.7253
+    about.xmax = 7.4392
+    about.ymax = 43.7517
 
     pbf_path = join(abspath(dirname("tests")), "tests/data/monaco/monaco-latest.osm.pbf")
 

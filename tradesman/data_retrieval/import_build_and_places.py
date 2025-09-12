@@ -78,7 +78,7 @@ class ImportBuildPlaces:
 
         return places
 
-    def import_building(self):
+    def import_buildings(self):
         con = duckdb.connect()
         con.install_extension("spatial")
         con.load_extension("spatial")
