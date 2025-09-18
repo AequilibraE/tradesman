@@ -75,7 +75,7 @@ for lvl in range(-1, subdivisions.level.max() + 1):
         )
     else:
         m = gdf.explore(
-            name=f"model_area",
+            name="model_area",
             tiles="CartoDB positron",
             tooltip=False,
             popup=True,

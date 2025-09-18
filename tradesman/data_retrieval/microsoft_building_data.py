@@ -128,7 +128,7 @@ class ImportMicrosoftBuildingData:
         frame_list = []
 
         for _, row in bld_list.iterrows():
-            file_name = f"mcr--building--footage--{self.about.country_name.lower()}--quadkey--{row["quadkey"]}.gz"
+            file_name = f"mcr--building--footage--{self.about.country_name.lower()}--quadkey--{row['quadkey']}.gz"
             dest_path = join(gettempdir(), file_name)
             if not isfile(dest_path):
                 _, _ = urlretrieve(row["url"], dest_path)
