@@ -12,7 +12,7 @@ maintainers = [
 dependencies = [
     "aequilibrae>=1.4.0",
     "aequilibrae<2.0.0",
-    "duckdb",
+    "duckdb<1.4.0",
     "matplotlib",
     "pycountry",
     "libpysal",
