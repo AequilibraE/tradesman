@@ -10,4 +10,4 @@ def load_vectorized_pop(project):
     """
     with project.db_connection as conn:
         sql = "SELECT population, Hex(ST_AsBinary(GEOMETRY)) as geom FROM raw_population;"
-        return gpd.GeoDataFrame.from_postgis(sql, conn, geom_col="geom", crs=4326)
+        return gpd.read_postgis(sql, conn, geom_col="geom", crs=4326)

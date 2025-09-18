@@ -82,7 +82,7 @@ def delete_links_and_nodes(model_place, project: Project):
     sql = "SELECT country_name, division_name, level, Hex(ST_AsBinary(GEOMETRY)) geometry FROM political_subdivisions WHERE level=0;"
 
     with project.db_connection as conn:
-        borders = gpd.GeoDataFrame.from_postgis(sql, conn, geom_col="geometry", crs=4326).explode(index_parts=True)
+        borders = gpd.read_postgis(sql, conn, geom_col="geometry", crs=4326).explode(index_parts=True)
 
     if coast is None:
         gdf_country_boundary = borders.copy()
@@ -101,7 +101,7 @@ def delete_links_and_nodes(model_place, project: Project):
     links_query = "SELECT link_id, Hex(ST_AsBinary(GEOMETRY)) geometry FROM links;"
 
     with project.db_connection as conn:
-        links = gpd.GeoDataFrame.from_postgis(links_query, conn, geom_col="geometry", crs=4326)
+        links = gpd.read_postgis(links_query, conn, geom_col="geometry", crs=4326)
 
         inner_gdf = gpd.sjoin(gdf_country_boundary, links, how="inner")
 

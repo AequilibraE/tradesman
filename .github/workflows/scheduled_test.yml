@@ -37,8 +37,8 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       run: |
         sudo apt update
-        sudo apt install libspatialite-dev 
-        sudo apt install -y libsqlite3-mod-spatialite
+        sudo apt install libsqlite3-mod-spatialite
+        sudo apt install -y libspatialite-dev
         pip3 install spatialite
         sudo ln -s /usr/lib/x86_64-linux-gnu/mod_spatialite.so /usr/lib/x86_64-linux-gnu/mod_spatialite
 

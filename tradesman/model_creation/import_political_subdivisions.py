@@ -307,7 +307,7 @@ class ImportPoliticalSubdivisions:
         """"""
         with self.project.db_connection as conn:
             qry = "SELECT *, Hex(ST_AsBinary(geometry)) as geom FROM political_subdivisions WHERE level=-1"
-            model_area = gpd.GeoDataFrame.from_postgis(qry, conn, geom_col="geom", crs=4326)
+            model_area = gpd.read_postgis(qry, conn, geom_col="geom", crs=4326)
             if model_area.empty:
                 Warning.warn("No model_area found in project. Please check its import.")
             return model_area.geom[0]

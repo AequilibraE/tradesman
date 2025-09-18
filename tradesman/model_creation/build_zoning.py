@@ -53,7 +53,7 @@ class ZoneBuilder:
     def load_subdivisions(self):
         with self.project.db_connection as conn:
             sql = "SELECT division_name, level, Hex(ST_AsBinary(geometry)) as geometry FROM political_subdivisions;"
-            return gpd.GeoDataFrame.from_postgis(sql, conn, geom_col="geometry", crs="EPSG:4326")
+            return gpd.read_postgis(sql, conn, geom_col="geometry", crs="EPSG:4326")
 
     def hex_builder(self):
         """
@@ -188,7 +188,7 @@ class ZoneBuilder:
 
         with self.project.db_connection as conn:
             sql = "SELECT population, Hex(ST_AsBinary(GEOMETRY)) as geom FROM raw_population;"
-            pop_data = gpd.GeoDataFrame.from_postgis(sql, conn, geom_col="geom", crs=4326)
+            pop_data = gpd.read_postgis(sql, conn, geom_col="geom", crs=4326)
 
         pop_to_zone = gpd.sjoin(pop_data, zones_from_locations, how="right")
         pop_to_zone = pop_to_zone[["hex_id", "population"]]

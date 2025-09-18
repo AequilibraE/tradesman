@@ -57,7 +57,7 @@ def create_nauru_test(folder):
             zone.geometry = zone_geo
             zone.save()
 
-        zones_from_location = gpd.GeoDataFrame.from_postgis(
+        zones_from_location = gpd.read_postgis(
             "SELECT zone_id,  Hex(ST_AsBinary(geometry)) as geom FROM zones;", conn, geom_col="geom", crs=4326
         )
 

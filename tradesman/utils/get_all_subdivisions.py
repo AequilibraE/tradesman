@@ -12,4 +12,4 @@ def get_subdivisions(project):
         sql = (
             "SELECT country_name, division_name, level, Hex(ST_AsBinary(GEOMETRY)) as geom FROM political_subdivisions;"
         )
-        return gpd.GeoDataFrame.from_postgis(sql, conn, geom_col="geom", crs=4326)
+        return gpd.read_postgis(sql, conn, geom_col="geom", crs=4326)

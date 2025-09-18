@@ -50,11 +50,11 @@ def create_control_totals_taz(project: Project, dest_folder: str):
     with project.db_connection as conn:
         sql = "SELECT country_name, division_name, level, Hex(ST_AsBinary(GEOMETRY)) as geom FROM political_subdivisions WHERE level=1;"
 
-        subdivisions = gpd.GeoDataFrame.from_postgis(sql, conn, geom_col="geom", crs=4326)
+        subdivisions = gpd.read_postgis(sql, conn, geom_col="geom", crs=4326)
 
         sql = "SELECT zone_id, Hex(ST_AsBinary(geometry)) as geom FROM zones;"
 
-        zones = gpd.GeoDataFrame.from_postgis(sql, con=conn, geom_col="geom", crs=4326)
+        zones = gpd.read_postgis(sql, con=conn, geom_col="geom", crs=4326)
 
     zones["centroid"] = zones.to_crs(3857).centroid.to_crs(4326)
 
