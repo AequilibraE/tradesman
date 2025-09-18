@@ -21,25 +21,6 @@ jobs:
         with:
           runCmd: |
             source .venv/bin/activate
+            python3 -m uv pip install git+https://github.com/AequilibraE/aequilibrae.git@develop
             python3 -m pip list
-
-      # - name: Install dependencies with develop aequilibrae
-      #   run: |
-      #     python3 -m pip install -U pip uv
-      #     python3 -m uv pip install -e .[dev]
-      #     python3 -m uv pip install git+https://github.com/AequilibraE/aequilibrae.git@develop
-      #     python3 -m pip list
-
-      # - name: Download spatialite on Linux
-      #   run: |
-      #     source .venv/bin/activate
-      #     sudo apt update
-      #     sudo apt install libspatialite-dev 
-      #     sudo apt install -y libsqlite3-mod-spatialite
-      #     pip3 install spatialite
-      #     sudo ln -s /usr/lib/x86_64-linux-gnu/mod_spatialite.so /usr/lib/x86_64-linux-gnu/mod_spatialite
-
-      # - name: Runs unit tests
-      #   run: |
-      #     source .venv/bin/activate
-      #     python -m pytest -v
+            python -m pytest -v
