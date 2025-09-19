@@ -1,46 +1,31 @@
-import unittest
-from os.path import join
-from tempfile import gettempdir
+import pytest
 from unittest import mock
-from uuid import uuid4
 
-from tests.create_nauru_test import create_nauru_test
 from tradesman.model_creation.import_population import ImportPopulation
 
 
-class TestPopBySexAndAge(unittest.TestCase):
-    def setUp(self) -> None:
-        self.country_name = "Nauru"
-        self.fldr = join(gettempdir(), uuid4().hex)
-        self.project = create_nauru_test(self.fldr)
-        self.mock_raster = mock.patch("tradesman.model_creation.import_population.ImportPopulation.population_raster")
-        self.mock_sjoin = mock.patch("tradesman.model_creation.import_population.gpd.sjoin")
+class TestPopBySexAndAge:
+    @pytest.fixture(autouse=True)
+    def setup_mocks(self):
+        with (
+            mock.patch("tradesman.model_creation.import_population.ImportPopulation.population_raster"),
+            mock.patch("tradesman.model_creation.import_population.gpd.sjoin"),
+        ):
+            yield
 
-        self.mock_raster.start()
-        self.mock_sjoin.start()
-
-    def tearDown(self) -> None:
-        self.project.close()
-        self.mock_raster.stop()
-        self.mock_sjoin.stop()
-
-    def test_get_pop_by_sex_age(self):
-        population = ImportPopulation(self.project)
+    def test_get_pop_by_sex_age(self, nauru_no_pop):
+        population = ImportPopulation(nauru_no_pop)
         population.get_stratified_population()
 
-        with self.project.db_connection as conn:
+        with nauru_no_pop.db_connection as conn:
             f_10_pop = conn.execute("SELECT SUM(f_pop_10) FROM zones;").fetchone()[0]
-            self.assertEqual(f_10_pop, 0)
+            assert f_10_pop == 0
 
             f_4_pop = conn.execute("SELECT SUM(f_pop_40) FROM zones;").fetchone()[0]
-            self.assertEqual(f_4_pop, 0)
+            assert f_4_pop == 0
 
             m_5_pop = conn.execute("SELECT SUM(m_pop_5) FROM zones;").fetchone()[0]
-            self.assertEqual(m_5_pop, 0)
+            assert m_5_pop == 0
 
             m_7_pop = conn.execute("SELECT SUM(m_pop_70) FROM zones;").fetchone()[0]
-            self.assertEqual(m_7_pop, 0)
-
-
-if __name__ == "__name__":
-    unittest.main()
+            assert m_7_pop == 0

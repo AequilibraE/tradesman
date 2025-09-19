@@ -1,47 +1,27 @@
-import unittest
-from os.path import join, abspath, dirname, exists
-from shutil import copytree, rmtree
-from tempfile import gettempdir
-from uuid import uuid4
+from os.path import abspath, dirname, exists, join
+from shutil import copytree
 
-from tests.create_nauru_test import create_nauru_test
+import pytest
+
 from tradesman.model_creation.synthetic_population.create_synthetic_population import run_populationsim
 
 
-class TestSubprocess(unittest.TestCase):
-    def setUp(self) -> None:
-        self.project_folder = join(gettempdir(), uuid4().hex)
-        self.project = create_nauru_test(self.project_folder)
+@pytest.mark.parametrize(("multithread", "num_threads"), [(True, 3), (False, 1)])
+def test_subprocess(nauru_no_pop, multithread, num_threads):
+    copytree(
+        src=join(abspath(dirname("tests")), "tests/data/nauru/population"),
+        dst=nauru_no_pop.project_base_path / "population",
+    )
 
-        self.fldr = join(self.project_folder, "population")
+    run_populationsim(
+        multithread=multithread, project=nauru_no_pop, folder=nauru_no_pop.project_base_path, thread_number=num_threads
+    )
 
-        copytree(
-            src=join(abspath(dirname("tests")), "tests/data/nauru/population"),
-            dst=self.fldr,
-        )
+    assert exists(join(nauru_no_pop.project_base_path, "population/output/synthetic_households.csv"))
 
-    def tearDown(self) -> None:
-        rmtree(self.fldr)
+    with nauru_no_pop.db_connection as conn:
+        hh_sql = "SELECT COUNT(*) FROM attributes_documentation WHERE name_table='synthetic_households';"
+        assert conn.execute(hh_sql).fetchone()[0] == 3
 
-    def test_subprocess(self):
-        run_populationsim(multithread=False, project=self.project, folder=self.project_folder, thread_number=1)
-
-        self.__dochecks()
-
-    def test_subprocess_true(self):
-        run_populationsim(multithread=True, project=self.project, folder=self.project_folder, thread_number=3)
-        self.__dochecks()
-
-    def __dochecks(self):
-        self.assertTrue(exists(join(self.fldr, "output/synthetic_households.csv")))
-
-        with self.project.db_connection as conn:
-            hh_sql = "SELECT COUNT(*) FROM attributes_documentation WHERE name_table='synthetic_households';"
-            self.assertEqual(conn.execute(hh_sql).fetchone()[0], 3)
-
-            person_hh = "SELECT COUNT(*) FROM attributes_documentation WHERE name_table='synthetic_persons';"
-            self.assertEqual(conn.execute(person_hh).fetchone()[0], 4)
-
-
-if __name__ == "__name__":
-    unittest.main()
+        person_hh = "SELECT COUNT(*) FROM attributes_documentation WHERE name_table='synthetic_persons';"
+        assert conn.execute(person_hh).fetchone()[0] == 4

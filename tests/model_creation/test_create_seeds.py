@@ -11,13 +11,11 @@ def test_create_seeds(nauru_no_pop, folder_path):
     Path(join(folder_path, "data")).mkdir(parents=True, exist_ok=True)
 
     copy(
-        src=join(abspath(dirname("tests")),
-                 "tests/data/nauru/population/data/seed_households.csv"),
+        src=join(abspath(dirname("tests")), "tests/data/nauru/population/data/seed_households.csv"),
         dst=join(folder_path, "data/seed_households.csv"),
     )
     copy(
-        src=join(abspath(dirname("tests")),
-                 "tests/data/nauru/population/data/seed_persons.csv"),
+        src=join(abspath(dirname("tests")), "tests/data/nauru/population/data/seed_persons.csv"),
         dst=join(folder_path, "data/seed_persons.csv"),
     )
 

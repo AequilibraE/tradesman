@@ -8,4 +8,3 @@ def test_set_bounding_boxes(nauru_no_pop):
     ymax = float(nauru_no_pop.about.ymax)
 
     assert isinstance(set_bbox(xmin, ymin, xmax, ymax, box_side=25), list)
-
