@@ -1,4 +1,6 @@
+import duckdb
 import geopandas as gpd
+from shapely import wkt
 
 
 def load_vectorized_pop(project):
@@ -8,6 +10,10 @@ def load_vectorized_pop(project):
     Parameters:
         *project*(:obj:`aequilibrae.project`): currently open project
     """
-    with project.db_connection as conn:
+    with duckdb.connect(project.project_base_path / "project_database.sqlite") as conn:
+        conn.install_extension("spatial")
+        conn.load_extension("spatial")
+
         sql = "SELECT population, Hex(ST_AsBinary(GEOMETRY)) as geom FROM raw_population;"
-        return gpd.read_postgis(sql, conn, geom_col="geom", crs=4326)
+        population = conn.execute(sql).df()
+        return gpd.GeoDataFrame(population, geometry=population["geom"].apply(wkt.loads), crs="EPSG:4326")

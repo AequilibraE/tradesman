@@ -3,7 +3,6 @@ from unittest.mock import Mock, patch
 import pandas as pd
 import pytest
 
-from tests.create_nauru_test import create_nauru_test
 from tradesman.data_retrieval.microsoft_building_data import ImportMicrosoftBuildingData
 
 CSV_DATA = """Location,QuadKey,Url,Size,UploadDate
@@ -21,10 +20,8 @@ def mock_url_response():
     return mock_response
 
 
-def test_microsoft_buildings_no_bld(folder_path, mock_url_response):
-    project = create_nauru_test(folder_path)
-
-    buildings = ImportMicrosoftBuildingData(project)
+def test_microsoft_buildings_no_bld(nauru_no_pop, mock_url_response):
+    buildings = ImportMicrosoftBuildingData(nauru_no_pop)
     with patch("tradesman.data_retrieval.microsoft_building_data.requests.get", return_value=mock_url_response):
         buildings.get_buildings()
 

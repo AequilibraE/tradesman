@@ -1,6 +1,8 @@
 from os.path import dirname, join
 
+import duckdb
 import geopandas as gpd
+from shapely import wkt
 import pandas as pd
 from aequilibrae.project import Project
 
@@ -47,14 +49,17 @@ def create_control_totals_taz(project: Project, dest_folder: str):
 
     df.insert(0, "TAZ", list(range(1, len(df) + 1)))
 
-    with project.db_connection as conn:
-        sql = "SELECT country_name, division_name, level, Hex(ST_AsBinary(GEOMETRY)) as geom FROM political_subdivisions WHERE level=1;"
+    with duckdb.connect(project.project_base_path / "project_database.sqlite") as conn:
+        conn.install_extension("spatial")
+        conn.load_extension("spatial")
 
-        subdivisions = gpd.read_postgis(sql, conn, geom_col="geom", crs=4326)
+        sql = "SELECT country_name, division_name, level, Hex(ST_AsBinary(GEOMETRY)) as geom FROM political_subdivisions WHERE level=1;"
+        subdivisions = conn.execute(sql).df()
+        subdivisions = gpd.GeoDataFrame(subdivisions, geometry=subdivisions["geom"].apply(wkt.loads), crs="EPSG:4326")
 
         sql = "SELECT zone_id, Hex(ST_AsBinary(geometry)) as geom FROM zones;"
-
-        zones = gpd.read_postgis(sql, con=conn, geom_col="geom", crs=4326)
+        zones = conn.execute(sql).df()
+        zones = gpd.GeoDataFrame(zones, geometry=zones["geom"].apply(wkt.loads), crs="EPSG:4326")
 
     zones["centroid"] = zones.to_crs(3857).centroid.to_crs(4326)
 
