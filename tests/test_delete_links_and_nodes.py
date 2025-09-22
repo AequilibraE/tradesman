@@ -4,6 +4,7 @@ from shutil import copytree
 from tempfile import gettempdir
 from uuid import uuid4
 from aequilibrae.project import Project
+from aequilibrae.utils.db_utils import commit_and_close
 
 from tradesman.model_creation.delete_links_and_nodes import (
     delete_links_and_nodes,
@@ -36,7 +37,8 @@ class TestDeleteLinksAndNodes(unittest.TestCase):
         self.project = Project()
         self.project.open(join(self.temp_fldr, "tests/data/vatican city"))
 
-        with self.project.db_connection as conn:
+        db_path = self.project.project_base_path / "project_database.sqlite"
+        with commit_and_close(db_path, spatial=True) as conn:
             before = len(conn.execute("SELECT * FROM nodes;").fetchall())
 
             delete_links_and_nodes("Vatican City", self.project)
@@ -56,7 +58,8 @@ class TestDeleteLinksAndNodes(unittest.TestCase):
         self.project = Project()
         self.project.open(join(self.temp_fldr, "tests/data/monaco"))
 
-        with self.project.db_connection as conn:
+        db_path = self.project.project_base_path / "project_database.sqlite"
+        with commit_and_close(db_path, spatial=True) as conn:
             before = len(conn.execute("SELECT * FROM nodes;").fetchall())
 
             delete_links_and_nodes("Monaco", self.project)

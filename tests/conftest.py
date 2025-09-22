@@ -4,6 +4,7 @@ from uuid import uuid4
 
 import pytest
 from aequilibrae.project import Project
+from aequilibrae.utils.db_utils import commit_and_close
 
 from tradesman.model_creation.create_new_tables import add_new_tables
 from tradesman.model_creation.import_population import ImportPopulation
@@ -19,7 +20,8 @@ def empty_aequilibrae_model(folder_path):
     prj = Project()
     prj.new(folder_path)
 
-    with prj.db_connection as conn:
+    db_path = prj.project_base_path / "project_database.sqlite"
+    with commit_and_close(db_path, spatial=True) as conn:
         add_new_tables(conn)
     yield prj
     prj.close()
@@ -27,7 +29,8 @@ def empty_aequilibrae_model(folder_path):
 
 @pytest.fixture
 def network_connection(empty_aequilibrae_model):
-    with empty_aequilibrae_model.db_connection as conn:
+    db_path = empty_aequilibrae_model.project_base_path / "project_database.sqlite"
+    with commit_and_close(db_path, spatial=True) as conn:
         yield conn
 
 
