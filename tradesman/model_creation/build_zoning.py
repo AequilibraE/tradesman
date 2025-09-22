@@ -11,6 +11,7 @@ import libpysal
 import numpy as np
 import pandas as pd
 from aequilibrae.project import Project
+from aequilibrae.utils.db_utils import commit_and_close
 from shapely.geometry import Polygon
 from shapely.geometry import box
 from sklearn.cluster import KMeans
@@ -49,9 +50,11 @@ class ZoneBuilder:
         self.min_zone_pop = min_zone_pop
         self.save_hexbins = save_hexbins
 
+        self.db_path = self.project.project_base_path / "project_database.sqlite"
+
     @property
     def load_subdivisions(self):
-        with self.project.db_connection as conn:
+        with commit_and_close(self.db_path, spatial=True) as conn:
             sql = "SELECT division_name, level, Hex(ST_AsBinary(geometry)) as geometry FROM political_subdivisions;"
             return gpd.read_postgis(sql, conn, geom_col="geometry", crs="EPSG:4326")
 
@@ -186,7 +189,7 @@ class ZoneBuilder:
         """
         zones_from_locations = self.zones_with_location()
 
-        with self.project.db_connection as conn:
+        with commit_and_close(self.db_path, spatial=True) as conn:
             sql = "SELECT population, Hex(ST_AsBinary(GEOMETRY)) as geom FROM raw_population;"
             pop_data = gpd.read_postgis(sql, conn, geom_col="geom", crs=4326)
 
@@ -214,7 +217,7 @@ class ZoneBuilder:
         pop_per_zone["geo_wkt"] = pop_per_zone.geometry.to_wkt()
         pop_per_zone = pop_per_zone[["hex_id", "division_name", "population", "geo_wkt"]]
 
-        with self.project.db_connection as conn:
+        with commit_and_close(self.db_path, spatial=True) as conn:
             pop_per_zone.to_sql("hex_pop", conn, if_exists="append", index=False)
             conn.execute("UPDATE hex_pop SET geometry=CastToMulti(GeomFromText(geo_wkt, 4326));")
             conn.execute("UPDATE hex_pop SET geo_wkt=NULL")
@@ -359,7 +362,7 @@ class ZoneBuilder:
         return zoning
 
     def execute(self):
-        with self.project.db_connection as conn:
+        with commit_and_close(self.db_path, spatial=True) as conn:
             sql = "SELECT count(*) FROM sqlite_master WHERE type='table' AND name='hex_pop';"
             if sum(conn.execute(sql).fetchone()) > 0:
                 conn.execute("DELETE FROM hex_pop;")
@@ -371,7 +374,7 @@ class ZoneBuilder:
 
         # This if-clause allow us to save the zones even if there is no network in the model.
         if not self.project.network.nodes.data.empty:
-            with self.project.db_connection as conn:
+            with commit_and_close(self.db_path, spatial=True) as conn:
                 max_zone = clusters.index.max()
                 min_node = conn.execute("SELECT MIN(node_id) FROM nodes").fetchone()[0]
                 if min_node <= max_zone:

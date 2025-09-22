@@ -1,5 +1,6 @@
 import geopandas as gpd
 from geopandas import sjoin_nearest
+from aequilibrae.utils.db_utils import commit_and_close
 
 from tradesman.data_retrieval.rural_access_index.population_data import population_data
 
@@ -26,7 +27,8 @@ def basic_RAI_data(project):
 
     # Add subdivision info
     # print('Obtaining country subdivisions')
-    with project.db_connection as conn:
+    db_path = project.project_base_path / "project_database.sqlite"
+    with commit_and_close(db_path, spatial=True) as conn:
         sql = "SELECT division_name, level, Hex(ST_AsBinary(GEOMETRY)) as geom FROM political_subdivisions;"
         subdivisions = gpd.read_postgis(sql, conn, geom_col="geom", crs=4326)
         subdivisions = subdivisions[subdivisions.level == subdivisions.level.max()]

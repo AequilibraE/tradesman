@@ -44,8 +44,7 @@ tests = [
 ]
 
 build = [
-    "setuptools",
-    "twine",
+    "setuptools>=61.0",
     "wheel"
 ]
 
@@ -107,3 +106,7 @@ target-version = "py310"
 
 [tool.setuptools.package-dir]
 tradesman = "tradesman"
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"

@@ -107,38 +107,57 @@ jobs:
         branch: gh-pages # The branch the action should deploy to.
         folder: docs/build/html # The folder the action should deploy.
 
-  builds_package:
-    needs: build_documentation
+  make_sdist:
+    needs: linting
+    name: Make SDist
     runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set up Python 3.12
-      uses: actions/setup-python@v5
+      - name: Build SDist
+        run: pipx run build --sdist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cibw-sdist
+          path: dist/*.tar.gz
+
+  build_wheels:
+    needs: linting
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.os }}
+      cancel-in-progress: true
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest, macos-13, ubuntu-24.04-arm]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build wheels
+        run: pipx run build --wheel
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
+          path: dist/*.whl
+  
+  upload_all:
+    needs: [build_wheels, make_sdist]
+    environment: pypi
+    permissions:
+      id-token: write
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release' && github.event.action == 'published'
+    steps:
+    - uses: actions/download-artifact@v4
       with:
-        python-version: 3.12
+        pattern: cibw-*
+        path: dist
+        merge-multiple: true
 
-    - name: Install dependencies
-      run: |
-        python -m pip install -U pip uv
-        python -m uv pip install -e .[dev]    
-
-    - name: Builds package
-      run: |
-        python setup.py sdist bdist_wheel
-
-    - name: Stores artifacts along with the workflow result
-      uses: actions/upload-artifact@v4
-      with:
-        name: library
-        path: dist/*.whl
-        if-no-files-found: error # 'warn' or 'ignore' are also available, defaults to `warn`
-
-    - name: Publish wheels to PyPI
-      if: ${{ github.event_name == 'release'}}
-      env:
-        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-      run: |
-        twine upload dist/*.whl
-        twine upload dist/*.gz
+    - uses: pypa/gh-action-pypi-publish@release/v1

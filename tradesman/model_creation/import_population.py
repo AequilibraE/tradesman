@@ -7,16 +7,18 @@ import geopandas as gpd
 import numpy as np
 import pandas as pd
 from aequilibrae import Project
+from aequilibrae.utils.db_utils import commit_and_close
 from scipy.sparse import coo_matrix
 
-from tradesman.utils import TqdmUpTo
-from tradesman.utils import mask_raster
+from tradesman.utils import TqdmUpTo, mask_raster
 
 
 class ImportPopulation:
     def __init__(self, project: Project, source: str = "WorldPop"):
         self.project = project
         self.source = source.lower()
+
+        self.db_path = self.project.project_base_path / "project_database.sqlite"
 
     def get_file_url(self):
         if self.source not in ["worldpop", "meta"]:
@@ -88,7 +90,7 @@ class ImportPopulation:
         return df
 
     def get_model_area(self, is_polygon: bool = False):
-        with self.project.db_connection as conn:
+        with commit_and_close(self.db_path, spatial=True) as conn:
             model_area = gpd.read_postgis(
                 "SELECT ST_AsBinary(geometry) as geom FROM political_subdivisions WHERE level=-1",
                 con=conn,
@@ -112,7 +114,7 @@ class ImportPopulation:
         model_area = self.get_model_area()
         population = population.clip(model_area, keep_geom_type=True)[["longitude", "latitude", "population"]]
 
-        with self.project.db_connection as conn:
+        with commit_and_close(self.db_path, spatial=True) as conn:
             population.to_sql("raw_population", conn, if_exists="append", index=False)
             conn.execute("UPDATE raw_population SET Geometry=MakePoint(longitude, latitude, 4326)")
 
@@ -147,6 +149,6 @@ class ImportPopulation:
                     fields.add(field_name, f"{sex[key]}male population over {a} years old.", "INTEGER")
 
                 list_of_tuples = list(population[["population", "zone_id"]].itertuples(False, None))
-                with self.project.db_connection as conn:
+                with commit_and_close(self.db_path, spatial=True) as conn:
                     conn.executemany(f"UPDATE zones SET {field_name}=? WHERE zone_id=?;", list_of_tuples)
                     conn.execute(f"UPDATE zones SET {field_name}=0 WHERE {field_name} IS NULL;")

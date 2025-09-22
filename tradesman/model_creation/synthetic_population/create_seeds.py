@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import tabulate
 from aequilibrae.project import Project
+from aequilibrae.utils.db_utils import commit_and_close
 
 
 def create_buckets(project: Project, folder: str, sample=0.02):
@@ -28,7 +29,8 @@ def create_buckets(project: Project, folder: str, sample=0.02):
 
     household_info.reset_index(drop=True, inplace=True)
 
-    with project.db_connection as conn:
+    db_path = project.project_base_path / "project_database.sqlite"
+    with commit_and_close(db_path, spatial=True) as conn:
         population = int(conn.execute("SELECT ROUND(SUM(population),0) FROM zones;").fetchone()[0])
 
     # Set the sample proportion

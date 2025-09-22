@@ -1,5 +1,6 @@
-import shapely
 from aequilibrae import Project
+from aequilibrae.utils.db_utils import commit_and_close
+import shapely
 from shapely.geometry import MultiPolygon
 
 
@@ -11,7 +12,8 @@ def country_border_from_model(project: Project):
          *project*(:obj:`aequilibrae.project`): currently open project
 
     """
-    with project.db_connection as conn:
+    db_path = project.project_base_path / "project_database.sqlite"
+    with commit_and_close(db_path, spatial=True) as conn:
         country_wkb = conn.execute("Select asBinary(geometry) from political_subdivisions where level=0").fetchone()
     if not country_wkb:
         return MultiPolygon([])
@@ -27,7 +29,8 @@ def model_borders(project: Project):
          *project*(:obj:`aequilibrae.project`): currently open project
 
     """
-    with project.db_connection as conn:
+    db_path = project.project_base_path / "project_database.sqlite"
+    with commit_and_close(db_path, spatial=True) as conn:
         country_wkb = conn.execute("Select asBinary(geometry) from political_subdivisions where level=-1").fetchone()
     if not country_wkb:
         return MultiPolygon([])

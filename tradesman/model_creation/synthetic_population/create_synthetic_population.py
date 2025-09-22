@@ -8,6 +8,7 @@ from os.path import join, isfile
 import pandas as pd
 import yaml
 from aequilibrae.project import Project
+from aequilibrae.utils.db_utils import commit_and_close
 
 from tradesman.model_creation.synthetic_population.create_control_totals_meta import create_control_totals_meta
 from tradesman.model_creation.synthetic_population.create_control_totals_taz import create_control_totals_taz
@@ -94,7 +95,8 @@ def run_populationsim(multithread: bool, project: Project, folder: str, thread_n
     """
     pop_fldr = join(folder, "population")
 
-    with project.db_connection as conn:
+    db_path = project.project_base_path / "project_database.sqlite"
+    with commit_and_close(db_path, spatial=True) as conn:
         num_zones = conn.execute("SELECT COUNT(*) FROM zones;").fetchone()[0]
 
     if multithread or num_zones > 100:
@@ -112,7 +114,7 @@ def run_populationsim(multithread: bool, project: Project, folder: str, thread_n
         )
         return
 
-    with project.db_connection as conn:
+    with commit_and_close(db_path, spatial=True) as conn:
         pd.read_csv(join(pop_fldr, "output/synthetic_persons.csv"))[["hh_id", "TAZ", "AGEP", "SEX"]].to_sql(
             "synthetic_persons", con=conn, if_exists="replace"
         )

@@ -9,6 +9,7 @@ import pycountry
 import requests
 from aequilibrae.project import Project
 from aequilibrae.project.network.osm.osm_params import http_headers
+from aequilibrae.utils.db_utils import commit_and_close
 from shapely import wkt
 from shapely.geometry import MultiPolygon, Polygon
 
@@ -46,6 +47,7 @@ class ImportPoliticalSubdivisions:
         self.project = project
         self._source = source.lower()
         self._poly = None
+        self.db_path = self.project.project_base_path / "project_database.sqlite"
 
         self.__source_control()
 
@@ -62,7 +64,7 @@ class ImportPoliticalSubdivisions:
         data["geom"] = data["geometry"].to_wkb()
         data = data[["country_name", "division_name", "geom"]]
 
-        with self.project.db_connection as conn:
+        with commit_and_close(self.db_path, spatial=True) as conn:
             # If the model area is a country, we update the model area to avoid creating useless zones in the future
             if self.project.about.address_type == "country":
                 conn.execute("DELETE FROM political_subdivisions WHERE level=-1;")
@@ -105,7 +107,7 @@ class ImportPoliticalSubdivisions:
 
         subdiv = subdiv[["country_name", "division_name", "level", "geom"]]
 
-        with self.project.db_connection as conn:
+        with commit_and_close(self.db_path, spatial=True) as conn:
             if overwrite:
                 conn.execute("DELETE FROM political_subdivisions WHERE level>0;")
                 conn.commit()
@@ -210,7 +212,7 @@ class ImportPoliticalSubdivisions:
         """
         Add model area into project database.
         """
-        with self.project.db_connection as conn:
+        with commit_and_close(self.db_path, spatial=True) as conn:
             if conn.execute("SELECT COUNT(*) FROM political_subdivisions WHERE level=-1;").fetchone()[0] > 0:
                 return
 
@@ -273,7 +275,7 @@ class ImportPoliticalSubdivisions:
         df["geom"] = df["geometry"].to_wkb()
         df.drop(["geometry"], axis=1, inplace=True)
 
-        with self.project.db_connection as conn:
+        with commit_and_close(self.db_path, spatial=True) as conn:
             qry = "INSERT INTO political_subdivisions (country_name, division_name, level, geometry) \
                     VALUES(?, ?, ?, CastToMulti(GeomFromWKB(?, 4326)));"
             list_of_tuples = list(df.itertuples(False, None))
@@ -305,7 +307,7 @@ class ImportPoliticalSubdivisions:
     @property
     def area_polygon(self):
         """"""
-        with self.project.db_connection as conn:
+        with commit_and_close(self.db_path, spatial=True) as conn:
             qry = "SELECT *, Hex(ST_AsBinary(geometry)) as geom FROM political_subdivisions WHERE level=-1"
             model_area = gpd.read_postgis(qry, conn, geom_col="geom", crs=4326)
             if model_area.empty:
