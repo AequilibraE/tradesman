@@ -3,6 +3,7 @@ import logging
 import sys
 from aequilibrae.context import get_logger
 from aequilibrae.project import Project
+from aequilibrae.utils.db_utils import commit_and_close
 from os.path import isdir
 
 from tradesman.data_retrieval.import_build_and_places import ImportBuildPlaces
@@ -209,7 +210,8 @@ class Tradesman:
             self.project.open(self.__folder)
         else:
             self.project.new(self.__folder)
-            with self.project.db_connection as conn:
+            db_path = self.project.project_base_path / "project_database.sqlite"
+            with commit_and_close(db_path, spatial=True) as conn:
                 add_new_tables(conn)
 
     @property

@@ -14,6 +14,7 @@ os.environ["USE_PYGEOS"] = "0"
 from uuid import uuid4
 from tempfile import gettempdir
 from aequilibrae.project import Project
+from aequilibrae.utils.db_utils import commit_and_close
 import branca
 import folium
 import geopandas as gpd
@@ -41,16 +42,25 @@ proj = Project()
 proj.open(proj_fldr)
 
 # %%
+# Let's create a path to the project database. It will help us get the geometry data we need.
+db_path = proj.project_base_path / "project_database.sqlite"
+
+# %%
 # We establish a connection to identify the region we are plotting our data.
 # First we import our subdivisions
 
-with proj.db_connection as conn:
+with commit_and_close(db_path, spatial=True) as conn:
     subdivisions = gpd.read_postgis(
         "SELECT division_name, level, ST_AsBinary(geometry)geom FROM political_subdivisions;",
         con=conn,
         geom_col="geom",
         crs=4326,
     )
+
+# %%
+# From AequilibraE version 1.5.0, the context manager can be replaced with:
+
+# with proj.db_connection_spatial as conn:
 
 # %%
 # Now we can plot our map!
@@ -93,7 +103,7 @@ m
 
 # %%
 # Now let's move on and import some information about our model's TAZs.
-with proj.db_connection as conn:
+with commit_and_close(db_path, spatial=True) as conn:
     zones = gpd.read_postgis("SELECT *, ST_AsBinary(geometry) geom FROM zones;", con=conn, geom_col="geom", crs=4326)
     zones.drop(columns=["geometry"], inplace=True)
 
@@ -207,7 +217,7 @@ fig
 
 # %%
 # Import the data
-with proj.db_connection as conn:
+with commit_and_close(db_path, spatial=True) as conn:
     qry = "SELECT building, zone_id, ST_AsBinary(geometry)geom FROM osm_building WHERE geometry IS NOT NULL;"
     buildings = gpd.read_postgis(qry, con=conn, geom_col="geom", crs=4326)
     buildings = buildings[buildings.building.isin(["undetermined", "Religious", "residential", "commercial"])]
@@ -252,7 +262,7 @@ m
 # %%
 # Finally, let's check out our model's network.
 # As we imported data from OpenStreetMaps, it is possible that we have several _link_type_ categories. We'll plot only five of them.
-with proj.db_connection as conn:
+with commit_and_close(db_path, spatial=True) as conn:
     qry = "SELECT link_type, distance, modes, ST_AsBinary(geometry) geom FROM links;"
     links = gpd.read_postgis(qry, con=conn, geom_col="geom", crs=4326)
     links = links[links.link_type.isin(["motorway", "trunk", "primary", "secondary", "tertiary"])]
