@@ -1,7 +1,5 @@
-import duckdb
 import geopandas as gpd
 from geopandas import sjoin_nearest
-from shapely import wkt
 
 from tradesman.data_retrieval.rural_access_index.population_data import population_data
 
@@ -28,13 +26,9 @@ def basic_RAI_data(project):
 
     # Add subdivision info
     # print('Obtaining country subdivisions')
-    with duckdb.connect(project.project_base_path / "project_database.sqlite") as conn:
-        conn.install_extension("spatial")
-        conn.load_extension("spatial")
-
+    with project.db_connection as conn:
         sql = "SELECT division_name, level, Hex(ST_AsBinary(GEOMETRY)) as geom FROM political_subdivisions;"
-        subdivisions = conn.execute(sql).df()
-        subdivisions = gpd.GeoDataFrame(subdivisions, geometry=subdivisions["geom"].apply(wkt.loads), crs="EPSG:4326")
+        subdivisions = gpd.read_postgis(sql, conn, geom_col="geom", crs=4326)
         subdivisions = subdivisions[subdivisions.level == subdivisions.level.max()]
 
     df = gpd.sjoin(df, subdivisions)
