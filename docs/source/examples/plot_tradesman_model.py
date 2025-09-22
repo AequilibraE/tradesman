@@ -54,16 +54,9 @@ model.import_amenities()
 model.import_buildings(False)
 
 # %%
-# With Tradesman, we can also create a synthetic population for our model.
-# First, we build our seed sample. At the end of this step, it is possible to see the overall characteristics of
-# our population sample.
-
-# model.build_population_synthesizer_data(sample_size=0.02)
+# If you also want to use Microsoft Building Data, you can set `model.import_buildings()`.
+# We won't run it here as there is no building data for Nauru in the Microsoft database (at least for now).
 
 # %%
-# Than we synthesize our data.
-# As our population is not that large, we don't need to set multiple threads to run the synthesizer.
-# But as the size of the population increases, it is worth using multiple threads to reduce the processing time.
-# At the end of the process, we will receive two outputs related to the validation of our synthetic population.
-
-# model.synthesize_population(thread_number=1)
+# Finally, let's close the model.
+model.close()
