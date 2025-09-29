@@ -7,7 +7,6 @@ from aequilibrae.utils.db_utils import commit_and_close
 from os.path import isdir
 
 from tradesman.data_retrieval.import_build_and_places import ImportBuildPlaces
-from tradesman.data_retrieval.microsoft_building_data import ImportMicrosoftBuildingData
 from tradesman.model_creation.build_zoning import ZoneBuilder
 from tradesman.model_creation.create_new_tables import add_new_tables
 from tradesman.model_creation.import_network import ImportNetwork
@@ -163,26 +162,20 @@ class Tradesman:
         Data will be exported as columns in zones file and as a separate parquet file.
 
         Parameters:
-            **box_size**(:obj:`int`): size of the box to be created (in km)
+            **box_side**(:obj:`int`): size of the box to be created (in km)
         """
         if not self._ovm:
             self._ovm = ImportBuildPlaces(self.project, box_side)
         self._ovm.import_places()
 
-    def import_buildings(self, box_side: int = 25, download_from_mcr: bool = True):
+    def import_buildings(self, box_side: int = 25):
         """
-        Triggers the import of buildings from both Overture and Microsoft Bing.
+        Triggers the import of buildings from Overture.
         Data will be exported as columns in zones file and as a separate parquet file.
 
         Parameters:
-            **box_size**(:obj:`int`): size of the box to be created (in km)
-
-            **download_from_mcr**(:obj:`bool`): downloads building data from Microsoft Bing. Defaults to ``True``.
+            **box_side**(:obj:`int`): size of the box to be created (in km)
         """
-        if download_from_mcr:
-            mcr_bld = ImportMicrosoftBuildingData(self.project)
-            mcr_bld.get_buildings()
-
         if not self._ovm:
             self._ovm = ImportBuildPlaces(self.project, box_side)
         self._ovm.import_buildings()

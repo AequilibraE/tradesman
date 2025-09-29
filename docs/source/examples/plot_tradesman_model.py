@@ -51,11 +51,7 @@ model.import_pop_by_sex_and_age()
 # %%
 # We can also import amenity (points of interest) and building information from Overture Maps.
 model.import_amenities()
-model.import_buildings(False)
-
-# %%
-# If you also want to use Microsoft Building Data, you can set `model.import_buildings()`.
-# We won't run it here as there is no building data for Nauru in the Microsoft database (at least for now).
+model.import_buildings()
 
 # %%
 # Finally, let's close the model.

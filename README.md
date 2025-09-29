@@ -9,8 +9,7 @@ Package's current capabilities:
 * Importing political sub-divisions for the modeling area 
 * Importing Population data from WorldPop and Meta population layers
 * Building zoning systems
-* Importing Point of Interest and building footprint data from OSM
-* Importing Building footprints data from Microsoft's building footprint datasets
+* Importing Point of Interest and building footprint data from Overture Maps
 
 Upcoming capabilities:
 * Creation of synthetic populations
