@@ -10,8 +10,7 @@ maintainers = [
     {name = "Pedro Camargo", email = "pedro@outerloop.io"},
 ]
 dependencies = [
-    "aequilibrae>=1.4.0",
-    "aequilibrae<2.0.0",
+    "aequilibrae>=1.4.0,<2.0",
     "duckdb<1.4.0",
     "matplotlib",
     "pycountry",
