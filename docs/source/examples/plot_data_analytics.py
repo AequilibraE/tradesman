@@ -58,10 +58,11 @@ zones.explore(
     popup=True,
 )
 # %%
+age = [0, 1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80]
 # Total female population per zone
-zones["female_pop"] = zones[[f"f_pop_{i}" for i in range(1, 19)]].sum(axis=1)
+zones["female_pop"] = zones[[f"f_pop_{i}" for i in age]].sum(axis=1)
 # Total male population per zone
-zones["male_pop"] = zones[[f"m_pop_{i}" for i in range(1, 19)]].sum(axis=1)
+zones["male_pop"] = zones[[f"m_pop_{i}" for i in age]].sum(axis=1)
 # Ratio of the male population with respect to the female population
 zones["pop_ratio"] = zones.male_pop / zones.female_pop
 
@@ -83,13 +84,11 @@ zones.explore(
 # %%
 # Now, let's analyze the median age of male and female inhabitants per zone.
 # To plot this data, we shall do a little bit of math first, as our data is represented in intervals.
-
-interval_min = [0, 1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80]
 interval_mean = [0.5, 3, 7.5, 12.5, 17.5, 22.5, 27.5, 32.5, 37.5, 42.5, 47.5, 52.5, 57.5, 62.5, 67.5, 72.5, 77.5, 82.5]
 interval_range = [1, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]
 
 for sex in ["f", "m"]:
-    columns = [col for col in zones.columns if f"pop_{sex}_" in col]
+    columns = [col for col in zones.columns if f"{sex}_pop_" in col]
     list_values = zones[columns].to_numpy()
 
     median_values = []
@@ -103,9 +102,9 @@ for sex in ["f", "m"]:
                 counter -= element
                 break
 
-        median_values.append(interval_min[pos - 1] + ((median - counter) * (interval_range[pos - 1] / lst[pos - 1])))
+        median_values.append(age[pos - 1] + ((median - counter) * (interval_range[pos - 1] / lst[pos - 1])))
 
-    zones[f"median_age_{sex}"] = median_values
+    zones[f"{sex}_median_age"] = median_values
 
 # %%
 # Let's take a look at our data!
@@ -117,7 +116,7 @@ subplot2 = fig.add_subplot(1, 2, 2)
 map1 = folium.Map(location=[-29.935717, -71.260520], zoom_start=12)
 map1 = zones.explore(
     m=map1,
-    column="median_age_f",
+    column="f_median_age",
     linewidth=0.1,
     cmap="Oranges",
     scheme="equal_interval",
@@ -131,7 +130,7 @@ folium.LayerControl().add_to(map1)
 map2 = folium.Map(location=[-29.935717, -71.260520], zoom_start=12)
 map2 = zones.explore(
     m=map2,
-    column="median_age_m",
+    column="m_median_age",
     linewidth=0.1,
     cmap="Blues",
     legend=False,
