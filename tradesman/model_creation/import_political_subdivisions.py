@@ -123,18 +123,19 @@ class ImportPoliticalSubdivisions:
         Imports political boundaries for an entire country. Data for all levels is stored in a parquet file.
         """
         if self._source == "overture":
-            bbox = []
             adm_places = core.geodataframe("division_area", bbox=bbox)
             adm_places = adm_places[
                 (adm_places["country"] == self.project.about.country_code_two_digit) & (adm_places["class"] == "land")
             ]
             adm_places["level"] = adm_places["subtype"].map(OVM_MAPPING)
             adm_places["country_name"] = self.project.about.country_name
+            adm_places["division_name"] = [name["primary"] for name in adm_places["names"]]
+            adm_places.rename(columns={"id": "ovm_id"}, inplace=True)
 
             adm_places = adm_places.sort_values(by=["level", "division_name"]).reset_index(drop=True)
-            adm_places = adm_places.set_crs(crs="WSG84")  # GeoJSON default is WGS84
+            adm_places = adm_places.set_crs(crs="WGS84")  # GeoJSON default is WGS84
             adm_places = adm_places[
-                ["level", "subtype", "id", "division_id", "country_name", "division_name", "geometry"]
+                ["level", "subtype", "ovm_id", "division_id", "country_name", "division_name", "geometry"]
             ]
 
         else:

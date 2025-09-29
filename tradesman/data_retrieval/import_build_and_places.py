@@ -85,7 +85,6 @@ class ImportBuildPlaces:
 
     def import_places(self):
         bboxes = set_bbox(self.__xmin, self.__ymin, self.__xmax, self.__ymax, self.box_side, True)
-
         places = []
         for bbox in bboxes:
             places.append(self.places_parser(bbox))

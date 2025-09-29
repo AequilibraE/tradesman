@@ -29,7 +29,6 @@ class Tradesman:
     ):
         # TODO: If the model exists, you would only tell where it is (network_path),
         # and the software would check and populate the model place.
-        self.__model_place = model_place
         self.__population_source = population_source
         self.__folder = network_path
         self.project = Project()
@@ -38,6 +37,7 @@ class Tradesman:
         self.logger = logger or get_logger()
 
         self.__initialize_model()
+        self.__model_place = model_place or self.project.about.model_place
 
         self._boundaries_source = boundaries_source
         self._boundaries = ImportPoliticalSubdivisions(self.__model_place, self.project, self._boundaries_source)
@@ -54,7 +54,7 @@ class Tradesman:
         self.build_zoning()
         self.import_pop_by_sex_and_age()
         self.import_amenities()
-        self.import_buildings(True)
+        self.import_buildings()
 
     def import_model_area(self):
         """

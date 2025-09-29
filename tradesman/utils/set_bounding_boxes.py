@@ -18,7 +18,7 @@ def set_bbox(xmin, ymin, xmax, ymax, box_side: int = 25, for_overture: bool = Fa
         if not for_overture:
             return [[area_bounds[0], area_bounds[1], area_bounds[2], area_bounds[3]]]
         else:
-            return area_bounds
+            return [area_bounds]
     else:
         bboxes = []
         xmin, ymin, xmax, ymax = area_bounds
