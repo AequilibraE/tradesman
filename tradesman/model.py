@@ -6,12 +6,12 @@ from aequilibrae.project import Project
 from aequilibrae.utils.db_utils import commit_and_close
 from os.path import isdir
 
-from tradesman.data_retrieval.import_build_and_places import ImportBuildPlaces
-from tradesman.model_creation.build_zoning import ZoneBuilder
-from tradesman.model_creation.create_new_tables import add_new_tables
-from tradesman.model_creation.import_network import ImportNetwork
-from tradesman.model_creation.import_political_subdivisions import ImportPoliticalSubdivisions
-from tradesman.model_creation.import_population import ImportPopulation
+from tradesman.data_retrieval import ImportBuildPlaces
+from tradesman.model_creation import ZoneBuilder
+from tradesman.model_creation import add_new_tables
+from tradesman.model_creation import ImportNetwork
+from tradesman.model_creation import ImportPoliticalSubdivisions
+from tradesman.model_creation import ImportPopulation
 from tradesman.model_creation.synthetic_population.create_synthetic_population import create_syn_pop, run_populationsim
 from tradesman.utils import get_subdivisions
 

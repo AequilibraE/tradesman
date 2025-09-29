@@ -2,7 +2,6 @@ from collections import namedtuple
 from os.path import isfile, join
 from tempfile import gettempdir
 
-import duckdb
 import geopandas as gpd
 import pandas as pd
 import pycountry
@@ -10,7 +9,7 @@ import requests
 from aequilibrae.project import Project
 from aequilibrae.project.network.osm.osm_params import http_headers
 from aequilibrae.utils.db_utils import commit_and_close
-from shapely import wkt
+from overturemaps import core
 from shapely.geometry import MultiPolygon, Polygon
 
 OVM_MAPPING = {
@@ -87,7 +86,8 @@ class ImportPoliticalSubdivisions:
 
         Parameters:
             *level*(:obj:`int`): number of levels to download.
-            *overwrite*(:obj:`bool`): overwrite political subdivisions if it already exists. Defaults to False.
+
+            *overwrite*(:obj:`bool`): overwrite political subdivisions if it already exists. Defaults to ``False``.
         """
         subdiv = self.__get_subdivisions()
         subdiv = subdiv[subdiv.level > 0].copy()
@@ -118,40 +118,24 @@ class ImportPoliticalSubdivisions:
 
             conn.executemany(qry, list_of_tuples)
 
-    def __boundaries_import(self):
+    def __boundaries_import(self, bbox: list = None):
         """
         Imports political boundaries for an entire country. Data for all levels is stored in a parquet file.
         """
         if self._source == "overture":
-            url = "s3://overturemaps-us-west-2/release/2025-07-23.0/theme=divisions/type=division_area/*"
-            qry = """
-            SELECT
-                id as ovm_id,
-                division_id,
-                subtype,
-                names.primary as division_name,
-                ST_AsText(geometry) as geometry
-            FROM
-                read_parquet('{}', hive_partitioning=1)
-            WHERE
-                country = '{}' AND
-                class = 'land'
-            """
-            qry = qry.format(url, self.project.about.country_code_two_digit)
-
-            # Load duckdb spatial
-            conn = duckdb.connect()
-            conn.install_extension("spatial")
-            conn.load_extension("spatial")
-
-            adm_places = conn.execute(qry).df()
-            adm_places = gpd.GeoDataFrame(adm_places, geometry=adm_places["geometry"].apply(wkt.loads), crs="EPSG:4326")
+            bbox = []
+            adm_places = core.geodataframe("division_area", bbox=bbox)
+            adm_places = adm_places[
+                (adm_places["country"] == self.project.about.country_code_two_digit) & (adm_places["class"] == "land")
+            ]
             adm_places["level"] = adm_places["subtype"].map(OVM_MAPPING)
             adm_places["country_name"] = self.project.about.country_name
-            adm_places = adm_places.sort_values(by=["level", "division_name"]).reset_index(drop=True)
 
-            cols = ["level", "subtype", "ovm_id", "division_id", "country_name", "division_name", "geometry"]
-            adm_places = adm_places[cols]
+            adm_places = adm_places.sort_values(by=["level", "division_name"]).reset_index(drop=True)
+            adm_places = adm_places.set_crs(crs="WSG84")  # GeoJSON default is WGS84
+            adm_places = adm_places[
+                ["level", "subtype", "id", "division_id", "country_name", "division_name", "geometry"]
+            ]
 
         else:
             url = "http://www.geoboundaries.org/api/current/gbOpen/{}/ALL/"
@@ -297,7 +281,15 @@ class ImportPoliticalSubdivisions:
             else:
                 return gpd.read_parquet(file_name)
         else:
-            return self.__boundaries_import()
+            if self._source == "overture":
+                xmin = float(self.project.about.xmin)
+                xmax = float(self.project.about.xmax)
+                ymin = float(self.project.about.ymin)
+                ymax = float(self.project.about.ymax)
+                bbox = [xmin, ymin, xmax, ymax]
+            else:
+                bbox = None
+            return self.__boundaries_import(bbox)
 
     @property
     def model_place(self):

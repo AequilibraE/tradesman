@@ -2,7 +2,15 @@ import geopandas as gpd
 from geopandas import sjoin_nearest
 from aequilibrae.utils.db_utils import commit_and_close
 
-from tradesman.data_retrieval.rural_access_index.population_data import population_data
+from tradesman.utils import load_vectorized_pop, select_urban_areas
+
+
+def population_data(project):
+    population = load_vectorized_pop(project)
+
+    urban_areas = select_urban_areas(project)
+
+    return population.overlay(urban_areas, how="difference")
 
 
 def basic_RAI_data(project):

@@ -4,3 +4,4 @@ from .load_vectorized_pop import load_vectorized_pop
 from .mask_raster import mask_raster
 from .set_bounding_boxes import set_bbox
 from .tqdm_download import TqdmUpTo
+from .urban_areas import select_urban_areas

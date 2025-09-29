@@ -23,7 +23,7 @@ def create_example(path: os.PathLike) -> Project:
 
     source = Path(__file__).parent / "reference_files" / "coquimbo.csv"
     population = pd.read_csv(source)
-    
+
     project = create_example(path, "coquimbo")
     db_path = project.project_base_path / "project_database.sqlite"
 
@@ -36,7 +36,9 @@ def create_example(path: os.PathLike) -> Project:
         for idx, a in enumerate(age):
             field_name = f"{key}_pop_{a}"
             if a < 80:
-                project_zones.fields.add(field_name, f"{sex[key]}male population {a} to {age[idx+1]} years old.", "NUMERIC")
+                project_zones.fields.add(
+                    field_name, f"{sex[key]}male population {a} to {age[idx+1]} years old.", "NUMERIC"
+                )
             else:
                 project_zones.fields.add(field_name, f"{sex[key]}male population over {a} years old.", "NUMERIC")
 

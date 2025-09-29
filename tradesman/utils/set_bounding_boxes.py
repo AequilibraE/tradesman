@@ -4,7 +4,7 @@ import geopandas as gpd
 from shapely import box
 
 
-def set_bbox(xmin, ymin, xmax, ymax, box_side: int = 25):
+def set_bbox(xmin, ymin, xmax, ymax, box_side: int = 25, for_overture: bool = False):
     """Split the model area into different bounding boxes
     Will now return ['ymin', 'xmin', 'ymax', 'xmax']
     """
@@ -15,7 +15,10 @@ def set_bbox(xmin, ymin, xmax, ymax, box_side: int = 25):
     parts = ceil(sqrt(geo.to_crs("EPSG:3857").area.sum() / (box_side * box_side * 1000 * 1000)))
 
     if parts == 1:
-        return [[area_bounds[1], area_bounds[0], area_bounds[3], area_bounds[2]]]
+        if not for_overture:
+            return [[area_bounds[0], area_bounds[1], area_bounds[2], area_bounds[3]]]
+        else:
+            return area_bounds
     else:
         bboxes = []
         xmin, ymin, xmax, ymax = area_bounds
@@ -26,7 +29,10 @@ def set_bbox(xmin, ymin, xmax, ymax, box_side: int = 25):
             xmax = xmin + delta_x
             for j in range(parts):
                 ymax = ymin + delta_y
-                bboxes.append([ymin, xmin, ymax, xmax])
+                if not for_overture:
+                    bboxes.append([ymin, xmin, ymax, xmax])
+                else:
+                    bboxes.append([xmin, ymin, xmax, ymax])
                 ymin = ymax
             xmin = xmax
             ymin = ymin_global

@@ -30,8 +30,7 @@ class ImportPopulation:
             url = "https://data.worldpop.org/GIS/Population/Global_2000_2020/2020/{}/{}_ppp_2020.tif"
             return url.format(country_code, country_code.lower())
         else:
-            folder = Path(dirname(__file__)).parent
-            url = pd.read_csv(folder / "data/population/all_raster_pop_source.csv")
+            url = pd.read_csv(join(dirname(__file__), "data/all_raster_pop_source.csv"))
             url = url[url.iso_country == country_code]
 
             if url.empty:
