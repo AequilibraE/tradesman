@@ -7,6 +7,8 @@ from tradesman.model import Tradesman
 
 @pytest.mark.skipif(bool(environ.get("CI")), reason="Does not run in GitHub Action")
 def test_create_model(folder_path):
+    """Tests the complete Tradesman workflow. It's first execution may take a while as it
+    downloads data from several sources."""
     proj = Tradesman(folder_path, model_place="San Marino")
     proj.create()
 

@@ -1,7 +1,9 @@
 from collections import namedtuple
 from os.path import isfile, join
 from tempfile import gettempdir
+from uuid import uuid4
 
+import duckdb
 import geopandas as gpd
 import pandas as pd
 import pycountry
@@ -9,10 +11,9 @@ import requests
 from aequilibrae.project import Project
 from aequilibrae.project.network.osm.osm_params import http_headers
 from aequilibrae.utils.db_utils import commit_and_close
-from overturemaps import core
 from shapely.geometry import MultiPolygon, Polygon
 
-OVM_MAPPING = {
+overture_mapping = {
     "country": 0,
     "dependency": 1,
     "macroregion": 2,
@@ -26,6 +27,7 @@ OVM_MAPPING = {
     "neighborhood": 10,
     "microhood": 11,
 }
+overture_url = "s3://overturemaps-us-west-2/release/2025-09-24.0"
 
 
 class ImportPoliticalSubdivisions:
@@ -118,22 +120,39 @@ class ImportPoliticalSubdivisions:
 
             conn.executemany(qry, list_of_tuples)
 
-    def __boundaries_import(self, bbox: list = None):
+    def __boundaries_import(self):
         """
         Imports political boundaries for an entire country. Data for all levels is stored in a parquet file.
         """
         if self._source == "overture":
-            adm_places = core.geodataframe("division_area", bbox=bbox)
-            adm_places = adm_places[
-                (adm_places["country"] == self.project.about.country_code_two_digit) & (adm_places["class"] == "land")
-            ]
-            adm_places["level"] = adm_places["subtype"].map(OVM_MAPPING)
-            adm_places["country_name"] = self.project.about.country_name
-            adm_places["division_name"] = [name["primary"] for name in adm_places["names"]]
-            adm_places.rename(columns={"id": "ovm_id"}, inplace=True)
+            conn = duckdb.connect()
+            c = conn.cursor()
 
+            c.execute("""INSTALL spatial; INSTALL httpfs; INSTALL parquet;""")
+            c.execute("""LOAD spatial; LOAD parquet; SET s3_region='us-west-2';""")
+
+            tmp_name = f"{gettempdir()}/{uuid4()}.parquet"
+            qry = f"""COPY (
+                            SELECT
+                                id as ovm_id,
+                                division_id,
+                                subtype,
+                                names.primary as division_name,
+                                geometry
+                            FROM
+                                read_parquet('{overture_url}/theme=divisions/type=division_area/*', filename=true, hive_partitioning=1, union_by_name = true)
+                            WHERE
+                                country = '{self.project.about.country_code_two_digit}' AND
+                                class = 'land'
+            ) TO '{tmp_name}' WITH (FORMAT 'parquet', COMPRESSION 'ZSTD');"""
+
+            _ = c.execute(qry)
+
+            df = pd.read_parquet(tmp_name)
+            adm_places = gpd.GeoDataFrame(df, geometry=gpd.GeoSeries.from_wkb(df.geometry, crs=4326))
+            adm_places["level"] = adm_places["subtype"].map(overture_mapping)
+            adm_places["country_name"] = self.project.about.country_name
             adm_places = adm_places.sort_values(by=["level", "division_name"]).reset_index(drop=True)
-            adm_places = adm_places.set_crs(crs="WGS84")  # GeoJSON default is WGS84
             adm_places = adm_places[
                 ["level", "subtype", "ovm_id", "division_id", "country_name", "division_name", "geometry"]
             ]
@@ -282,15 +301,7 @@ class ImportPoliticalSubdivisions:
             else:
                 return gpd.read_parquet(file_name)
         else:
-            if self._source == "overture":
-                xmin = float(self.project.about.xmin)
-                xmax = float(self.project.about.xmax)
-                ymin = float(self.project.about.ymin)
-                ymax = float(self.project.about.ymax)
-                bbox = [xmin, ymin, xmax, ymax]
-            else:
-                bbox = None
-            return self.__boundaries_import(bbox)
+            return self.__boundaries_import()
 
     @property
     def model_place(self):

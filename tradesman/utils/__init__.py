@@ -1,5 +1,5 @@
 from .country_main_area import country_border_from_model, model_borders
-from .create_example import create_example
+from .create_example import create_model_example
 from .get_all_subdivisions import get_subdivisions
 from .load_vectorized_pop import load_vectorized_pop
 from .mask_raster import mask_raster

@@ -1,12 +1,15 @@
+import logging
 from os import mkdir
 from os.path import dirname, isdir, join
+from uuid import uuid4
+from tempfile import gettempdir
 
+import duckdb
 import geopandas as gpd
 import pandas as pd
 from aequilibrae.project import Project
-from overturemaps import core
 
-from tradesman.utils import set_bbox
+overture_url = "s3://overturemaps-us-west-2/release/2025-09-24.0"
 
 
 class ImportBuildPlaces:
@@ -22,93 +25,107 @@ class ImportBuildPlaces:
         zones = self.project.zoning.data.copy()
         self.zones = zones[["zone_id", "geometry"]]
 
-    def building_parser(self, bbox):
-        buildings = core.geodataframe("building", bbox=bbox)
-        buildings["source_dataset"] = [source[0]["dataset"] for source in buildings["sources"]]
-        buildings["source_id"] = [source[0]["record_id"] for source in buildings["sources"]]
-        buildings["subtype"] = buildings["subtype"].fillna("undetermined")
-        buildings["class"] = buildings["class"].fillna("undetermined")
+    def import_data(self, theme: str = "buildings"):
+        conn = duckdb.connect()
+        c = conn.cursor()
 
-        return buildings[["id", "source_dataset", "source_id", "subtype", "class", "geometry"]]
-
-    def places_parser(self, bbox):
-        places = core.geodataframe("place", bbox=bbox)
-        places["source_dataset"] = [source[0]["dataset"] for source in places["sources"]]
-        places["source_id"] = [source[0]["record_id"] for source in places["sources"]]
-        places["tags"] = [cat["primary"] for cat in places["categories"]]
-        places["secondary_tags"] = [cat["alternate"] for cat in places["categories"]]
-
-        categories = pd.read_csv(join(dirname(__file__), "ovm_tags/ovm_categories.csv"), sep=",")
-
-        places = places.merge(categories, on="tags")
-
-        return places[["id", "source_dataset", "source_id", "tags", "secondary_tags", "main_category", "geometry"]]
-
-    def import_buildings(self):
-        bboxes = set_bbox(self.__xmin, self.__ymin, self.__xmax, self.__ymax, self.box_side, True)
-
-        blds = []
-        for bbox in bboxes:
-            blds.append(self.building_parser(bbox))
-
-        buildings = pd.concat(blds)
-        buildings = buildings.set_crs(crs="WGS84")  # GeoJSON default is WGS84
-        buildings = gpd.sjoin(buildings, self.zones)  # Join with the zones database
-        buildings = buildings.drop_duplicates(["id"]).reset_index(drop=True)
-        buildings["area"] = buildings.geometry.to_crs(3857).area
-
-        cols = ["id", "source_id", "source_dataset", "subtype", "class", "zone_id", "area", "geometry"]
-        buildings = buildings[cols]
+        c.execute("""INSTALL spatial; INSTALL httpfs; INSTALL parquet;""")
+        c.execute("""LOAD spatial; LOAD parquet; SET s3_region='us-west-2';""")
 
         if not isdir(self.project.project_base_path / "ovm_data"):
             mkdir(self.project.project_base_path / "ovm_data")
-        buildings.to_parquet(self.project.project_base_path / "ovm_data" / "ovm_buildings.parquet")
 
-        bld_count = buildings[["zone_id", "id"]].groupby("zone_id").count()
-        bld_area = buildings[["zone_id", "area"]].groupby("zone_id").sum()
+        logging.info(f"Downloading {theme} from Overture maps. Sit tight! This may take a while.")
+        tmp_name = f"{gettempdir()}/{uuid4()}.parquet"
+
+        qrys = {
+            "buildings": f"""COPY (
+                            SELECT
+                                id as ovm_id,
+                                sources[1].dataset as source_dataset,
+                                sources[1].record_id as source_id,
+                                subtype,
+                                class,
+                                geometry
+                            FROM
+                                read_parquet('{overture_url}/theme=buildings/type=building/*', filename=true, hive_partitioning=1, union_by_name = true)
+                            WHERE
+                                bbox.ymin >= {self.__ymin} AND
+                                bbox.xmin >= {self.__xmin} AND
+                                bbox.ymax <= {self.__ymax} AND
+                                bbox.xmax <= {self.__xmax}
+                            ) TO '{tmp_name}' WITH (FORMAT 'parquet', COMPRESSION 'ZSTD');""",
+            "places": f"""COPY (
+                        SELECT
+                            id as ovm_id,
+                            sources[1].dataset as source_dataset,
+                            sources[1].record_id as source_id,
+                            categories.primary as tags,
+                            categories.alternate as secondary_tags,
+                            geometry
+                        FROM
+                            read_parquet('{overture_url}/theme=places/type=place/*')
+                        WHERE
+                            bbox.ymin >= {self.__ymin} AND
+                            bbox.xmin >= {self.__xmin} AND
+                            bbox.ymax <= {self.__ymax} AND
+                            bbox.xmax <= {self.__xmax}
+                        ) TO '{tmp_name}' WITH (FORMAT 'parquet', COMPRESSION 'ZSTD');""",
+        }
+        _ = c.execute(qrys[theme])
+
+        logging.info(f"{theme} data downloaded. Basic geo-processing")
+        df = pd.read_parquet(tmp_name)
+
+        gdf = gpd.GeoDataFrame(df, geometry=gpd.GeoSeries.from_wkb(df.geometry, crs=4326))
+        gdf = gpd.sjoin(gdf, self.zones)  # Join with the zones database
+        gdf = gdf.drop_duplicates(["ovm_id"]).reset_index(drop=True)
+
+        if theme == "buildings":
+            gdf["subtype"] = gdf["subtype"].fillna("undetermined")
+            gdf["class"] = gdf["class"].fillna("undetermined")
+            gdf["area"] = gdf.geometry.to_crs(3857).area
+
+            gdf = gdf[["ovm_id", "source_id", "source_dataset", "subtype", "class", "zone_id", "area", "geometry"]]
+
+            area = gdf[["zone_id", "area"]].groupby("zone_id").sum()
+            with self.project.db_connection as conn:
+                conn.execute("ALTER TABLE zones ADD ovm_bld_area FLOAT;")
+                if not area.empty:
+                    for zone_id, row in area.iterrows():
+                        area_qry = "UPDATE zones SET ovm_bld_area={} WHERE zone_id={}".format(row["area"], zone_id)
+                        conn.execute(area_qry)
+
+                conn.execute("UPDATE zones SET ovm_bld_area=0 WHERE ovm_bld_area IS NULL;")
+
+        elif theme == "places":
+            categories = pd.read_csv(join(dirname(__file__), "ovm_tags/ovm_categories.csv"), sep=",")
+
+            gdf = gdf.merge(categories, on="tags")
+            gdf = gdf[
+                [
+                    "ovm_id",
+                    "source_id",
+                    "source_dataset",
+                    "main_category",
+                    "tags",
+                    "secondary_tags",
+                    "zone_id",
+                    "geometry",
+                ]
+            ]
+
+        gdf.to_parquet(self.project.project_base_path / "ovm_data" / f"ovm_{theme}.parquet")
+
+        counts = gdf[["ovm_id", "zone_id"]].groupby("zone_id").count()
 
         with self.project.db_connection as conn:
-            conn.execute("ALTER TABLE zones ADD ovm_bld_count INT;")
-            conn.execute("ALTER TABLE zones ADD ovm_bld_area FLOAT;")
+            tag = "poi" if theme == "places" else "bld"
+            conn.execute(f"ALTER TABLE zones ADD ovm_{tag}_count INT;")
 
-            if not bld_count.empty:
-                for zone_id, row in bld_count.iterrows():
-                    count_qry = "UPDATE zones SET ovm_bld_count={} WHERE zone_id={}".format(row["id"], zone_id)
+            if not counts.empty:
+                for zone_id, row in counts.iterrows():
+                    count_qry = f"UPDATE zones SET ovm_{tag}_count={row['ovm_id']} WHERE zone_id={zone_id}"
                     conn.execute(count_qry)
 
-            if not bld_area.empty:
-                for zone_id, row in bld_area.iterrows():
-                    area_qry = "UPDATE zones SET ovm_bld_area={} WHERE zone_id={}".format(row["area"], zone_id)
-                    conn.execute(area_qry)
-
-            conn.execute("UPDATE zones SET ovm_bld_area=0, ovm_bld_count=0 WHERE ovm_bld_area IS NULL;")
-
-    def import_places(self):
-        bboxes = set_bbox(self.__xmin, self.__ymin, self.__xmax, self.__ymax, self.box_side, True)
-        places = []
-        for bbox in bboxes:
-            places.append(self.places_parser(bbox))
-
-        all_places = pd.concat(places)
-        all_places = all_places.set_crs(crs="WGS84")  # GeoJSON default is WGS84
-        all_places = gpd.sjoin(all_places, self.zones)
-        all_places.reset_index(drop=True, inplace=True)
-
-        cols = ["id", "source_id", "source_dataset", "main_category", "tags", "secondary_tags", "zone_id", "geometry"]
-        all_places = all_places[cols]
-
-        if not isdir(self.project.project_base_path / "ovm_data"):
-            mkdir(self.project.project_base_path / "ovm_data")
-        all_places.to_parquet(self.project.project_base_path / "ovm_data" / "ovm_points_of_interest.parquet")
-
-        poi_count = all_places[["id", "zone_id"]].groupby("zone_id").count()
-
-        with self.project.db_connection as conn:
-            conn.execute("ALTER TABLE zones ADD ovm_poi_count INT;")
-
-            if not poi_count.empty:
-                for zone_id, row in poi_count.iterrows():
-                    count_qry = "UPDATE zones SET ovm_poi_count={} WHERE zone_id={}".format(row["id"], zone_id)
-                    conn.execute(count_qry)
-
-            conn.execute("UPDATE zones SET ovm_poi_count=0 WHERE ovm_poi_count IS NULL;")
+            conn.execute(f"UPDATE zones SET ovm_{tag}_count=0 WHERE ovm_{tag}_count IS NULL;")

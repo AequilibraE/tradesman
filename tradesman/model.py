@@ -158,7 +158,7 @@ class Tradesman:
 
     def import_amenities(self, box_side: int = 25):
         """
-        Triggers the import of amenities from OSM.
+        Triggers the import of amenities from Overture.
         Data will be exported as columns in zones file and as a separate parquet file.
 
         Parameters:
@@ -166,7 +166,7 @@ class Tradesman:
         """
         if not self._ovm:
             self._ovm = ImportBuildPlaces(self.project, box_side)
-        self._ovm.import_places()
+        self._ovm.import_data("places")
 
     def import_buildings(self, box_side: int = 25):
         """
@@ -178,7 +178,7 @@ class Tradesman:
         """
         if not self._ovm:
             self._ovm = ImportBuildPlaces(self.project, box_side)
-        self._ovm.import_buildings()
+        self._ovm.import_data("buildings")
 
     def build_population_synthesizer_data(self, sample_size: float = 0.01):
         """

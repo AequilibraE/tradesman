@@ -2,7 +2,9 @@
 Plotting Data
 =============
 
-In this example, we plot some data obtained from a Tradesman model.
+In this example, we plot some data from a Tradesman model.
+If you're familiar with AequilibraE, this is similar to the Coquimbo example with
+randomly generated population data.
 """
 
 # %%
@@ -15,22 +17,25 @@ from tempfile import gettempdir
 import geopandas as gpd
 import folium
 import branca
+import numpy as np
 
 from aequilibrae.utils.db_utils import commit_and_close
-from tradesman.utils import create_example
+from tradesman.utils import create_model_example
 
 # %%
-# Let's import our example
 
+# Let's import our example
 folder_path = join(gettempdir(), uuid4().hex)
 
-project = create_example(folder_path)
+model = create_model_example(folder_path)
 
 # %%
+
 # Let's create a path to the project database. It will help us get the geometry data we need.
-db_path = project.project_base_path / "project_database.sqlite"
+db_path = model.project.project_base_path / "project_database.sqlite"
 
 # %%
+
 # Let's import some information about our model's TAZs.
 with commit_and_close(db_path, spatial=True) as conn:
     zones = gpd.read_postgis("SELECT *, ST_AsBinary(geometry) geom FROM zones;", con=conn, geom_col="geom", crs=4326)
@@ -81,28 +86,42 @@ zones.explore(
 # %%
 # In an ideal scenario, the ratio of the male population with respect to the female population would be close to 1.06. In countries such as India or China, this ratio is a bit larger, 1.12 and 1.15, respectively. This difference is responsible for creating abnormal sex ratios at birth.
 
+
+# %%
+def grouped_data_median(data, class_limits):
+    midpoints = np.array([(lim[0] + lim[1]) / 2 for lim in class_limits])
+
+    medians = np.zeros(data.shape[0])
+
+    for i, row in enumerate(data):
+        n = np.sum(row)
+        median_pos = n / 2
+        cum_freq = np.cumsum(row)
+        median_class = np.argmax(cum_freq >= median_pos)
+        prev_cum_freq = cum_freq[median_class - 1] if median_class > 0 else 0
+        class_freq = row[median_class]
+        lower_limit = class_limits[median_class][0]
+        upper_limit = class_limits[median_class][1]
+        class_width = upper_limit - lower_limit
+        if class_freq > 0:
+            median = lower_limit + ((median_pos - prev_cum_freq) / class_freq) * class_width
+        else:
+            median = midpoints[median_class]
+        medians[i] = median
+
+    return medians
+
+
 # %%
 # Now, let's analyze the median age of male and female inhabitants per zone.
 # To plot this data, we shall do a little bit of math first, as our data is represented in intervals.
-interval_mean = [0.5, 3, 7.5, 12.5, 17.5, 22.5, 27.5, 32.5, 37.5, 42.5, 47.5, 52.5, 57.5, 62.5, 67.5, 72.5, 77.5, 82.5]
-interval_range = [1, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]
+class_limit = list(zip(age[:-1], age[1:]))
 
 for sex in ["f", "m"]:
     columns = [col for col in zones.columns if f"{sex}_pop_" in col]
     list_values = zones[columns].to_numpy()
 
-    median_values = []
-
-    for idx, lst in enumerate(list_values):
-        median = lst.sum() / 2
-        counter = 0
-        for pos, element in enumerate(lst):
-            counter += element
-            if counter > median:
-                counter -= element
-                break
-
-        median_values.append(age[pos - 1] + ((median - counter) * (interval_range[pos - 1] / lst[pos - 1])))
+    median_values = grouped_data_median(list_values, class_limit)
 
     zones[f"{sex}_median_age"] = median_values
 
@@ -149,10 +168,8 @@ fig
 # %%
 # Finally, let's check out our model's network.
 # As we imported data from OpenStreetMaps, it is possible that we have several _link_type_ categories. We'll plot only five of them.
-with commit_and_close(db_path, spatial=True) as conn:
-    qry = "SELECT link_type, distance, modes, ST_AsBinary(geometry) geom FROM links;"
-    links = gpd.read_postgis(qry, con=conn, geom_col="geom", crs=4326)
-    links = links[links.link_type.isin(["motorway", "trunk", "primary", "secondary", "tertiary"])]
+links = model.project.network.links.data
+links = links[links.link_type.isin(["motorway", "trunk", "primary", "secondary", "tertiary"])]
 
 # %%
 colors = ["#219EBC", "#ffb703", "#8ECAE6", "#023047", "#fb8500"]
@@ -189,4 +206,5 @@ folium.LayerControl().add_to(m)
 m
 
 # %%
-project.close()
+# Finally, we close the model.
+model.close()

@@ -4,7 +4,7 @@ from pathlib import Path
 from aequilibrae.project import Project
 
 
-def create_example(path: str) -> Project:
+def create_model_example(path: str) -> Project:
     """Copies an example model to a new project project and returns the project handle
 
     :Arguments:
@@ -14,6 +14,8 @@ def create_example(path: str) -> Project:
         **project** (:obj:`Project`): AequilibraE Coquimbo Project handle (open)
 
     """
+    from tradesman.model import Tradesman
+
     pth = Path(path)
     if pth.is_dir() and pth.exists():
         raise FileExistsError("Cannot overwrite an existing directory")
@@ -22,4 +24,6 @@ def create_example(path: str) -> Project:
 
     pth.mkdir(parents=True, exist_ok=True)
     zipfile.ZipFile(source).extractall(pth)
-    return Project.from_path(str(pth))
+
+    _ = Project.from_path(str(pth))
+    return Tradesman(str(pth))
