@@ -1,3 +1,5 @@
+:orphan:
+
 .. _build_travel_model:
 
 Travel model

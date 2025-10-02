@@ -2,9 +2,8 @@
 Plotting Data
 =============
 
-In this example, we plot some data from a Tradesman model.
-If you're familiar with AequilibraE, this is similar to the Coquimbo example with
-randomly generated population data.
+In this example, we plot some data from a Tradesman model. If you're familiar with AequilibraE,
+it corresponds to the Coquimbo example with randomly generated population data.
 """
 
 # %%
@@ -19,37 +18,37 @@ import folium
 import branca
 import numpy as np
 
-from aequilibrae.utils.db_utils import commit_and_close
 from tradesman.utils import create_model_example
+# sphinx_gallery_thumbnail_path = '../images/model.png'
 
 # %%
 
-# Let's import our example
+# Let's create our example
 folder_path = join(gettempdir(), uuid4().hex)
 
 model = create_model_example(folder_path)
 
 # %%
-
-# Let's create a path to the project database. It will help us get the geometry data we need.
-db_path = model.project.project_base_path / "project_database.sqlite"
-
-# %%
-
 # Let's import some information about our model's TAZs.
-with commit_and_close(db_path, spatial=True) as conn:
-    zones = gpd.read_postgis("SELECT *, ST_AsBinary(geometry) geom FROM zones;", con=conn, geom_col="geom", crs=4326)
+
+with model.project.db_connection_spatial as conn:
+    qry = "SELECT *, ST_AsBinary(geometry) geom FROM zones;"
+    zones = gpd.read_postgis(qry, con=conn, geom_col="geom", crs=4326)
     zones.drop(columns=["geometry"], inplace=True)
 
 # %%
-# From AequilibraE version 1.5.0, the context manager can be replaced with:
-
-# with proj.db_connection_spatial as conn:
+# The import method above is verbose but corresponds to the one used for importing political
+# subdivisions or other spatial data that do not belong to the default AequilibraE project.
+#
+# To import zoning data directly from the project, you can use:
+# zones = model.project.zoning.data
 
 # %%
 # Create a population density field
 zones["pop_density"] = zones["population"] / (zones["geom"].to_crs(3857).area * 10e-6)
 
+# %%
+map_location = [-29.935717, -71.260520]
 # %%
 # Let's plot our data!
 zones.explore(
@@ -59,9 +58,14 @@ zones.explore(
     tooltip=False,
     style_kwds={"fillOpacity": 1.0},
     zoom_start=11,
-    location=[-29.935717, -71.260520],
-    popup=True,
+    location=map_location,
 )
+
+# %%
+# In an ideal scenario, the ratio of the male population with respect to the female population
+# would be close to 1.06. In countries such as India or China, this ratio is a bit larger, 1.12
+# and 1.15, respectively. This difference is responsible for creating abnormal sex ratios at birth.
+
 # %%
 age = [0, 1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80]
 # Total female population per zone
@@ -79,49 +83,45 @@ zones.explore(
     tooltip=False,
     style_kwds={"fillOpacity": 1.0},
     zoom_start=11,
-    location=[-29.935717, -71.260520],
-    popup=True,
+    location=map_location
 )
-
-# %%
-# In an ideal scenario, the ratio of the male population with respect to the female population would be close to 1.06. In countries such as India or China, this ratio is a bit larger, 1.12 and 1.15, respectively. This difference is responsible for creating abnormal sex ratios at birth.
-
-
-# %%
-def grouped_data_median(data, class_limits):
-    midpoints = np.array([(lim[0] + lim[1]) / 2 for lim in class_limits])
-
-    medians = np.zeros(data.shape[0])
-
-    for i, row in enumerate(data):
-        n = np.sum(row)
-        median_pos = n / 2
-        cum_freq = np.cumsum(row)
-        median_class = np.argmax(cum_freq >= median_pos)
-        prev_cum_freq = cum_freq[median_class - 1] if median_class > 0 else 0
-        class_freq = row[median_class]
-        lower_limit = class_limits[median_class][0]
-        upper_limit = class_limits[median_class][1]
-        class_width = upper_limit - lower_limit
-        if class_freq > 0:
-            median = lower_limit + ((median_pos - prev_cum_freq) / class_freq) * class_width
-        else:
-            median = midpoints[median_class]
-        medians[i] = median
-
-    return medians
-
 
 # %%
 # Now, let's analyze the median age of male and female inhabitants per zone.
 # To plot this data, we shall do a little bit of math first, as our data is represented in intervals.
-class_limit = list(zip(age[:-1], age[1:]))
 
+from math import ceil
+
+# %% 
+def grouped_data_median(data):
+    cvalues = np.cumsum(data, axis=1)
+    median_values = []
+    for _, val in enumerate(cvalues):
+        if val[-1] % 2 == 0:
+            median = val[-1] / 2
+            next_element = median + 1
+            for idx, element in enumerate(val):
+                if median <= element:
+                    a = age[idx]
+                if next_element <= element:
+                    b = age[idx]
+                    break
+            median_values.append(int((a + b) / 2))
+        else:
+            median = ceil(val[-1] / 2)
+            for idx, element in enumerate(val):
+                if median <= element:
+                    median_values.append(age[idx])
+                    break
+    
+    return median_values
+
+# %%
 for sex in ["f", "m"]:
     columns = [col for col in zones.columns if f"{sex}_pop_" in col]
     list_values = zones[columns].to_numpy()
 
-    median_values = grouped_data_median(list_values, class_limit)
+    median_values = grouped_data_median(list_values)
 
     zones[f"{sex}_median_age"] = median_values
 
@@ -132,33 +132,27 @@ fig = branca.element.Figure()
 subplot1 = fig.add_subplot(1, 2, 1)
 subplot2 = fig.add_subplot(1, 2, 2)
 
-map1 = folium.Map(location=[-29.935717, -71.260520], zoom_start=12)
 map1 = zones.explore(
-    m=map1,
-    column="f_median_age",
-    linewidth=0.1,
+    "f_median_age",
+    tiles="CartoDB positron",
     cmap="Oranges",
-    scheme="equal_interval",
-    k=5,
+    tooltip=False,
     legend=False,
-    legend_kwds={"loc": "upper left", "fmt": "{:.2f}"},
-    tiles="CartoDB positron",
+    style_kwds={"fillOpacity": 1.0},
+    zoom_start=11,
+    location=map_location
 )
-folium.LayerControl().add_to(map1)
 
-map2 = folium.Map(location=[-29.935717, -71.260520], zoom_start=12)
 map2 = zones.explore(
-    m=map2,
-    column="m_median_age",
-    linewidth=0.1,
-    cmap="Blues",
-    legend=False,
-    scheme="equal_interval",
-    k=5,
-    legend_kwds={"loc": "upper left", "fmt": "{:.2f}"},
+    "m_median_age",
     tiles="CartoDB positron",
+    cmap="Blues",
+    tooltip=False,
+    legend=False,
+    style_kwds={"fillOpacity": 1.0},
+    zoom_start=11,
+    location=map_location
 )
-folium.LayerControl().add_to(map2)
 
 subplot1.add_child(map1)
 subplot2.add_child(map2)
@@ -167,15 +161,17 @@ fig
 
 # %%
 # Finally, let's check out our model's network.
-# As we imported data from OpenStreetMaps, it is possible that we have several _link_type_ categories. We'll plot only five of them.
+# As we imported data from OpenStreetMaps, it is possible that we have several 'link_type' categories.
+# We'll plot only five of them.
+ltypes = ["motorway", "trunk", "primary", "secondary", "tertiary"]
 links = model.project.network.links.data
-links = links[links.link_type.isin(["motorway", "trunk", "primary", "secondary", "tertiary"])]
+links = links[links.link_type.isin(ltypes)]
 
 # %%
 colors = ["#219EBC", "#ffb703", "#8ECAE6", "#023047", "#fb8500"]
 m = None
 
-for idx, tp in enumerate(links.link_type.unique()):
+for idx, tp in enumerate(ltypes):
     gdf = links[links.link_type == tp]
     if m:
         gdf.explore(
@@ -183,9 +179,8 @@ for idx, tp in enumerate(links.link_type.unique()):
             name=tp,
             tiles="CartoDB positron",
             tooltip=False,
-            popup=True,
             zoom_start=11,
-            location=[-29.935717, -71.260520],
+            location=map_location,
             legend=False,
             color=colors[idx],
         )
@@ -194,9 +189,8 @@ for idx, tp in enumerate(links.link_type.unique()):
             name=tp,
             tiles="CartoDB positron",
             tooltip=False,
-            popup=True,
             zoom_start=11,
-            location=[-29.935717, -71.260520],
+            location=map_location,
             legend=False,
             color=colors[idx],
         )

@@ -1,9 +1,9 @@
+:orphan:
+
 .. _concepts:
 
 General concepts
 ================
-
-
 
 4-step models
 -------------
@@ -51,7 +51,6 @@ other open-source packages in the Python (NumPy, really) ecosystem.
 
 Comprehensive documentation is available in its `website
 <http://aequilibrae.com/>`_.
-
 
 Road Networks model
 -------------------
