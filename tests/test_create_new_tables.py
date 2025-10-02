@@ -1,21 +1,18 @@
-import uuid
-from os.path import join
-from tempfile import gettempdir
-from unittest import TestCase
-from aequilibrae.utils.create_example import create_example
 import pandas as pd
+from aequilibrae.utils.create_example import create_example
+from aequilibrae.utils.db_utils import commit_and_close
 
 from tradesman.model_creation.create_new_tables import add_new_tables
 
 
-class Test(TestCase):
-    def test_add_new_tables(self):
-        test_model = create_example(join(gettempdir(), uuid.uuid4().hex))
+def test_add_new_tables(folder_path):
+    test_model = create_example(folder_path)
 
-        with test_model.db_connection as conn:
-            add_new_tables(conn)
+    db_path = test_model.project_base_path / "project_database.sqlite"
+    with commit_and_close(db_path, spatial=True) as conn:
+        add_new_tables(conn)
 
-            df = pd.read_sql("SELECT name FROM sqlite_master WHERE type='table'", conn)
+        df = pd.read_sql("SELECT name FROM sqlite_master WHERE type='table'", conn)
 
-            for i in ["political_subdivisions", "raw_population", "hex_pop"]:
-                self.assertIn(i, list(df.name))
+    for i in ["political_subdivisions", "raw_population", "hex_pop"]:
+        assert i in df.name.tolist()

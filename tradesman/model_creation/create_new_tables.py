@@ -1,6 +1,6 @@
 import glob
 import sqlite3
-from os.path import join, dirname
+from os.path import dirname, join
 
 
 def add_new_tables(connection: sqlite3.Connection):

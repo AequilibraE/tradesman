@@ -1,6 +1,7 @@
-import pandas as pd
 import csv
 from os.path import join
+
+import pandas as pd
 
 
 def create_control_totals_meta(dest_folder: str):

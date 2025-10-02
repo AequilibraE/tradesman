@@ -34,6 +34,7 @@ jobs:
   unit_tests:
     needs: linting
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
     - uses: actions/checkout@v4
 
@@ -57,7 +58,7 @@ jobs:
 
     - name: Runs unit tests
       run: |
-        python -m pytest -v
+        python -m pytest --cov-report term-missing --cov=tradesman tests
 
   build_documentation:
     needs: linting

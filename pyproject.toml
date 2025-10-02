@@ -10,7 +10,8 @@ maintainers = [
     {name = "Pedro Camargo", email = "pedro@outerloop.io"},
 ]
 dependencies = [
-    "aequilibrae<2.0.0",
+    "aequilibrae<2.0",
+    "duckdb<1.4.0",
     "matplotlib",
     "pycountry",
     "libpysal",
@@ -34,14 +35,15 @@ docs = [
 tests = [
     "setuptools",
     "pytest",
+    "pytest-cov",
+    "pytest-mock",
     "ruff==0.9.10",
     "black==25.1.0",
     "wheel"
 ]
 
 build = [
-    "setuptools",
-    "twine",
+    "setuptools>=61.0",
     "wheel"
 ]
 
@@ -95,6 +97,7 @@ exclude = [
     ".venv310",
     ".venv311",
     ".venv312",
+    ".ipynb",
 ]
 line-length = 120
 lint.dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
@@ -102,3 +105,7 @@ target-version = "py310"
 
 [tool.setuptools.package-dir]
 tradesman = "tradesman"
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"

@@ -1,9 +1,10 @@
-from shutil import rmtree
 import unittest
-from os.path import join, exists
 from os import rename
+from os.path import join, exists
+from shutil import rmtree
 from tempfile import gettempdir, mkdtemp
 from urllib.request import urlopen
+
 from tradesman.model_creation.synthetic_population.seeds_url import population_url
 from tradesman.model_creation.synthetic_population.unzip_seed_files import unzip_seed_files
 

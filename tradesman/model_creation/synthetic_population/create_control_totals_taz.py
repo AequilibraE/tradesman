@@ -1,9 +1,9 @@
 from os.path import dirname, join
 
-import geopandas as gpd
 import pandas as pd
-import pycountry
 from aequilibrae.project import Project
+
+from tradesman.utils.get_all_subdivisions import get_subdivisions
 
 
 def create_control_totals_taz(project: Project, dest_folder: str):
@@ -15,50 +15,34 @@ def create_control_totals_taz(project: Project, dest_folder: str):
          *dest_folder*(:obj:`str`): folder containing population files
     """
 
-    country_code = project.about.country_code
+    country_code = project.about.country_code_three_digit
 
     pth = dirname(__file__)
 
     un_hh_size = pd.read_csv(join(pth, "controls_and_validation/hh_size_data.csv"))
-
     un_hh_size = un_hh_size[un_hh_size.iso_code == country_code]
-
     un_hh_size.reset_index(drop=True, inplace=True)
 
-    with project.db_connection as conn:
-        df = pd.read_sql("SELECT * FROM zones;", con=conn)
-
+    df = project.zoning.data
     selected_fields = [field for field in df.columns.tolist() if "POP" in field]
-
     df = df[selected_fields].copy()
 
     df["POPBASE"] = df[selected_fields].transpose().sum().tolist()
-
     df["HHBASE1"] = df["POPBASE"] / un_hh_size.AVGSIZE[0] * un_hh_size.HHBASE1[0] / 100
-
     df["HHBASE2"] = df["POPBASE"] / un_hh_size.AVGSIZE[0] * un_hh_size.HHBASE2[0] / 100
-
     df["HHBASE4"] = df["POPBASE"] / un_hh_size.AVGSIZE[0] * un_hh_size.HHBASE4[0] / 100
-
     df["HHBASE6"] = df["POPBASE"] / un_hh_size.AVGSIZE[0] * un_hh_size.HHBASE6[0] / 100
 
     df = df.round(decimals=0).astype(int)
-
     df["HHBASE"] = df["HHBASE1"] + df["HHBASE2"] + df["HHBASE4"] + df["HHBASE6"]
-
     df.insert(0, "TAZ", list(range(1, len(df) + 1)))
 
-    with project.db_connection as conn:
-        sql = "SELECT country_name, division_name, level, Hex(ST_AsBinary(GEOMETRY)) as geom FROM political_subdivisions WHERE level=1;"
+    subdivisions = get_subdivisions(project)
+    lvl = subdivisions["level"].unique().tolist()[2]
+    subdivisions = subdivisions[subdivisions["level"] == lvl]
 
-        subdivisions = gpd.GeoDataFrame.from_postgis(sql, conn, geom_col="geom", crs=4326)
-
-        sql = "SELECT zone_id, Hex(ST_AsBinary(geometry)) as geom FROM zones;"
-
-        zones = gpd.GeoDataFrame.from_postgis(sql, con=conn, geom_col="geom", crs=4326)
-
+    zones = project.zoning.data
     zones["centroid"] = zones.to_crs(3857).centroid.to_crs(4326)
-
     zones.set_geometry(col="centroid", drop=True, inplace=True)
 
     zones_and_subdivisions = (

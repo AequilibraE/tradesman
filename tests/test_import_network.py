@@ -1,61 +1,53 @@
+import pytest
+from os import environ
 from os.path import join, abspath, dirname
-from tempfile import gettempdir
-import requests
-import unittest
-from unittest import mock
-from uuid import uuid4
-from aequilibrae import Project, Parameters
-
-import pandas as pd
 
 from tradesman.model_creation.import_network import ImportNetwork
 
 
-class TestImportNetwork(unittest.TestCase):
-    def setUp(self) -> None:
-        self.fldr = join(gettempdir(), uuid4().hex)
+@pytest.mark.skipif(bool(environ.get("CI")), reason="Does not run in GitHub Action")
+def test_import_from_gmns(empty_aequilibrae_model):
+    fields = ["model_place", "address_type", "country_name", "country_code_two_digit", "country_code_three_digit"]
+    fields.extend(["xmin", "ymin", "xmax", "ymax"])
 
-        self.project = Project()
-        self.project.new(self.fldr)
+    about = empty_aequilibrae_model.about
+    for field in fields:
+        about.add_info_field(field)
 
-        self.pbf_path = join(abspath(dirname("tests")), "tests/data/monaco/monaco-latest.osm.pbf")
-        self.model_place = "Monaco"
+    about.model_place = "Monaco"
+    about.address_type = "country"
+    about.country_name = "Monaco"
+    about.country_code_two_digit = "MC"
+    about.country_code_three_digit = "MCO"
+    about.xmin = 7.4064
+    about.ymin = 43.7253
+    about.xmax = 7.4392
+    about.ymax = 43.7517
 
-        try:
-            requests.get("https://lz4.overpass-api.de/api/interpreter")
-        except requests.exceptions.ConnectionError:
-            par = Parameters()
-            par.parameters["osm"]["overpass_endpoint"] = "https://overpass.kumi.systems/api/interpreter"
-            par.write_back()
+    pbf_path = join(abspath(dirname("tests")), "tests/data/monaco/monaco-latest.osm.pbf")
 
-    def tearDown(self) -> None:
-        self.project.close()
+    network = ImportNetwork(empty_aequilibrae_model, pbf_path=pbf_path)
+    network.build_network()
 
-    def test_import_from_osm(self):
-        network = ImportNetwork(self.project, self.model_place)
-        network.build_network()
+    links = empty_aequilibrae_model.network.links.data
 
-        with self.project.db_connection as conn:
-            links = pd.read_sql("SELECT * FROM links;", con=conn)
-
-        self.assertGreater(len(links), 0)
-        self.assertIn("bridge", links.columns)
-        self.assertIn("toll", links.columns)
-        self.assertIn("tunnel", links.columns)
-
-    @mock.patch("tradesman.model_creation.import_network.bounding_boxes")
-    def test_import_from_gmns(self, patch_box):
-        network = ImportNetwork(self.project, self.model_place, self.pbf_path)
-        network.build_network()
-
-        with self.project.db_connection as conn:
-            links = pd.read_sql("SELECT * FROM links;", con=conn)
-
-        self.assertGreater(len(links), 0)
-        self.assertIn("bridge", links.columns)
-        self.assertIn("toll", links.columns)
-        self.assertIn("tunnel", links.columns)
+    assert links.shape[0] > 0
+    for i in ["bridge", "toll", "tunnel"]:
+        assert i in links.columns
 
 
-if __name__ == "__name__":
-    unittest.main()
+@pytest.mark.skipif(bool(environ.get("CI")), reason="Does not run in GitHub Action")
+def test_import_from_osm(empty_aequilibrae_model):
+    about = empty_aequilibrae_model.about
+    about.add_info_field("model_place")
+
+    about.model_place = "Monaco"
+
+    network = ImportNetwork(empty_aequilibrae_model)
+    network.build_network()
+
+    links = empty_aequilibrae_model.network.links.data
+
+    assert links.shape[0] > 0
+    for i in ["bridge", "toll", "tunnel"]:
+        assert i in links.columns

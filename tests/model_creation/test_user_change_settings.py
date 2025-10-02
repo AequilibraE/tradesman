@@ -1,9 +1,10 @@
+import unittest
 from os import rename
 from os.path import join
 from shutil import rmtree
 from tempfile import gettempdir, mkdtemp
+
 import yaml
-import unittest
 
 from tradesman.model_creation.synthetic_population.user_control_import import user_change_settings
 

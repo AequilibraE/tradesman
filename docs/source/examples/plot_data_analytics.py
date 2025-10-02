@@ -2,166 +2,131 @@
 Plotting Data
 =============
 
-In this example, we plot some data obtained from a Tradesman model.
+In this example, we plot some data from a Tradesman model. If you're familiar with AequilibraE,
+it corresponds to the Coquimbo example with randomly generated population data.
 """
 
 # %%
+
 # Imports
-import os
-
-os.environ["USE_PYGEOS"] = "0"
-
+from os.path import join
 from uuid import uuid4
 from tempfile import gettempdir
-from aequilibrae.project import Project
-import branca
-import folium
+
 import geopandas as gpd
-from zipfile import ZipFile
-from urllib.request import urlretrieve
+import folium
+import branca
+import numpy as np
+
+from tradesman.utils import create_model_example
+
+# sphinx_gallery_thumbnail_path = '../images/model.png'
 
 # %%
-# Let's download our project data.
-# This data is available as part of the project documentation, and presents
-# La Serena and Coquimbo metropolitan area in Chile.
 
-URL = "https://github.com/AequilibraE/tradesman/releases/download/V0.1b/coquimbo.zip"
+# Let's create our example
+folder_path = join(gettempdir(), uuid4().hex)
 
-proj_fldr = os.path.join(gettempdir(), uuid4().hex)
-file_fldr = os.path.join(gettempdir(), "coquimbo.zip")
-
-if not os.path.isfile(file_fldr):
-    urlretrieve(URL, file_fldr)
-
-ZipFile(file_fldr).extractall(proj_fldr)
+model = create_model_example(folder_path)
 
 # %%
-# Open an AequilibraE project
-proj = Project()
-proj.open(proj_fldr)
+# Let's import some information about our model's TAZs.
 
-# %%
-# We establish a connection to identify the region we are plotting our data.
-# First we import our subdivisions
-
-with proj.db_connection as conn:
-    subdivisions = gpd.read_postgis(
-        "SELECT division_name, level, ST_AsBinary(geometry)geom FROM political_subdivisions;",
-        con=conn,
-        geom_col="geom",
-        crs=4326,
-    )
-
-# %%
-# Now we can plot our map!
-# Go ahead and check it out
-colors = ["#01BEFE", "#FFDD00", "#FF7D00", "#FF006D", "#ADFF02", "#8F00FF"]
-m = None
-
-for lvl in range(-1, subdivisions.level.max() + 1):
-    gdf = subdivisions[subdivisions.level == lvl]
-
-    if m:
-        gdf.explore(
-            m=m,
-            name=f"level {lvl}",
-            tiles="CartoDB positron",
-            tooltip=False,
-            popup=True,
-            location=[-29.935717, -71.260520],
-            zoom_start=11,
-            legend=False,
-            color=colors[lvl + 1],
-        )
-    else:
-        m = gdf.explore(
-            name=f"model_area",
-            tiles="CartoDB positron",
-            tooltip=False,
-            popup=True,
-            location=[-29.935717, -71.260520],
-            zoom_start=11,
-            legend=False,
-            color=colors[lvl + 1],
-        )
-
-folium.LayerControl().add_to(m)
-
-m
-# %%
-# Feel free to turn on/off all the layers. If you click on the subdivisions, you can also check its name and level.
-
-# %%
-# Now let's move on and import some information about our model's TAZs.
-with proj.db_connection as conn:
-    zones = gpd.read_postgis("SELECT *, ST_AsBinary(geometry) geom FROM zones;", con=conn, geom_col="geom", crs=4326)
+with model.project.db_connection_spatial as conn:
+    qry = "SELECT *, ST_AsBinary(geometry) geom FROM zones;"
+    zones = gpd.read_postgis(qry, con=conn, geom_col="geom", crs=4326)
     zones.drop(columns=["geometry"], inplace=True)
 
 # %%
-# And create new columns
-# Population per square kilometer
-zones["POP_DENSITY"] = zones["population"] / (zones["geom"].to_crs(3857).area * 10e-6)
+# The import method above is verbose but corresponds to the one used for importing political
+# subdivisions or other spatial data that do not belong to the default AequilibraE project.
+#
+# To import zoning data directly from the project, you can use:
+# zones = model.project.zoning.data
 
+# %%
+# Create a population density field
+zones["pop_density"] = zones["population"] / (zones["geom"].to_crs(3857).area * 10e-6)
+
+# %%
+map_location = [-29.935717, -71.260520]
 # %%
 # Let's plot our data!
 zones.explore(
-    "POP_DENSITY",
+    "pop_density",
     tiles="CartoDB positron",
     cmap="Greens",
     tooltip=False,
     style_kwds={"fillOpacity": 1.0},
     zoom_start=11,
-    location=[-29.935717, -71.260520],
-    popup=True,
+    location=map_location,
 )
+
 # %%
+# In an ideal scenario, the ratio of the male population with respect to the female population
+# would be close to 1.06. In countries such as India or China, this ratio is a bit larger, 1.12
+# and 1.15, respectively. This difference is responsible for creating abnormal sex ratios at birth.
+
+# %%
+age = [0, 1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80]
 # Total female population per zone
-zones["TOTALF_POP"] = zones[[f"POPF{i}" for i in range(1, 19)]].sum(axis=1)
+zones["female_pop"] = zones[[f"f_pop_{i}" for i in age]].sum(axis=1)
 # Total male population per zone
-zones["TOTALM_POP"] = zones[[f"POPM{i}" for i in range(1, 19)]].sum(axis=1)
+zones["male_pop"] = zones[[f"m_pop_{i}" for i in age]].sum(axis=1)
 # Ratio of the male population with respect to the female population
-zones["PP_FM"] = zones.TOTALM_POP / zones.TOTALF_POP
+zones["pop_ratio"] = zones.male_pop / zones.female_pop
 
 # %%
 zones.explore(
-    "PP_FM",
+    "pop_ratio",
     tiles="CartoDB positron",
     cmap="RdPu",
     tooltip=False,
     style_kwds={"fillOpacity": 1.0},
     zoom_start=11,
-    location=[-29.935717, -71.260520],
-    popup=True,
+    location=map_location,
 )
-
-# %%
-# In an ideal scenario, the ratio of the male population with respect to the female population would be close to 1.06. In countries such as India or China, this ratio is a bit larger, 1.12 and 1.15, respectively. This difference is responsible for creating abnormal sex ratios at birth.
 
 # %%
 # Now, let's analyze the median age of male and female inhabitants per zone.
 # To plot this data, we shall do a little bit of math first, as our data is represented in intervals.
 
-interval_min = [0, 1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80]
-interval_mean = [0.5, 3, 7.5, 12.5, 17.5, 22.5, 27.5, 32.5, 37.5, 42.5, 47.5, 52.5, 57.5, 62.5, 67.5, 72.5, 77.5, 82.5]
-interval_range = [1, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]
+from math import ceil
 
-for sex in ["F", "M"]:
-    list_values = zones[[f"POP{sex}{i}" for i in range(1, 19)]].to_numpy()
 
+# %%
+def grouped_data_median(data):
+    cvalues = np.cumsum(data, axis=1)
     median_values = []
+    for _, val in enumerate(cvalues):
+        if val[-1] % 2 == 0:
+            median = val[-1] / 2
+            next_element = median + 1
+            for idx, element in enumerate(val):
+                if median <= element:
+                    a = age[idx]
+                if next_element <= element:
+                    b = age[idx]
+                    break
+            median_values.append(int((a + b) / 2))
+        else:
+            median = ceil(val[-1] / 2)
+            for idx, element in enumerate(val):
+                if median <= element:
+                    median_values.append(age[idx])
+                    break
 
-    for idx, lst in enumerate(list_values):
-        median = lst.sum() / 2
-        counter = 0
-        for pos, element in enumerate(lst):
-            counter += element
-            if counter > median:
-                counter -= element
-                break
+    return median_values
 
-        median_values.append(interval_min[pos - 1] + ((median - counter) * (interval_range[pos - 1] / lst[pos - 1])))
 
-    zones[f"MEDIAN_AGE_{sex}"] = median_values
+# %%
+for sex in ["f", "m"]:
+    columns = [col for col in zones.columns if f"{sex}_pop_" in col]
+    list_values = zones[columns].to_numpy()
+
+    median_values = grouped_data_median(list_values)
+
+    zones[f"{sex}_median_age"] = median_values
 
 # %%
 # Let's take a look at our data!
@@ -170,98 +135,46 @@ fig = branca.element.Figure()
 subplot1 = fig.add_subplot(1, 2, 1)
 subplot2 = fig.add_subplot(1, 2, 2)
 
-map1 = folium.Map(location=[-29.935717, -71.260520], zoom_start=12)
 map1 = zones.explore(
-    m=map1,
-    column="MEDIAN_AGE_F",
-    linewidth=0.1,
+    "f_median_age",
+    tiles="CartoDB positron",
     cmap="Oranges",
-    scheme="equal_interval",
-    k=5,
+    tooltip=False,
     legend=False,
-    legend_kwds={"loc": "upper left", "fmt": "{:.2f}"},
-    tiles="CartoDB positron",
+    style_kwds={"fillOpacity": 1.0},
+    zoom_start=11,
+    location=map_location,
 )
-folium.LayerControl().add_to(map1)
 
-map2 = folium.Map(location=[-29.935717, -71.260520], zoom_start=12)
 map2 = zones.explore(
-    m=map2,
-    column="MEDIAN_AGE_M",
-    linewidth=0.1,
-    cmap="Blues",
-    legend=False,
-    scheme="equal_interval",
-    k=5,
-    legend_kwds={"loc": "upper left", "fmt": "{:.2f}"},
+    "m_median_age",
     tiles="CartoDB positron",
+    cmap="Blues",
+    tooltip=False,
+    legend=False,
+    style_kwds={"fillOpacity": 1.0},
+    zoom_start=11,
+    location=map_location,
 )
-folium.LayerControl().add_to(map2)
 
 subplot1.add_child(map1)
 subplot2.add_child(map2)
 
 fig
-# %%
-# Our model also has OpenStreetMaps Building information. Let's take a look at the location of some building types.
-
-# %%
-# Import the data
-with proj.db_connection as conn:
-    qry = "SELECT building, zone_id, ST_AsBinary(geometry)geom FROM osm_building WHERE geometry IS NOT NULL;"
-    buildings = gpd.read_postgis(qry, con=conn, geom_col="geom", crs=4326)
-    buildings = buildings[buildings.building.isin(["undetermined", "Religious", "residential", "commercial"])]
-
-# %%
-# And plot it
-colors = ["#73b7b8", "#0077b6", "#f05a29", "#f05a29"]
-
-m = None
-
-for idx, bld in enumerate(buildings.building.unique()):
-    gdf = buildings[buildings.building == bld]
-
-    if m:
-        gdf.explore(
-            m=m,
-            name=bld,
-            tiles="CartoDB positron",
-            tooltip=False,
-            popup=True,
-            zoom_start=15,
-            location=[-29.9541855, -71.3479664],
-            legend=False,
-            color=colors[idx],
-        )
-    else:
-        m = gdf.explore(
-            name=bld,
-            tiles="CartoDB positron",
-            tooltip=False,
-            popup=True,
-            zoom_start=15,
-            location=[-29.9541855, -71.3479664],
-            legend=False,
-            color=colors[idx],
-        )
-
-folium.LayerControl().add_to(m)
-
-m
 
 # %%
 # Finally, let's check out our model's network.
-# As we imported data from OpenStreetMaps, it is possible that we have several _link_type_ categories. We'll plot only five of them.
-with proj.db_connection as conn:
-    qry = "SELECT link_type, distance, modes, ST_AsBinary(geometry) geom FROM links;"
-    links = gpd.read_postgis(qry, con=conn, geom_col="geom", crs=4326)
-    links = links[links.link_type.isin(["motorway", "trunk", "primary", "secondary", "tertiary"])]
+# As we imported data from OpenStreetMaps, it is possible that we have several 'link_type' categories.
+# We'll plot only five of them.
+ltypes = ["motorway", "trunk", "primary", "secondary", "tertiary"]
+links = model.project.network.links.data
+links = links[links.link_type.isin(ltypes)]
 
 # %%
 colors = ["#219EBC", "#ffb703", "#8ECAE6", "#023047", "#fb8500"]
 m = None
 
-for idx, tp in enumerate(links.link_type.unique()):
+for idx, tp in enumerate(ltypes):
     gdf = links[links.link_type == tp]
     if m:
         gdf.explore(
@@ -269,9 +182,8 @@ for idx, tp in enumerate(links.link_type.unique()):
             name=tp,
             tiles="CartoDB positron",
             tooltip=False,
-            popup=True,
             zoom_start=11,
-            location=[-29.935717, -71.260520],
+            location=map_location,
             legend=False,
             color=colors[idx],
         )
@@ -280,9 +192,8 @@ for idx, tp in enumerate(links.link_type.unique()):
             name=tp,
             tiles="CartoDB positron",
             tooltip=False,
-            popup=True,
             zoom_start=11,
-            location=[-29.935717, -71.260520],
+            location=map_location,
             legend=False,
             color=colors[idx],
         )
@@ -290,3 +201,7 @@ for idx, tp in enumerate(links.link_type.unique()):
 folium.LayerControl().add_to(m)
 
 m
+
+# %%
+# Finally, we close the model.
+model.close()

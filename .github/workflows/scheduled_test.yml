@@ -1,0 +1,48 @@
+name: Scheduled Test
+
+on:
+  schedule:
+    - cron: '0 8 1 * *'
+  repository_dispatch:
+    types: [ custom-event ]
+
+jobs:
+  scheduled_test:
+    runs-on: ${{ matrix.os}}
+    strategy:
+      matrix:
+        python-version: ['3.10', '3.11', '3.12']
+        os: [ windows-latest, ubuntu-latest ]
+      max-parallel: 20
+    timeout-minutes: 20
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set Python environment
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies with develop aequilibrae
+      run: |
+        python3 -m pip install -U pip uv
+        python3 -m uv pip install -e .[dev]
+        python3 -m uv pip install git+https://github.com/AequilibraE/aequilibrae.git@develop
+        python3 -m pip list
+
+    - name: Download spatialite on Linux
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo apt update
+        sudo apt install libsqlite3-mod-spatialite
+        sudo apt install -y libspatialite-dev
+        pip3 install spatialite
+        sudo ln -s /usr/lib/x86_64-linux-gnu/mod_spatialite.so /usr/lib/x86_64-linux-gnu/mod_spatialite
+
+    - name: Download spatialite on Windows
+      if: matrix.os == 'windows-latest'
+      run: python tests/setup_windows_spatialite.py
+  
+    - name: Runs unit tests
+      run: |
+        python -m pytest -v

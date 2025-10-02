@@ -1,13 +1,15 @@
-from math import floor
 import multiprocessing as mp
 import subprocess
-import warnings
-import yaml
-from os.path import join, isfile
-import pandas as pd
 import sys
+import warnings
+from math import floor
+from os.path import join, isfile
 
+import pandas as pd
+import yaml
 from aequilibrae.project import Project
+from aequilibrae.utils.db_utils import commit_and_close
+
 from tradesman.model_creation.synthetic_population.create_control_totals_meta import create_control_totals_meta
 from tradesman.model_creation.synthetic_population.create_control_totals_taz import create_control_totals_taz
 from tradesman.model_creation.synthetic_population.create_geo_crosswalk import create_geo_cross_walk
@@ -93,7 +95,8 @@ def run_populationsim(multithread: bool, project: Project, folder: str, thread_n
     """
     pop_fldr = join(folder, "population")
 
-    with project.db_connection as conn:
+    db_path = project.project_base_path / "project_database.sqlite"
+    with commit_and_close(db_path, spatial=True) as conn:
         num_zones = conn.execute("SELECT COUNT(*) FROM zones;").fetchone()[0]
 
     if multithread or num_zones > 100:
@@ -111,7 +114,7 @@ def run_populationsim(multithread: bool, project: Project, folder: str, thread_n
         )
         return
 
-    with project.db_connection as conn:
+    with commit_and_close(db_path, spatial=True) as conn:
         pd.read_csv(join(pop_fldr, "output/synthetic_persons.csv"))[["hh_id", "TAZ", "AGEP", "SEX"]].to_sql(
             "synthetic_persons", con=conn, if_exists="replace"
         )
@@ -135,8 +138,8 @@ def run_populationsim(multithread: bool, project: Project, folder: str, thread_n
         )
         conn.commit()
 
-    user_change_validation_parameters(overwrite=False, model_place=project.about.model_name, dest_folder=pop_fldr)
+    user_change_validation_parameters(overwrite=False, model_place=project.about.model_place, dest_folder=pop_fldr)
 
-    validate_non_controlled_vars(project.about.country_code, pop_fldr)
+    validate_non_controlled_vars(project.about.country_code_three_digit, pop_fldr)
 
     validate_controlled_vars(pop_fldr)

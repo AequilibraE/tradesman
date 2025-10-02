@@ -1,55 +1,60 @@
+import geopandas as gpd
 import logging
 import sys
+from aequilibrae.context import get_logger
+from aequilibrae.project import Project
+from aequilibrae.utils.db_utils import commit_and_close
 from os.path import isdir
 
-import geopandas as gpd
-from aequilibrae import Project
-
-from tradesman.data_retrieval import subdivisions
-from tradesman.data_retrieval.import_amenities import import_amenities
-from tradesman.data_retrieval.import_building import building_import
-from tradesman.model_creation.create_new_tables import add_new_tables
-from tradesman.model_creation.import_network import ImportNetwork
-from tradesman.model_creation.import_political_subdivisions import ImportPoliticalSubdivisions
-from tradesman.model_creation.import_population import import_population
-from tradesman.model_creation.pop_by_sex_and_age import get_pop_by_sex_age
-from tradesman.model_creation.set_source import set_political_boundaries_source, set_population_source
+from tradesman.data_retrieval import ImportBuildPlaces
+from tradesman.model_creation import ZoneBuilder
+from tradesman.model_creation import add_new_tables
+from tradesman.model_creation import ImportNetwork
+from tradesman.model_creation import ImportPoliticalSubdivisions
+from tradesman.model_creation import ImportPopulation
 from tradesman.model_creation.synthetic_population.create_synthetic_population import create_syn_pop, run_populationsim
-from tradesman.model_creation.zoning.zone_building import zone_builder
+from tradesman.utils import get_subdivisions
 
 
 class Tradesman:
     def __init__(
-        self, network_path: str, model_place: str = None, pbf_path: str = None, boundaries_source: str = "GADM"
+        self,
+        network_path: str,
+        model_place: str = None,
+        pbf_path: str = None,
+        box_side: int = 25,
+        boundaries_source: str = "Overture",
+        population_source: str = "WorldPop",
+        logger=None,
     ):
-        # If the model exists, you would only tell where it is (network_path), and the software
-        # would check and populate the model place.  Needs to be implemented
-        self.__model_place = model_place
-        self.__population_source = "WorldPop"
+        # TODO: If the model exists, you would only tell where it is (network_path),
+        # and the software would check and populate the model place.
+        self.__population_source = population_source
         self.__folder = network_path
-        self._project = Project()
-        self.__osm_data = {}
+        self.project = Project()
         self.__pbf_path = pbf_path
-        self.__starts_logging()
+        self.box_side = box_side
+        self.logger = logger or get_logger()
 
         self.__initialize_model()
-        self._network = ImportNetwork(self._project, self.__model_place, self.__pbf_path)
+        self.__model_place = model_place or self.project.about.model_place
 
         self._boundaries_source = boundaries_source
-        self._boundaries = ImportPoliticalSubdivisions(self.__model_place, self._boundaries_source, self._project)
+        self._boundaries = ImportPoliticalSubdivisions(self.__model_place, self.project, self._boundaries_source)
+        self._ovm = None
 
     def create(self):
         """Creates the entire model"""
 
         self.import_model_area()
         self.add_country_borders()
-        self.import_subdivisions(2)
+        self.import_subdivisions()
         self.import_network()
         self.import_population()
         self.build_zoning()
         self.import_pop_by_sex_and_age()
         self.import_amenities()
-        self.import_buildings(True)
+        self.import_buildings()
 
     def import_model_area(self):
         """
@@ -58,33 +63,16 @@ class Tradesman:
 
         self._boundaries.import_model_area()
 
-    def add_country_borders(self, overwrite=False):
+    def add_country_borders(self, overwrite: bool = False):
         """
         Retrieves country borders and adds to the model.
 
         Parameters:
-            *overwrite* (:obj:`bool`): User option for overwriting data that may already exist in the model. Defaults to False
+            *overwrite* (:obj:`bool`): User option for overwriting data that may already exist in the model.
+            Defaults to ``False``
         """
 
         self._boundaries.add_country_borders(overwrite)
-
-    def set_population_source(self, source="WorldPop"):
-        """
-        Sets the source for downloading population data
-
-        Parameters:
-            *source* (:obj:`str`): Can be 'WorldPop' or 'Meta'. Defaults to WorldPop
-        """
-        self.__population_source = set_population_source(source)
-
-    def set_political_boundaries_source(self, source="GADM"):
-        """
-        Sets the source for downloading geographic data.
-
-        Parameters:
-             *source*(:obj:`str`): Takes "GADM" or "GeoBoundaries". Defaults to GADM.
-        """
-        self._boundaries_source = set_political_boundaries_source(source)
 
     def import_network(self):
         """
@@ -92,63 +80,65 @@ class Tradesman:
         If the network already exists in the folder, it will be loaded, otherwise it will be created.
         """
 
-        self._network.build_network()
+        network = ImportNetwork(self.project, self.__pbf_path, self.box_side)
+        network.build_network()
 
-    def import_subdivisions(self, subdivision_levels=2, overwrite=False):
+    def import_subdivisions(self, subdivision_levels: int = 2, overwrite: bool = False):
         """Imports political subdivisions.
 
         Parameters:
             *subdivisions* (:obj:`int`): Number of subdivision levels to import. Defaults to 2
-            *overwrite* (:obj:`bool`): Deletes pre-existing subdivisions. Defaults to False
 
+            *overwrite* (:obj:`bool`): Deletes pre-existing subdivisions. Defaults to False
         """
 
         self._boundaries.import_subdivisions(subdivision_levels, overwrite)
 
-    def import_population(self, overwrite=False):
+    def import_population(self):
         """
-        Triggers the import of population from raster into the model
-
-        Parameters:
-            *overwrite* (:obj:`bool`): Deletes pre-existing population_source_import. Defaults to False
+        Triggers the import of population from raster into the model.
         """
 
-        fields = self._project.zoning.fields
-        if "population" not in fields.all_fields():
-            fields.add("population", "Total population", "INTEGER")
-            fields.save()
+        population = ImportPopulation(self.project, self.__population_source)
+        population.get_overall_population()
 
-        import_population(
-            self._project, self._project.about.country_name, self.__population_source, overwrite=overwrite
-        )
-
-    def build_zoning(self, hexbin_size=200, max_zone_pop=10000, min_zone_pop=500, save_hexbins=False, overwrite=False):
+    def build_zoning(
+        self,
+        hexbin_size: int = 200,
+        max_zone_pop: int = 10_000,
+        min_zone_pop: int = 500,
+        save_hexbins: bool = False,
+        overwrite: bool = False,
+    ):
         """
         Creates hexagonal bins, and then clusters it regarding the political subdivision.
 
         Parameters:
-             *hexbin_size*(:obj:`int`): size of the hexagonal bins to be created.
-             *max_zone_pop*(:obj:`int`): max population living within a zone.
-             *min_zone_pop*(:obj:`int`): min population living within a zone.
-             *save_hexbins*(:obj:`bool`): saves the hexagonal bins with population. Defaults to False.
-             *overwrite* (:obj:`bool`): Deletes pre-existing HexBins and Zones. Defaults to False
-        """
-        with self._project.db_connection as conn:
-            num_zones = conn.execute("Select count(*) from Zones").fetchone()
+            *hexbin_size*(:obj:`int`): size of the hexagonal bins to be created.
 
-        if not overwrite and sum(num_zones) > 0:
-            return
-        zone_builder(self._project, hexbin_size, max_zone_pop, min_zone_pop, save_hexbins)
+            *max_zone_pop*(:obj:`int`): max population living within a zone.
+
+            *min_zone_pop*(:obj:`int`): min population living within a zone.
+
+            *save_hexbins*(:obj:`bool`): saves the hexagonal bins with population. Defaults to ``False``.
+
+            *overwrite* (:obj:`bool`): Deletes pre-existing HexBins and Zones. Defaults to ``False``.
+        """
+        if not overwrite and not self.project.zoning.data.empty:
+            raise ValueError("Project zones is not empty. Set overwrite=True to proceed.")
+
+        zones = ZoneBuilder(self.project, hexbin_size, max_zone_pop, min_zone_pop, save_hexbins)
+        zones.execute()
 
     def get_political_subdivisions(self, level: int = None) -> gpd.GeoDataFrame:
         """
         Return political subdivisions from a country.
 
         Parameters:
-             *level*(:obj:`int`): Number of subdivision levels to import. Default imports all levels.
+            *level*(:obj:`int`): Number of subdivision levels to import. Default imports all levels.
         """
 
-        subd = subdivisions(self._project)
+        subd = get_subdivisions(self.project)
         if level is not None:
             subd = subd[subd.level == level]
         return subd
@@ -157,56 +147,64 @@ class Tradesman:
         """
         Close the project model.
         """
-        self._project.close()
+        self.project.close()
 
     def import_pop_by_sex_and_age(self):
         """
         Triggers the import of population pyramid from raster into the model.
         """
-        get_pop_by_sex_age(self._project, self._project.about.country_name)
+        population = ImportPopulation(self.project)
+        population.get_stratified_population()
 
-    def import_amenities(self):
+    def import_amenities(self, box_side: int = 25):
         """
-        Triggers the import of amenities from OSM.
-        Data will be exported as columns in zones file and as a separate SQL file.
-        """
-
-        import_amenities(self._project, self.__osm_data)
-
-    def import_buildings(self, download_from_bing=True):
-        """
-        Triggers the import of buildings from both OSM and Microsoft Bing.
-        Data will be exported as columns in zones file and as a separate SQL file.
+        Triggers the import of amenities from Overture.
+        Data will be exported as columns in zones file and as a separate parquet file.
 
         Parameters:
-            *download_from_bing(:obj:`bool`): downloads building data from Microsoft Bing. Defaults to True.
+            **box_side**(:obj:`int`): size of the box to be created (in km)
         """
+        if not self._ovm:
+            self._ovm = ImportBuildPlaces(self.project, box_side)
+        self._ovm.import_data("places")
 
-        building_import(self.__model_place, self._project, self.__osm_data, download_from_bing)
+    def import_buildings(self, box_side: int = 25):
+        """
+        Triggers the import of buildings from Overture.
+        Data will be exported as columns in zones file and as a separate parquet file.
 
-    def build_population_synthesizer_data(self, sample_size=0.01):
+        Parameters:
+            **box_side**(:obj:`int`): size of the box to be created (in km)
+        """
+        if not self._ovm:
+            self._ovm = ImportBuildPlaces(self.project, box_side)
+        self._ovm.import_data("buildings")
+
+    def build_population_synthesizer_data(self, sample_size: float = 0.01):
         """
         Triggers the import of data to create the synthetic population.
         """
-        create_syn_pop(self._project, self.__folder, sample_size=sample_size)
+        create_syn_pop(self.project, self.__folder, sample_size=sample_size)
 
-    def synthesize_population(self, thread_number=None, multithread=False):
+    def synthesize_population(self, thread_number: int = None, multithread: bool = False):
         """
         Triggers the creation of synthetic population.
 
         Parameters:
             *multithread*(:obj:`bool`): sets if one wants to use multiple threads or not. Defaults to False.
+
             *thread_number*(:obj:`int`): number of threads for multiprocessing
         """
 
-        run_populationsim(multithread, self._project, self.__folder, thread_number)
+        run_populationsim(multithread, self.project, self.__folder, thread_number)
 
     def __initialize_model(self):
         if isdir(self.__folder):
-            self._project.open(self.__folder)
+            self.project.open(self.__folder)
         else:
-            self._project.new(self.__folder)
-            with self._project.db_connection as conn:
+            self.project.new(self.__folder)
+            db_path = self.project.project_base_path / "project_database.sqlite"
+            with commit_and_close(db_path, spatial=True) as conn:
                 add_new_tables(conn)
 
     @property

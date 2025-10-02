@@ -1,8 +1,8 @@
+import unittest
 from os import rename
 from os.path import join, abspath, dirname
 from shutil import copytree, rmtree
 from tempfile import gettempdir, mkdtemp
-import unittest
 
 from tradesman.model_creation.synthetic_population.syn_pop_validation import validate_non_controlled_vars
 
