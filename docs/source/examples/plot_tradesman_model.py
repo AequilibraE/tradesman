@@ -12,6 +12,7 @@ from tradesman.model import Tradesman
 from tempfile import gettempdir
 from uuid import uuid4
 from os.path import join
+
 # sphinx_gallery_thumbnail_path = '../images/model.png'
 
 # %%
@@ -23,7 +24,7 @@ folder = join(gettempdir(), uuid4().hex)
 model = Tradesman(network_path=folder, model_place="Nauru")
 
 # %%
-# If we want to run a complete Tradesman model using its default configurations, we can use 
+# If we want to run a complete Tradesman model using its default configurations, we can use
 
 # model.create()
 
@@ -31,7 +32,7 @@ model = Tradesman(network_path=folder, model_place="Nauru")
 # The command above comprises all the steps below to create a complete model from scratch.
 #
 # However, we can also customize the model we want to create, set up the size of the zones,
-# decide whether to import the network, gender population data, and so on. So let's check out 
+# decide whether to import the network, gender population data, and so on. So let's check out
 # how to change some configurations.
 
 # %%
@@ -41,7 +42,7 @@ model.add_country_borders()
 model.import_subdivisions()
 
 # %%
-# We won't download the network from OpenStreetMap for now, but you can try it out by 
+# We won't download the network from OpenStreetMap for now, but you can try it out by
 # uncommenting the line below.
 
 # model.import_network()

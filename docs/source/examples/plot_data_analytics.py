@@ -19,6 +19,7 @@ import branca
 import numpy as np
 
 from tradesman.utils import create_model_example
+
 # sphinx_gallery_thumbnail_path = '../images/model.png'
 
 # %%
@@ -83,7 +84,7 @@ zones.explore(
     tooltip=False,
     style_kwds={"fillOpacity": 1.0},
     zoom_start=11,
-    location=map_location
+    location=map_location,
 )
 
 # %%
@@ -92,7 +93,8 @@ zones.explore(
 
 from math import ceil
 
-# %% 
+
+# %%
 def grouped_data_median(data):
     cvalues = np.cumsum(data, axis=1)
     median_values = []
@@ -113,8 +115,9 @@ def grouped_data_median(data):
                 if median <= element:
                     median_values.append(age[idx])
                     break
-    
+
     return median_values
+
 
 # %%
 for sex in ["f", "m"]:
@@ -140,7 +143,7 @@ map1 = zones.explore(
     legend=False,
     style_kwds={"fillOpacity": 1.0},
     zoom_start=11,
-    location=map_location
+    location=map_location,
 )
 
 map2 = zones.explore(
@@ -151,7 +154,7 @@ map2 = zones.explore(
     legend=False,
     style_kwds={"fillOpacity": 1.0},
     zoom_start=11,
-    location=map_location
+    location=map_location,
 )
 
 subplot1.add_child(map1)
