@@ -27,7 +27,7 @@ def create_clusters(hexbins, max_zone_pop=10000, min_zone_pop=500):
     if hexbins.population.max() > max_zone_pop:
         raise ValueError(
             """There is at least one hexbin with population greater than max_zone_pop.
-        Plase change the parameter value."""
+        Please change the parameter value."""
         )
     hexbins["zone_id"] = -1
     centroids = hexbins.geometry.centroid
